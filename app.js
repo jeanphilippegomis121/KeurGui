@@ -115,6 +115,23 @@ const DEFAULT_PROPERTIES = [
     paidDate: "01/10/2026",
     owner: "Mme Fatou Sow",
     receiptNo: "KG-2026-0048"
+  },
+  {
+    id: 8,
+    building: "Centre d'Affaires VDN",
+    unitName: "Bureaux 2ème Étage (Plateau Bureaux)",
+    neighborhood: "VDN / Mermoz",
+    type: "Bail Commercial & Professionnel (SARL)",
+    rent: 600000,
+    charges: 50000,
+    tenant: "Cabinet Sahel Consulting SARL",
+    phone: "+221 77 912 34 56",
+    status: "paid",
+    paymentMethod: "Virement Bancaire (CBAO)",
+    paidDate: "05/10/2026",
+    owner: "M. Babacar Ndiaye",
+    receiptNo: "FACT-2026-0018",
+    isCommercial: true
   }
 ];
 
@@ -125,7 +142,16 @@ function loadProperties() {
   try {
     const saved = localStorage.getItem('keurgui_properties_data');
     if (saved) {
-      return JSON.parse(saved);
+      let parsed = JSON.parse(saved);
+      // S'assurer que l'exemple de bail commercial TVA 18% est présent
+      if (!parsed.some(p => p.isCommercial)) {
+        const comm = DEFAULT_PROPERTIES.find(p => p.isCommercial);
+        if (comm) {
+          parsed.push(comm);
+          localStorage.setItem('keurgui_properties_data', JSON.stringify(parsed));
+        }
+      }
+      return parsed;
     }
   } catch (e) {
     console.error('Erreur chargement LocalStorage', e);
@@ -372,14 +398,24 @@ function updateStats() {
 
   const totalExpected = totalCollected + totalPending;
   const rate = totalExpected > 0 ? Math.round((totalCollected / totalExpected) * 100) : 0;
-  const agencyCommission = Math.round(totalCollected * 0.10);
+  
+  // Calcul commissions Agence (10% HT + TVA 18% selon CGI Sénégal)
+  const agencyCommissionHt = Math.round(totalCollected * 0.10);
+  const agencyTva = Math.round(agencyCommissionHt * 0.18);
+  const agencyTtc = agencyCommissionHt + agencyTva;
+  const agencyNet = Math.max(0, totalCollected - agencyTtc);
 
   // Animation fluide des chiffres (Rolling Counter)
   animateNumber('totalCollected', prevStats.collected, totalCollected, 750, true);
   animateNumber('totalPending', prevStats.pending, totalPending, 750, true);
   animateNumber('collectionRate', prevStats.rate, rate, 750, false);
   document.getElementById('collectionFill').style.width = rate + '%';
-  document.getElementById('agencyCommission').textContent = formatFCFA(agencyCommission);
+  document.getElementById('agencyCommission').textContent = formatFCFA(agencyCommissionHt);
+  
+  const payoutTag = document.getElementById('agencyPayoutTag');
+  if (payoutTag) {
+    payoutTag.textContent = `Reversé aux bailleurs : ${formatFCFA(agencyNet)}`;
+  }
 
   prevStats = { collected: totalCollected, pending: totalPending, rate: rate };
 
@@ -556,13 +592,15 @@ function renderProperties() {
             }
 
             const ownerBadge = isAgencyMode ? `<span class="agency-tag-owner">Bailleur : ${u.owner}</span>` : '';
+            const commercialBadge = u.isCommercial ? `<span class="badge-commercial">Bail Pro (TVA 18%)</span>` : '';
 
             // Boutons d'action
             let actionButtons = '';
             if (u.status === 'paid') {
+              const receiptBtnLabel = u.isCommercial ? 'Facture TVA' : 'Quittance PDF';
               actionButtons = `
                 <button class="btn-receipt-sm" onclick="openReceiptModal(${u.id})">
-                  <span>📄</span> Quittance PDF
+                  <span>📄</span> ${receiptBtnLabel}
                 </button>
                 <button class="btn-whatsapp-sm" onclick="sendWhatsAppReceiptDirect(${u.id})">
                   <span>💬</span> WhatsApp
@@ -582,7 +620,7 @@ function renderProperties() {
             return `
               <div class="unit-row">
                 <div class="unit-info-col">
-                  <div class="unit-name">${u.unitName} ${ownerBadge}</div>
+                  <div class="unit-name">${u.unitName} ${commercialBadge} ${ownerBadge}</div>
                   <div class="unit-tenant">
                     Locataire : <strong>${u.tenant}</strong>
                     <span class="unit-phone">(${u.phone})</span>
@@ -615,7 +653,13 @@ function openReceiptModal(id) {
   if (!p) return;
   currentActiveProperty = p;
 
-  const total = p.rent + p.charges;
+  const isComm = !!p.isCommercial;
+  const docTitle = document.getElementById('mDocumentMainTitle');
+  const rentLabel = document.getElementById('mTableRentLabel');
+  const rowSubtotal = document.getElementById('mTableRowSubtotalHt');
+  const rowTva = document.getElementById('mTableRowTva');
+  const totalLabel = document.getElementById('mTableTotalLabel');
+  const legalNote = document.getElementById('mDocumentLegalNote');
 
   document.getElementById('mReceiptNumber').textContent = p.receiptNo;
   document.getElementById('mReceiptRef').textContent = p.receiptNo;
@@ -626,8 +670,45 @@ function openReceiptModal(id) {
   document.getElementById('mTablePropertyDetails').textContent = p.type;
   document.getElementById('mTableBaseRent').textContent = formatFCFA(p.rent);
   document.getElementById('mTableCharges').textContent = formatFCFA(p.charges);
-  document.getElementById('mTableTotal').textContent = formatFCFA(total);
-  document.getElementById('mAmountWords').textContent = numberToWordsFR(total);
+
+  if (isComm) {
+    if (docTitle) docTitle.textContent = "FACTURE DE LOYER & CHARGES LOCATIVES";
+    if (rentLabel) rentLabel.textContent = "Loyer commercial / professionnel (HT)";
+    
+    const ht = p.rent + p.charges;
+    const tva = Math.round(ht * 0.18);
+    const ttc = ht + tva;
+
+    if (rowSubtotal) {
+      rowSubtotal.style.display = 'table-row';
+      document.getElementById('mTableSubtotalHt').textContent = formatFCFA(ht);
+    }
+    if (rowTva) {
+      rowTva.style.display = 'table-row';
+      document.getElementById('mTableTva').textContent = formatFCFA(tva);
+    }
+    if (totalLabel) totalLabel.textContent = "TOTAL GÉNÉRAL TTC RÉGLÉ";
+    document.getElementById('mTableTotal').textContent = formatFCFA(ttc);
+    document.getElementById('mAmountWords').textContent = numberToWordsFR(ttc);
+    
+    if (legalNote) {
+      legalNote.innerHTML = "<p>Facture de loyer commercial assujettie à la TVA au taux légal de 18% conformément à l'article 355 et suivants du Code Général des Impôts (CGI) de la République du Sénégal. TVA déductible. Le présent document certifié vaut quittance libératoire de loyer pour la période susmentionnée.</p>";
+    }
+  } else {
+    if (docTitle) docTitle.textContent = "QUITTANCE DE LOYER OFFICIELLE";
+    if (rentLabel) rentLabel.textContent = "Loyer principal d'habitation";
+    if (rowSubtotal) rowSubtotal.style.display = 'none';
+    if (rowTva) rowTva.style.display = 'none';
+    if (totalLabel) totalLabel.textContent = "TOTAL NET ENCAISSÉ ET RÉGLÉ";
+    
+    const total = p.rent + p.charges;
+    document.getElementById('mTableTotal').textContent = formatFCFA(total);
+    document.getElementById('mAmountWords').textContent = numberToWordsFR(total);
+
+    if (legalNote) {
+      legalNote.innerHTML = "<p>La présente quittance annule tout reçu antérieur pour la période susvisée. Elle ne préjuge pas des loyers postérieurs. Exonéré de TVA en vertu de l'article 361 du Code Général des Impôts (CGI) du Sénégal. Document généré avec certification numérique KeurGui conforme aux normes OHADA.</p>";
+    }
+  }
 
   if (isAgencyMode && p.owner) {
     document.getElementById('mOwnerName').textContent = p.owner + ' (Géré par Agence KeurGui)';
@@ -654,7 +735,8 @@ function downloadDirectPDF() {
 
   const element = document.getElementById('printableReceipt');
   const cleanTenantName = currentActiveProperty.tenant.replace(/\s+/g, '_');
-  const filename = `Quittance_${currentActiveProperty.receiptNo}_${cleanTenantName}.pdf`;
+  const docTypePrefix = currentActiveProperty.isCommercial ? 'Facture_Loyer' : 'Quittance';
+  const filename = `${docTypePrefix}_${currentActiveProperty.receiptNo}_${cleanTenantName}.pdf`;
 
   const opt = {
     margin: [10, 10, 10, 10],
@@ -699,10 +781,30 @@ function sendWhatsAppReceiptDirect(id) {
   const p = properties.find(item => item.id === id);
   if (!p) return;
 
-  const total = formatFCFA(p.rent + p.charges);
-  
-  // Message courtois et direct conçu pour accompagner le fichier PDF joint
-  const message = `Bonjour ${p.tenant},
+  let message = '';
+  if (p.isCommercial) {
+    const ht = p.rent + p.charges;
+    const tva = Math.round(ht * 0.18);
+    const ttc = ht + tva;
+    message = `Bonjour ${p.tenant},
+
+J'espère que vous vous portez bien.
+
+Veuillez trouver ci-joint votre Facture de Loyer et Quittance officielle (au format PDF) avec décompte de TVA 18% pour le mois d'Octobre 2026 concernant vos locaux professionnels : ${p.unitName} (${p.building}).
+
+• Montant HT (Loyer + charges) : ${formatFCFA(ht)}
+• TVA légale (18% - CGI Sénégal) : ${formatFCFA(tva)}
+• Total réglé TTC : ${formatFCFA(ttc)} (par ${p.paymentMethod})
+• Référence Facture : ${p.receiptNo}
+
+Ce document officiel comporte toutes les mentions fiscales réglementaires (NINEA, RC) déductibles auprès de la DGID Sénégal.
+Merci pour votre collaboration.
+
+Bien cordialement,
+Jean Philippe Gomis — KeurGui Immobilier`;
+  } else {
+    const total = formatFCFA(p.rent + p.charges);
+    message = `Bonjour ${p.tenant},
 
 J'espère que vous vous portez bien.
 
@@ -716,6 +818,7 @@ Excellente journée à vous !
 
 Bien cordialement,
 Jean Philippe Gomis — KeurGui Immobilier`;
+  }
 
   const cleanPhone = sanitizeWhatsAppPhone(p.phone);
   const url = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
@@ -885,9 +988,14 @@ function handleAddNewProperty(e) {
   const phone = document.getElementById('propTenantPhone').value.trim();
   const owner = (document.getElementById('propOwnerName') && document.getElementById('propOwnerName').value) || 'Jean Philippe Gomis';
   const initialStatus = document.querySelector('input[name="propInitialStatus"]:checked').value;
+  const isCommercial = document.getElementById('propIsCommercial') 
+    ? document.getElementById('propIsCommercial').checked 
+    : (type === 'Commercial' || type === 'Bureaux');
 
   const newId = Date.now();
-  const newReceiptNo = `KG-${new Date().getFullYear()}-${String(newId).slice(-6)}`;
+  const newReceiptNo = isCommercial 
+    ? `FACT-${new Date().getFullYear()}-${String(newId).slice(-6)}`
+    : `KG-${new Date().getFullYear()}-${String(newId).slice(-6)}`;
 
   const newProp = {
     id: newId,
@@ -903,7 +1011,8 @@ function handleAddNewProperty(e) {
     paymentMethod: initialStatus === 'paid' ? 'Wave' : null,
     paidDate: initialStatus === 'paid' ? '17/10/2026' : null,
     owner: owner,
-    receiptNo: newReceiptNo
+    receiptNo: newReceiptNo,
+    isCommercial: isCommercial
   };
 
   properties.unshift(newProp);
@@ -1091,3 +1200,187 @@ function sendFeedbackWhatsAppDirect() {
   window.open(url, '_blank');
   closeFeedbackModal();
 }
+
+// ===================================================
+// GESTION DES FACTURES D'HONORAIRES AGENCE (TVA 18% & TTC)
+// ===================================================
+let activeAgencyOwner = 'all';
+
+function openAgencyInvoiceModal() {
+  populateAgencyOwnerSelect();
+  updateAgencyInvoiceView();
+  const modal = document.getElementById('agencyInvoiceModalOverlay');
+  if (modal) modal.classList.add('active');
+}
+
+function closeAgencyInvoiceModal() {
+  const modal = document.getElementById('agencyInvoiceModalOverlay');
+  if (modal) modal.classList.remove('active');
+}
+
+function closeAgencyInvoiceModalOnOverlay(e) {
+  if (e.target && e.target.id === 'agencyInvoiceModalOverlay') {
+    closeAgencyInvoiceModal();
+  }
+}
+
+function populateAgencyOwnerSelect() {
+  const select = document.getElementById('agencyInvoiceOwnerSelect');
+  if (!select) return;
+
+  // Récupérer la liste unique des bailleurs
+  const owners = Array.from(new Set(properties.map(p => p.owner || 'Jean Philippe Gomis'))).sort();
+  
+  let html = `<option value="all">Portefeuille global (Tous les bailleurs)</option>`;
+  owners.forEach(owner => {
+    html += `<option value="${owner}">${owner}</option>`;
+  });
+  select.innerHTML = html;
+  select.value = activeAgencyOwner || 'all';
+}
+
+function onAgencyOwnerFilterChange() {
+  const select = document.getElementById('agencyInvoiceOwnerSelect');
+  activeAgencyOwner = select ? select.value : 'all';
+  updateAgencyInvoiceView();
+}
+
+function updateAgencyInvoiceView() {
+  const select = document.getElementById('agencyInvoiceOwnerSelect');
+  const selectedOwner = select ? select.value : 'all';
+
+  // Filtrer les biens encaissés
+  const paidProps = properties.filter(p => p.status === 'paid' && (selectedOwner === 'all' || p.owner === selectedOwner));
+  
+  let totalCollected = 0;
+  paidProps.forEach(p => {
+    totalCollected += (p.rent + p.charges);
+  });
+
+  // Commission 10% HT, TVA 18% sur commission, TTC
+  const commissionRate = 0.10;
+  const commissionHt = Math.round(totalCollected * commissionRate);
+  const tvaRate = 0.18;
+  const tva = Math.round(commissionHt * tvaRate);
+  const commissionTtc = commissionHt + tva;
+  const netPayout = Math.max(0, totalCollected - commissionTtc);
+
+  // Mettre à jour l'en-tête
+  const ownerDisplay = document.getElementById('agencyInvoiceOwnerDisplay');
+  const portfolioDesc = document.getElementById('agencyInvoicePortfolioDesc');
+  const unitsDetail = document.getElementById('agencyInvoiceUnitsDetail');
+  
+  if (selectedOwner === 'all') {
+    if (ownerDisplay) ownerDisplay.textContent = "Portefeuille Global de l'Agence";
+    if (portfolioDesc) portfolioDesc.textContent = `${paidProps.length} lots gérés avec encaissement au Sénégal`;
+    if (unitsDetail) unitsDetail.textContent = `Globalité des encaissements (${paidProps.length} loyers perçus)`;
+  } else {
+    if (ownerDisplay) ownerDisplay.textContent = selectedOwner;
+    if (portfolioDesc) portfolioDesc.textContent = `${paidProps.length} lot(s) en gérance mandatée`;
+    if (unitsDetail) unitsDetail.textContent = `Encaissements perçus pour ${selectedOwner} (${paidProps.length} lot(s))`;
+  }
+
+  // Remplir les montants
+  document.getElementById('agencyTableCollected').textContent = formatFCFA(totalCollected);
+  document.getElementById('agencyTableCommissionHt').textContent = formatFCFA(commissionHt);
+  document.getElementById('agencyTableTva').textContent = formatFCFA(tva);
+  document.getElementById('agencyTableTotalTtc').textContent = formatFCFA(commissionTtc);
+  document.getElementById('agencyNetPayout').textContent = formatFCFA(netPayout);
+  document.getElementById('agencyAmountWords').textContent = numberToWordsFR(commissionTtc);
+  
+  // Date et Réf
+  const now = new Date();
+  const year = now.getFullYear();
+  const invoiceRef = `FACT-AG-${year}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  
+  const invNumberEl = document.getElementById('mAgencyInvoiceNumber');
+  const invRefEl = document.getElementById('agencyInvoiceRef');
+  if (invNumberEl) invNumberEl.textContent = invoiceRef;
+  if (invRefEl) invRefEl.textContent = invoiceRef;
+}
+
+function downloadAgencyInvoicePdf() {
+  const btn = document.getElementById('btnAgencyPdf');
+  const originalText = btn.innerHTML;
+  btn.innerHTML = '<span>⏳</span> Création du PDF...';
+  btn.classList.add('loading');
+
+  const element = document.getElementById('printableAgencyInvoice');
+  const select = document.getElementById('agencyInvoiceOwnerSelect');
+  const ownerClean = (select ? select.value : 'Global').replace(/[^a-zA-Z0-9]/g, '_');
+  const filename = `Facture_Honoraires_KeurGui_${ownerClean}_Octobre_2026.pdf`;
+
+  const opt = {
+    margin: [10, 10, 10, 10],
+    filename: filename,
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2, useCORS: true },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+  };
+
+  if (window.html2pdf) {
+    html2pdf().set(opt).from(element).save().then(() => {
+      btn.innerHTML = '<span>✅</span> Facture Téléchargée !';
+      setTimeout(() => {
+        btn.innerHTML = originalText;
+        btn.classList.remove('loading');
+      }, 2500);
+    }).catch(err => {
+      console.error('Erreur PDF Facture:', err);
+      window.print();
+      btn.innerHTML = originalText;
+      btn.classList.remove('loading');
+    });
+  } else {
+    window.print();
+    btn.innerHTML = originalText;
+    btn.classList.remove('loading');
+  }
+}
+
+function printAgencyInvoice() {
+  window.print();
+}
+
+function sendWhatsAppAgencyInvoice() {
+  const select = document.getElementById('agencyInvoiceOwnerSelect');
+  const selectedOwner = select ? select.value : 'all';
+
+  const paidProps = properties.filter(p => p.status === 'paid' && (selectedOwner === 'all' || p.owner === selectedOwner));
+  let totalCollected = 0;
+  paidProps.forEach(p => { totalCollected += (p.rent + p.charges); });
+
+  const commissionHt = Math.round(totalCollected * 0.10);
+  const tva = Math.round(commissionHt * 0.18);
+  const commissionTtc = commissionHt + tva;
+  const netPayout = Math.max(0, totalCollected - commissionTtc);
+
+  const ownerName = selectedOwner === 'all' ? 'Cher Bailleur' : selectedOwner;
+  const message = `Bonjour ${ownerName},
+
+Veuillez trouver ci-joint votre Décompte de Gestion et la Facture d'Honoraires officielle (au format PDF) pour le mois d'Octobre 2026 concernant vos biens sous mandat.
+
+📊 RÉCAPITULATIF FINANCIER DU MOIS :
+• Total des loyers encaissés : ${formatFCFA(totalCollected)}
+• Honoraires de gestion (10% HT) : ${formatFCFA(commissionHt)}
+• TVA sur honoraires (18% - CGI Sénégal) : ${formatFCFA(tva)}
+• Total Honoraires TTC : ${formatFCFA(commissionTtc)}
+━━━━━━━━━━━━━━━━━━━━
+💰 NET REVERSÉ SUR VOTRE COMPTE : ${formatFCFA(netPayout)}
+(Virement / Wave effectué avec succès)
+
+• Réf Facture : FACT-AG-2026-10
+
+Merci pour votre confiance continue.
+Excellente journée à vous !
+
+Bien cordialement,
+Direction Financière — KeurGui Immobilier SARL
+VDN Sacré-Cœur 3, Dakar • +221 78 818 21 04`;
+
+  // Trouver un numéro WhatsApp si dispo ou Jean Philippe par défaut
+  let targetPhone = '221788182104';
+  const url = `https://wa.me/${targetPhone}?text=${encodeURIComponent(message)}`;
+  window.open(url, '_blank');
+}
+
