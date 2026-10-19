@@ -1370,6 +1370,30 @@ input:checked + .slider:before {
   letter-spacing: 0.5px;
 }
 
+/* ===================================================
+   MOTION DESIGN 1 : ANIMATION DE TAMPON D'IMPACT RÉALISTE
+   =================================================== */
+@keyframes stamp-impact {
+  0% {
+    opacity: 0;
+    transform: scale(3.2) rotate(-25deg);
+    filter: blur(4px);
+  }
+  60% {
+    opacity: 0.95;
+    transform: scale(0.92) rotate(-5deg);
+    filter: blur(0px);
+  }
+  80% {
+    transform: scale(1.06) rotate(-3deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(-3deg);
+    box-shadow: 0 0 25px rgba(5, 150, 105, 0.45);
+  }
+}
+
 .receipt-stamp-box {
   text-align: right;
 }
@@ -1385,6 +1409,11 @@ input:checked + .slider:before {
   flex-direction: column;
   transform: rotate(-3deg);
   background: #f0fdf4;
+  opacity: 0;
+}
+
+.modal-overlay.active .receipt-badge-paid {
+  animation: stamp-impact 0.5s cubic-bezier(0.25, 1, 0.5, 1) 0.15s forwards;
 }
 
 .receipt-badge-paid span {
@@ -1396,6 +1425,32 @@ input:checked + .slider:before {
   font-size: 10px;
   text-transform: uppercase;
   font-weight: 700;
+}
+
+/* Onde de choc lumineuse Wave lors du paiement */
+@keyframes wave-burst {
+  0% {
+    transform: translate(-50%, -50%) scale(0.3);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(2);
+    opacity: 0;
+  }
+}
+
+.payment-success-burst {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 250px;
+  height: 250px;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.6) 0%, rgba(5, 150, 105, 0.2) 50%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 10000;
+  animation: wave-burst 0.75s ease-out forwards;
 }
 
 .receipt-divider {

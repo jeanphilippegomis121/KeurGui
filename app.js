@@ -324,6 +324,32 @@ function toggleAgencyMode() {
   updateStats();
 }
 
+// Variables pour le compteur chiffré fluide (Motion Design)
+let prevStats = { collected: 0, pending: 0, rate: 0 };
+
+function animateNumber(elementId, start, end, duration, isFCFA = true) {
+  const el = document.getElementById(elementId);
+  if (!el) return;
+  if (start === end || duration <= 0) {
+    el.textContent = isFCFA ? formatFCFA(end) : end + '%';
+    return;
+  }
+  const startTime = performance.now();
+  function step(now) {
+    const elapsed = now - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    const ease = 1 - Math.pow(1 - progress, 3); // Ease-out cubic
+    const current = Math.round(start + (end - start) * ease);
+    el.textContent = isFCFA ? formatFCFA(current) : current + '%';
+    if (progress < 1) {
+      requestAnimationFrame(step);
+    } else {
+      el.textContent = isFCFA ? formatFCFA(end) : end + '%';
+    }
+  }
+  requestAnimationFrame(step);
+}
+
 // ===================================================
 // STATISTIQUES GLOBALES
 // ===================================================
@@ -348,11 +374,14 @@ function updateStats() {
   const rate = totalExpected > 0 ? Math.round((totalCollected / totalExpected) * 100) : 0;
   const agencyCommission = Math.round(totalCollected * 0.10);
 
-  document.getElementById('totalCollected').textContent = formatFCFA(totalCollected);
-  document.getElementById('totalPending').textContent = formatFCFA(totalPending);
-  document.getElementById('collectionRate').textContent = rate + '%';
+  // Animation fluide des chiffres (Rolling Counter)
+  animateNumber('totalCollected', prevStats.collected, totalCollected, 750, true);
+  animateNumber('totalPending', prevStats.pending, totalPending, 750, true);
+  animateNumber('collectionRate', prevStats.rate, rate, 750, false);
   document.getElementById('collectionFill').style.width = rate + '%';
   document.getElementById('agencyCommission').textContent = formatFCFA(agencyCommission);
+
+  prevStats = { collected: totalCollected, pending: totalPending, rate: rate };
 
   // Gestion dynamique de l'alerte pulsation danger pour les retards
   const pendingCard = document.querySelector('.stat-card.stat-warning');
@@ -767,8 +796,20 @@ function confirmPayment() {
   renderProperties();
   updateStats();
 
+  // Motion Design : Onde de choc lumineuse Wave
+  triggerPaymentSuccessBurst();
+
   showToast(`Paiement de ${propertyToPay.tenant} enregistré (${selectedMethod}) !`, "success");
-  openReceiptModal(propertyToPay.id);
+  setTimeout(() => {
+    openReceiptModal(propertyToPay.id);
+  }, 450);
+}
+
+function triggerPaymentSuccessBurst() {
+  const burst = document.createElement('div');
+  burst.className = 'payment-success-burst';
+  document.body.appendChild(burst);
+  setTimeout(() => burst.remove(), 800);
 }
 
 // ===================================================
