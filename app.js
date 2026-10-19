@@ -1044,8 +1044,9 @@ async function handleFeedbackSubmit(e) {
 function sendFeedbackWhatsAppDirect() {
   const rating = document.getElementById('selectedRatingValue').value;
   const comment = document.getElementById('feedbackComment').value.trim() || 'Bonjour Jean Philippe, je viens de tester KeurGui !';
-  const text = `Salam Jean Philippe, voici mon avis sur KeurGui (Note : ${rating}/5) : "${comment}"`;
-  const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+  const text = `Salam Jean Philippe, voici mon avis sur KeurGui (Note : ${rating}/5) :\n\n"${comment}"`;
+  const jpPhone = "221788182104"; // Numéro direct WhatsApp de Jean Philippe
+  const url = `https://wa.me/${jpPhone}?text=${encodeURIComponent(text)}`;
   window.open(url, '_blank');
   closeFeedbackModal();
 }
