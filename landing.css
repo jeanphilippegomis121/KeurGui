@@ -929,36 +929,168 @@ a {
 }
 
 /* ===================================================
-   RESPONSIVE MOBILE
+   RESPONSIVE MOBILE HAUT DE GAMME (iPhone & Android)
    =================================================== */
 @media (max-width: 900px) {
-  .hero-title {
-    font-size: 36px;
+  .nav-container {
+    padding: 0 16px;
   }
+
   .nav-links {
     display: none;
   }
+
+  .btn-nav-cta {
+    padding: 8px 14px;
+    font-size: 12px;
+  }
+
+  .hero-section {
+    padding: 40px 0 60px 0;
+  }
+
+  .hero-content {
+    padding: 0 16px;
+  }
+
+  .badge-pill {
+    font-size: 11px;
+    padding: 6px 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .hero-title {
+    font-size: clamp(27px, 7vw, 38px);
+    line-height: 1.25;
+    margin-top: 16px;
+    margin-bottom: 16px;
+  }
+
+  .hero-sub {
+    font-size: 15px;
+    line-height: 1.6;
+    margin-bottom: 24px;
+  }
+
+  .hero-cta-group {
+    flex-direction: column;
+    width: 100%;
+    gap: 12px;
+  }
+
+  .btn-hero-primary,
+  .btn-hero-secondary {
+    width: 100%;
+    justify-content: center;
+    padding: 15px 20px;
+    font-size: 14px;
+    border-radius: 12px;
+  }
+
+  .hero-trust-bar {
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin-top: 24px;
+  }
+
+  .trust-item {
+    font-size: 12px;
+  }
+
+  .hero-mockup-wrapper {
+    margin-top: 36px;
+  }
+
+  .mockup-frame {
+    border-radius: 16px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+  }
+
+  .mockup-header-dots {
+    padding: 10px 14px;
+  }
+
+  .mockup-url {
+    font-size: 11px;
+  }
+
+  .mockup-screen-preview {
+    padding: 14px;
+  }
+
   .preview-metric-row {
     grid-template-columns: 1fr;
+    gap: 10px;
   }
+
+  /* Affichage des badges de réassurance sous le mockup sur mobile */
   .floating-badge {
-    display: none;
+    position: static;
+    display: flex;
+    margin-top: 12px;
+    width: 100%;
+    box-shadow: none;
+    border: 1px solid rgba(255, 255, 255, 0.1);
   }
+
   .comparison-grid {
     grid-template-columns: 1fr;
+    gap: 18px;
   }
+
+  .features-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .feature-card {
+    padding: 22px 18px;
+  }
+
   .diaspora-box {
     grid-template-columns: 1fr;
-    padding: 30px;
+    padding: 24px 18px;
+    border-radius: 20px;
   }
+
   .vip-wrapper {
     grid-template-columns: 1fr;
-    padding: 30px;
+    padding: 24px 18px;
+    border-radius: 20px;
+    gap: 24px;
   }
+
+  .vip-intro h2 {
+    font-size: 24px;
+  }
+
+  .vip-form-box {
+    padding: 22px 18px;
+    border-radius: 16px;
+  }
+
+  .form-field input,
+  .form-field select {
+    padding: 13px 14px;
+    font-size: 16px; /* Empêche le zoom involontaire sur Safari iPhone */
+    border-radius: 10px;
+  }
+
+  .btn-vip-submit {
+    padding: 15px;
+    font-size: 16px;
+    border-radius: 10px;
+  }
+
   .footer-content {
     flex-direction: column;
     text-align: center;
+    gap: 16px;
   }
+
   .footer-meta {
     text-align: center;
   }

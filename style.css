@@ -416,7 +416,7 @@ input:checked + .slider:before {
   gap: 16px;
   border: 1px solid var(--gray-200);
   box-shadow: var(--shadow-sm);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
 .stat-card:hover {
@@ -425,7 +425,7 @@ input:checked + .slider:before {
 }
 
 .stat-icon {
-  font-size: 28px;
+  font-size: 26px;
   background: var(--gray-100);
   width: 52px;
   height: 52px;
@@ -434,6 +434,7 @@ input:checked + .slider:before {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  transition: transform 0.2s ease;
 }
 
 .stat-info {
@@ -442,36 +443,146 @@ input:checked + .slider:before {
 
 .stat-title {
   font-size: 12px;
-  font-weight: 600;
-  color: var(--gray-400);
+  font-weight: 700;
+  color: var(--gray-600);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 .stat-value {
-  font-size: 24px;
-  font-weight: 800;
+  font-size: 26px;
+  font-weight: 900;
   color: var(--dark);
   margin: 4px 0 8px 0;
   letter-spacing: -0.5px;
 }
 
 .stat-tag {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   font-size: 11px;
-  font-weight: 700;
-  padding: 3px 8px;
+  font-weight: 800;
+  padding: 4px 10px;
   border-radius: 999px;
 }
 
-.stat-tag.success {
-  background: var(--primary-light);
-  color: var(--primary);
+/* ===================================================
+   1. TOTAL ENCAISSÉ : VERT ÉCLATANT, GRATIFIANT & PRÉSTIGIEUX
+   =================================================== */
+.stat-card.stat-success {
+  background: linear-gradient(135deg, #ffffff 0%, #ecfdf5 100%);
+  border: 2px solid #10b981;
+  box-shadow: 0 10px 25px -4px rgba(16, 185, 129, 0.22), 0 2px 6px -1px rgba(16, 185, 129, 0.1);
+  position: relative;
+  overflow: hidden;
 }
 
-.stat-tag.warning {
-  background: #fef3c7;
-  color: #b45309;
+.stat-card.stat-success::after {
+  content: '';
+  position: absolute;
+  top: -30px;
+  right: -30px;
+  width: 90px;
+  height: 90px;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.25) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.stat-card.stat-success .stat-icon {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.stat-card.stat-success .stat-title {
+  color: #065f46;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+
+.stat-card.stat-success .stat-value {
+  color: #047857; /* Vert émeraude éclatant, riche et gratifiant */
+  font-size: 28px;
+  font-weight: 900;
+  text-shadow: 0 1px 2px rgba(16, 185, 129, 0.15);
+}
+
+.stat-card.stat-success .stat-tag.success {
+  background: #d1fae5;
+  color: #065f46;
+  border: 1px solid #6ee7b7;
+  font-weight: 800;
+}
+
+/* ===================================================
+   2. RESTE À ENCAISSER : ROUGE DANGER ALERTE VIBRANT & SURBRILLANCE
+   =================================================== */
+@keyframes pulse-danger-glow {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.35), 0 8px 20px -4px rgba(239, 68, 68, 0.2);
+    border-color: #ef4444;
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(239, 68, 68, 0.75), 0 12px 30px -2px rgba(239, 68, 68, 0.35);
+    border-color: #dc2626;
+    transform: scale(1.02);
+  }
+}
+
+.stat-card.stat-warning {
+  background: linear-gradient(135deg, #ffffff 0%, #fef2f2 100%);
+  border: 2px solid #ef4444;
+  box-shadow: 0 8px 25px -4px rgba(239, 68, 68, 0.22);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.stat-card.stat-warning.has-late {
+  animation: pulse-danger-glow 2.2s infinite ease-in-out;
+}
+
+.stat-card.stat-warning::after {
+  content: '';
+  position: absolute;
+  top: -30px;
+  right: -30px;
+  width: 90px;
+  height: 90px;
+  background: radial-gradient(circle, rgba(239, 68, 68, 0.25) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.stat-card.stat-warning .stat-icon {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.stat-card.stat-warning .stat-title {
+  color: #991b1b;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+
+.stat-card.stat-warning .stat-value {
+  color: #dc2626; /* Rouge alerte franc et percutant */
+  font-size: 28px;
+  font-weight: 900;
+  text-shadow: 0 1px 2px rgba(239, 68, 68, 0.15);
+}
+
+.stat-card.stat-warning .stat-tag.warning {
+  background: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fca5a5;
+  font-weight: 800;
 }
 
 .stat-tag.info {
@@ -1501,84 +1612,337 @@ input:checked + .slider:before {
   }
 }
 
-/* Adaptation mobile */
+/* ===================================================
+   EXPÉRIENCE MOBILE NATIVE HAUT DE GAMME (iPhone & Android)
+   =================================================== */
 @media (max-width: 768px) {
+  /* Conteneur et espacements */
+  .container {
+    padding: 0 16px;
+  }
+
+  .main-content {
+    padding-top: 16px;
+    padding-bottom: 50px;
+  }
+
+  /* Header mobile optimisé en 2 lignes ultra-propres */
+  .app-header {
+    padding: 8px 0;
+  }
+
   .header-container {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 12px;
-  }
-  .mode-toggle-card {
-    order: 3;
-  }
-  .user-profile {
-    order: 2;
+    display: flex;
     flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 0 16px;
   }
-  .btn-link-landing {
-    font-size: 11px !important;
-    padding: 4px 8px !important;
-  }
-  .demo-banner-left {
-    flex-direction: column;
-    align-items: flex-start;
+
+  .logo-area {
     gap: 8px;
   }
-  .demo-banner-actions {
-    width: 100%;
+
+  .brand-logo-icon svg {
+    width: 32px;
+    height: 32px;
   }
+
+  .logo-title {
+    font-size: 19px;
+  }
+
+  .user-profile {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .user-name, .user-badge {
+    display: none; /* Masqués sur petit écran pour aérer le header */
+  }
+
+  .user-avatar {
+    width: 34px;
+    height: 34px;
+    font-size: 12px;
+  }
+
+  .btn-link-landing {
+    font-size: 11px !important;
+    padding: 5px 10px !important;
+  }
+
+  /* Toggle Mode Agence sur mobile */
+  .mode-toggle-card {
+    width: 100%;
+    order: 10;
+    margin-top: 4px;
+    padding: 8px 14px;
+    background: #f1f5f9;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .mode-label {
+    font-size: 12px;
+  }
+
+  /* Bandeau Démo Interactive sur mobile */
+  .demo-banner-highlight {
+    padding: 14px 0;
+  }
+
+  .notif-content {
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+    text-align: center;
+  }
+
+  .demo-banner-left {
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .demo-chip-live {
+    font-size: 10px;
+    padding: 2px 8px;
+  }
+
+  .demo-text-desc {
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
   .btn-clean-start-prominent {
     width: 100%;
     justify-content: center;
     font-size: 14px;
-    padding: 14px 20px;
+    padding: 13px 18px;
+    border-radius: 12px;
   }
-  .notif-content {
-    flex-direction: column;
-    gap: 10px;
-    align-items: flex-start;
-  }
-  .unit-row {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  .unit-financial-col {
-    text-align: left;
-  }
-  .unit-actions-col {
-    width: 100%;
-    justify-content: flex-start;
-    flex-wrap: wrap;
-  }
-  .receipt-sheet {
-    padding: 24px 16px;
-  }
-  .receipt-parties-grid {
-    grid-template-columns: 1fr;
-  }
-  .form-row {
-    grid-template-columns: 1fr;
-  }
-  .add-mode-tabs {
-    grid-template-columns: 1fr;
-  }
-  .unit-setup-row {
-    grid-template-columns: 1fr;
-  }
+
+  /* Cartes KPIs Statistiques sur mobile */
   .stats-grid {
     grid-template-columns: 1fr;
+    gap: 14px;
+    margin-bottom: 22px;
   }
+
+  .stat-card {
+    padding: 18px 16px;
+    border-radius: 16px;
+    gap: 14px;
+  }
+
+  .stat-icon {
+    width: 46px;
+    height: 46px;
+    font-size: 22px;
+  }
+
+  .stat-title {
+    font-size: 11px;
+  }
+
+  .stat-value {
+    font-size: 24px !important;
+  }
+
+  .stat-tag {
+    font-size: 10px;
+    padding: 3px 8px;
+  }
+
+  /* Barre d'action et filtres tactiles */
   .action-bar {
     flex-direction: column;
     align-items: stretch;
+    gap: 14px;
+    margin-bottom: 22px;
   }
+
+  /* Défilement horizontal des filtres style application mobile */
+  .filter-tabs {
+    display: flex;
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding: 4px;
+    border-radius: 12px;
+    gap: 6px;
+  }
+
+  .filter-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .tab-btn {
+    flex-shrink: 0;
+    padding: 8px 14px;
+    font-size: 12px;
+    border-radius: 8px;
+  }
+
+  .action-buttons {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 10px;
+  }
+
   .search-input {
     width: 100%;
+    padding: 12px 14px;
+    font-size: 14px;
+    border-radius: 10px;
   }
-  .action-buttons {
+
+  .action-buttons .btn-primary {
+    width: 100%;
+    justify-content: center;
+    padding: 13px;
+    font-size: 14px;
+    border-radius: 10px;
+  }
+
+  /* Immeubles et Logements sur Mobile */
+  .buildings-container {
+    gap: 20px;
+  }
+
+  .building-card {
+    border-radius: 16px;
+  }
+
+  .building-header {
+    padding: 14px 16px;
     flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
   }
-  .filter-tabs {
+
+  .building-title-area {
+    width: 100%;
+    gap: 10px;
+  }
+
+  .building-icon {
+    width: 38px;
+    height: 38px;
+    font-size: 18px;
+  }
+
+  .building-name {
+    font-size: 15px;
+  }
+
+  .building-summary-chips {
+    width: 100%;
+    justify-content: flex-start;
     flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .bld-chip {
+    font-size: 11px;
+    padding: 3px 8px;
+  }
+
+  /* Ligne de Logement transformée en Card Mobile Fintech */
+  .unit-row {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    background: #ffffff;
+    border-bottom: 1px solid #f1f5f9;
+  }
+
+  .unit-info-col {
+    min-width: unset;
+  }
+
+  .unit-name {
+    font-size: 15px;
+  }
+
+  .unit-tenant {
+    font-size: 13px;
+  }
+
+  .unit-financial-col {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    padding: 10px 14px;
+    border-radius: 10px;
+    text-align: left;
+    min-width: unset;
+  }
+
+  .unit-amount {
+    font-size: 17px;
+  }
+
+  .unit-badge-status {
+    margin-top: 0;
+  }
+
+  .unit-actions-col {
+    display: flex;
+    width: 100%;
+    gap: 8px;
+  }
+
+  .unit-actions-col .btn-whatsapp-sm,
+  .unit-actions-col .btn-receipt-sm,
+  .unit-actions-col .btn-pay-sm {
+    flex: 1;
+    justify-content: center;
+    padding: 10px 12px;
+    font-size: 12px;
+    border-radius: 8px;
+    text-align: center;
+  }
+
+  /* Modales en "Bottom Sheet" tactile sur mobile */
+  .modal-overlay {
+    padding: 0;
+    align-items: flex-end; /* Glisse depuis le bas de l'écran */
+  }
+
+  .modal-receipt-wrapper,
+  .modal-card {
+    max-width: 100%;
+    width: 100%;
+    max-height: 94vh;
+    border-radius: 20px 20px 0 0;
+    margin: 0;
+    overflow-y: auto;
+  }
+
+  .receipt-sheet {
+    padding: 20px 14px;
+  }
+
+  .receipt-parties-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .form-row,
+  .add-mode-tabs,
+  .unit-setup-row {
+    grid-template-columns: 1fr;
   }
 }

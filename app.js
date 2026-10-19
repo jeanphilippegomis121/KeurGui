@@ -352,10 +352,29 @@ function updateStats() {
   document.getElementById('collectionFill').style.width = rate + '%';
   document.getElementById('agencyCommission').textContent = formatFCFA(agencyCommission);
 
-  // Mise à jour du tag "Reversé aux bailleurs"
-  const reversalTag = document.querySelector('#agencyCommissionCard .stat-tag');
-  if (reversalTag) {
-    reversalTag.textContent = `Reversé aux bailleurs : ${formatFCFA(totalCollected - agencyCommission)}`;
+  // Gestion dynamique de l'alerte pulsation danger pour les retards
+  const pendingCard = document.querySelector('.stat-card.stat-warning');
+  if (pendingCard) {
+    if (lateCount > 0) {
+      pendingCard.classList.add('has-late');
+    } else {
+      pendingCard.classList.remove('has-late');
+    }
+  }
+
+  // Tags dynamiques explicites et valorisants
+  const collectedTag = document.querySelector('.stat-card.stat-success .stat-tag');
+  if (collectedTag) {
+    collectedTag.textContent = paidCount > 0 
+      ? `↑ ${paidCount} loyer${paidCount > 1 ? 's' : ''} encaissé${paidCount > 1 ? 's' : ''}` 
+      : 'Aucun encaissement ce mois';
+  }
+
+  const pendingTag = document.querySelector('.stat-card.stat-warning .stat-tag');
+  if (pendingTag) {
+    pendingTag.textContent = lateCount > 0 
+      ? `⚠️ ${lateCount} retard${lateCount > 1 ? 's' : ''} à régulariser` 
+      : '✓ Tous les loyers sont réglés';
   }
 
   // Compteurs d'onglets
