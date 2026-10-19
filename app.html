@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="KeurGui — La solution de gestion locative moderne pour les propriétaires et agences au Sénégal. Suivez vos loyers, générez des quittances PDF conformes et relancez vos locataires via WhatsApp.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'><rect width='40' height='40' rx='10' fill='%23064E3B'/><path d='M20 9L9 18H13V30H18V24H22V30H27V18H31L20 9Z' fill='%2310B981'/><circle cx='20' cy='18' r='2.5' fill='%23F59E0B'/></svg>" type="image/svg+xml">
+  <title>KeurGui — Gestion Locative Simple au Sénégal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Bibliothèque de génération PDF directe (téléchargement instantané du fichier .pdf) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Navigation principale -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="logo-area">
+        <!-- Logo vectoriel premium KeurGui -->
+        <div class="brand-logo-icon">
+          <svg width="34" height="34" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="40" height="40" rx="10" fill="#064E3B"/>
+            <path d="M20 9L9 18H13V30H18V24H22V30H27V18H31L20 9Z" fill="#10B981"/>
+            <circle cx="20" cy="18" r="2.5" fill="#F59E0B"/>
+            <path d="M17 12L20 9.5L23 12" stroke="#F59E0B" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div>
+          <h1 class="logo-title">Keur<span>Gui</span></h1>
+          <p class="logo-sub">Gestion locative intelligente • Sénégal</p>
+        </div>
+      </div>
+
+      <!-- Sélecteur Mode Propriétaire / Mode Agence -->
+      <div class="mode-toggle-card">
+        <span class="mode-label active-role" id="label-bailleur">Bailleur Particulier</span>
+        <label class="switch">
+          <input type="checkbox" id="agencyModeToggle" onchange="toggleAgencyMode()">
+          <span class="slider round"></span>
+        </label>
+        <span class="mode-label" id="label-agence">Mode Agence</span>
+      </div>
+
+      <!-- Profil Utilisateur & Outils -->
+      <div class="user-profile">
+        <a href="index.html" class="btn-link-landing" style="font-size: 12px; font-weight: 700; color: #059669; text-decoration: none; padding: 6px 12px; background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 999px; display: flex; align-items: center; gap: 4px;">
+          <span>🌐</span> Site Vitrine VIP
+        </a>
+        <div class="user-avatar">JP</div>
+        <div class="user-meta">
+          <span class="user-name">Jean Philippe Gomis</span>
+          <span class="user-badge" id="userRoleBadge">Propriétaire</span>
+        </div>
+        <button class="btn-icon-subtle" title="Réinitialiser les données de démo" onclick="resetDemoData()">🔄</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Bannière d'accueil Démo Interactive Ultra-Visible -->
+  <div class="notification-bar demo-banner-highlight">
+    <div class="container notif-content">
+      <div class="demo-banner-left">
+        <span class="demo-chip-live">⚡ DÉMO INTERACTIVE</span>
+        <span class="demo-text-desc">Vous testez actuellement des exemples fictifs à Dakar.</span>
+      </div>
+      <div class="demo-banner-actions">
+        <button class="btn-clean-start-prominent" onclick="clearToMyProperties()">
+          <span>✨</span>
+          <strong>Nettoyer pour mettre mes vrais biens</strong>
+          <span class="btn-arrow-subtle">→</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contenu Principal -->
+  <main class="container main-content">
+
+    <!-- Statistiques Clés -->
+    <section class="stats-grid">
+      <div class="stat-card stat-success">
+        <div class="stat-icon">💰</div>
+        <div class="stat-info">
+          <span class="stat-title">Total Encaissé (Mois)</span>
+          <h2 class="stat-value" id="totalCollected">1 850 000 FCFA</h2>
+          <span class="stat-tag success">↑ 5 loyers payés</span>
+        </div>
+      </div>
+
+      <div class="stat-card stat-warning">
+        <div class="stat-icon">⏳</div>
+        <div class="stat-info">
+          <span class="stat-title">Reste à Encaisser</span>
+          <h2 class="stat-value" id="totalPending">250 000 FCFA</h2>
+          <span class="stat-tag warning">1 locataire en attente</span>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon">📊</div>
+        <div class="stat-info">
+          <span class="stat-title">Taux de Recouvrement</span>
+          <h2 class="stat-value" id="collectionRate">88%</h2>
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="collectionFill" style="width: 88%;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Statistique spéciale Agence (affichée en Mode Agence) -->
+      <div class="stat-card stat-agency" id="agencyCommissionCard" style="display: none;">
+        <div class="stat-icon">💼</div>
+        <div class="stat-info">
+          <span class="stat-title">Commissions Agence (10%)</span>
+          <h2 class="stat-value" id="agencyCommission">185 000 FCFA</h2>
+          <span class="stat-tag info">Reversé aux bailleurs : 1 665 000 FCFA</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Barre d'actions & Filtres -->
+    <section class="action-bar">
+      <div class="filter-tabs">
+        <button class="tab-btn active" id="tab-all" onclick="setFilter('all')">Tous les biens (<span id="countAll">6</span>)</button>
+        <button class="tab-btn" id="tab-paid" onclick="setFilter('paid')">Payés (<span id="countPaid">5</span>)</button>
+        <button class="tab-btn" id="tab-late" onclick="setFilter('late')">En attente / Retard (<span id="countLate">1</span>)</button>
+      </div>
+
+      <div class="action-buttons">
+        <input type="text" id="searchInput" placeholder="Rechercher (Mermoz, Diallo, Teranga...)" class="search-input" onkeyup="searchProperties()">
+        <button class="btn btn-primary" onclick="openAddPropertyModal()">
+          <span>+</span> Ajouter un bien / immeuble
+        </button>
+      </div>
+    </section>
+
+    <!-- Zone principale : Affichage structuré et épuré par Immeuble / Résidence -->
+    <section class="buildings-container" id="buildingsContainer">
+      <!-- Rempli dynamiquement et regroupé par Javascript -->
+    </section>
+
+  </main>
+
+  <!-- ============================================== -->
+  <!-- MODAL QUITTANCE DE LOYER OFFICIELLE -->
+  <!-- ============================================== -->
+  <div class="modal-overlay" id="receiptModalOverlay" onclick="closeModalOnOverlay(event)">
+    <div class="modal-receipt-wrapper">
+      
+      <!-- Barre d'outils du modal -->
+      <div class="receipt-actions-bar no-print">
+        <div class="receipt-modal-title">
+          <span class="tag-live">Document certifié</span>
+          <h3>Quittance de Loyer N° <span id="mReceiptNumber">KG-2026-0042</span></h3>
+        </div>
+        <div class="receipt-cta-group">
+          <!-- BOUTON 1 : TÉLÉCHARGEMENT DIRECT PDF -->
+          <button class="btn btn-download-direct-pdf" id="btnDirectPdf" onclick="downloadDirectPDF()">
+            <span>📥</span> Télécharger le PDF
+          </button>
+          
+          <!-- BOUTON 2 : PARTAGE WHATSAPP AVEC MESSAGE D'ACCOMPAGNEMENT -->
+          <button class="btn btn-whatsapp" onclick="sendWhatsAppReceipt()">
+            <span>💬</span> Message d'envoi WhatsApp
+          </button>
+          
+          <!-- BOUTON 3 : IMPRESSION PAPIER -->
+          <button class="btn btn-secondary-sm" onclick="printReceiptPaper()">
+            <span>🖨️</span> Imprimer
+          </button>
+
+          <button class="btn-close-modal" onclick="closeReceiptModal()">✕</button>
+        </div>
+      </div>
+
+      <!-- FEUILLE DE QUITTANCE OFFICIELLE (ZONE DU FICHIER PDF A4) -->
+      <div class="receipt-sheet" id="printableReceipt">
+        
+        <!-- En-tête officiel -->
+        <div class="receipt-header">
+          <div class="receipt-brand">
+            <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+              <svg width="24" height="24" viewBox="0 0 40 40" fill="none">
+                <rect width="40" height="40" rx="8" fill="#064E3B"/>
+                <path d="M20 9L9 18H13V30H18V24H22V30H27V18H31L20 9Z" fill="#10B981"/>
+                <circle cx="20" cy="18" r="2.5" fill="#F59E0B"/>
+              </svg>
+              <h2>KEURGUI IMMOBILIER</h2>
+            </div>
+            <p>RÉPUBLIQUE DU SÉNÉGAL — GESTION LOCATIVE CONFORME</p>
+          </div>
+          <div class="receipt-stamp-box">
+            <div class="receipt-badge-paid">
+              <span>ACQUITTÉ / PAYÉ</span>
+              <small id="mPaymentMethodBadge">Par Wave</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="receipt-divider"></div>
+
+        <!-- Titre du document -->
+        <div class="receipt-document-title">
+          <h1>QUITTANCE DE LOYER OFFICIELLE</h1>
+          <p>Période couverte : <strong id="mPeriod">Mois d'Octobre 2026</strong></p>
+        </div>
+
+        <!-- Coordonnées Bailleur & Locataire -->
+        <div class="receipt-parties-grid">
+          <div class="party-box">
+            <span class="party-label">BAILLEUR / GESTIONNAIRE :</span>
+            <h4 id="mOwnerName">Jean Philippe Gomis</h4>
+            <p id="mOwnerAddress">Dakar, Sénégal</p>
+            <p>Contact : +221 77 000 00 00</p>
+          </div>
+          <div class="party-box">
+            <span class="party-label">LOCATAIRE :</span>
+            <h4 id="mTenantName">Moussa Diop</h4>
+            <p id="mPropertyAddress">Appartement 2B, 2ème étage — Mermoz</p>
+            <p>Téléphone : <span id="mTenantPhone">+221 77 654 32 10</span></p>
+          </div>
+        </div>
+
+        <!-- Détail financier du loyer -->
+        <table class="receipt-table">
+          <thead>
+            <tr>
+              <th>Désignation des sommes</th>
+              <th>Période couverte</th>
+              <th class="text-right">Montant (FCFA)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <strong>Loyer principal d'habitation</strong><br>
+                <small class="text-muted" id="mTablePropertyDetails">Logement conventionné</small>
+              </td>
+              <td id="mTablePeriod">01/10/2026 au 31/10/2026</td>
+              <td class="text-right font-mono" id="mTableBaseRent">230 000 FCFA</td>
+            </tr>
+            <tr>
+              <td>
+                <strong>Charges locatives forfaitaires</strong><br>
+                <small class="text-muted">Parties communes, gardiennage & entretien</small>
+              </td>
+              <td>Octobre 2026</td>
+              <td class="text-right font-mono" id="mTableCharges">20 000 FCFA</td>
+            </tr>
+            <tr class="receipt-total-row">
+              <td colspan="2">
+                <strong>TOTAL NET ENCAISSÉ ET RÉGLÉ</strong>
+              </td>
+              <td class="text-right font-mono-bold" id="mTableTotal">250 000 FCFA</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Montant en lettres et mentions légales -->
+        <div class="receipt-words-box">
+          <p>Le bailleur reconnaît avoir reçu la somme de :  
+            <strong id="mAmountWords">Deux cent cinquante mille Francs CFA</strong>
+          </p>
+        </div>
+
+        <div class="receipt-legal-note">
+          <p>La présente quittance annule tout reçu antérieur pour la période susvisée. Elle ne préjuge pas des loyers postérieurs. Document généré avec certification numérique KeurGui conforme aux normes OHADA et au Code des Obligations Civiles et Commerciales du Sénégal.</p>
+        </div>
+
+        <!-- Signatures & Date -->
+        <div class="receipt-footer-signatures">
+          <div class="sig-col">
+            <p>Fait à Dakar, le <span id="mIssueDate">17 Octobre 2026</span></p>
+            <div class="qr-placeholder">
+              <div class="qr-box">
+                <span style="font-size: 22px;">🇸🇳</span>
+                <small>Certifié KeurGui</small>
+              </div>
+              <small class="text-muted">Réf : <span id="mReceiptRef">KG-SN-8742</span></small>
+            </div>
+          </div>
+          <div class="sig-col text-right">
+            <p>Signature et Cachet :</p>
+            <div class="signature-stamp-area">
+              <div class="digital-stamp">
+                <span>KEURGUI VALIDÉ</span>
+                <strong>GOMIS J.P.</strong>
+                <small>Dakar • Sénégal</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL ENCAISSEMENT RAPIDE (WAVE / ORANGE MONEY / CASH) -->
+  <div class="modal-overlay" id="payModalOverlay" onclick="closeModalOnOverlay(event)">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Enregistrer le paiement du loyer</h3>
+        <button class="btn-close-modal" onclick="closePayModal()">✕</button>
+      </div>
+      <div class="pay-target-info">
+        <p>Locataire : <strong id="payModalTenant">Moussa Diop</strong></p>
+        <p>Montant à régler : <strong id="payModalAmount" class="text-emerald">250 000 FCFA</strong></p>
+      </div>
+      <div class="payment-method-choices">
+        <label class="pay-option">
+          <input type="radio" name="payMethod" value="Wave" checked>
+          <div class="pay-option-content">
+            <span class="pay-logo wave-logo">🌊 Wave</span>
+            <small>Transfert direct sans frais</small>
+          </div>
+        </label>
+        <label class="pay-option">
+          <input type="radio" name="payMethod" value="Orange Money">
+          <div class="pay-option-content">
+            <span class="pay-logo om-logo">🟠 Orange Money</span>
+            <small>Transfert Orange Money</small>
+          </div>
+        </label>
+        <label class="pay-option">
+          <input type="radio" name="payMethod" value="Espèces">
+          <div class="pay-option-content">
+            <span class="pay-logo cash-logo">💵 Espèces (Cash)</span>
+            <small>Remis en main propre</small>
+          </div>
+        </label>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-secondary" onclick="closePayModal()">Annuler</button>
+        <button type="button" class="btn btn-primary" onclick="confirmPayment()">Confirmer le paiement & Générer la Quittance</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- MODAL : AJOUT LOGEMENT UNIQUE OU IMMEUBLE AVEC LOCATAIRES -->
+  <!-- ============================================== -->
+  <div class="modal-overlay" id="addPropertyModal" onclick="closeModalOnOverlay(event)">
+    <div class="modal-card modal-card-large">
+      <div class="modal-header">
+        <div>
+          <h3>Ajouter à votre patrimoine</h3>
+          <p style="font-size: 12px; color: #64748b;">Gérez vos biens avec une clarté absolue.</p>
+        </div>
+        <button class="btn-close-modal" onclick="closeAddPropertyModal()">✕</button>
+      </div>
+
+      <!-- Sélecteur : Logement individuel OU Immeuble complet -->
+      <div class="add-mode-tabs">
+        <button type="button" class="add-tab-btn active" id="tabAddSingle" onclick="switchAddMode('single')">
+          🏠 Logement unique (Villa, Studio isolé)
+        </button>
+        <button type="button" class="add-tab-btn" id="tabAddBuilding" onclick="switchAddMode('building')">
+          🏢 Immeuble entier (Multi-appartements)
+        </button>
+      </div>
+
+      <!-- FORMULAIRE 1 : LOGEMENT UNIQUE -->
+      <form id="formSingleProperty" onsubmit="handleAddNewProperty(event)">
+        <div class="form-group">
+          <label>Nom du logement</label>
+          <input type="text" id="propName" placeholder="Ex: Villa Keur Mariama" required>
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label>Quartier</label>
+            <select id="propNeighborhood" required>
+              <option value="Mermoz">Mermoz</option>
+              <option value="Almadies">Almadies</option>
+              <option value="Ngor">Ngor</option>
+              <option value="Ouakam">Ouakam</option>
+              <option value="Fann Résidence">Fann Résidence</option>
+              <option value="Maristes">Maristes</option>
+              <option value="Plateau">Dakar Plateau</option>
+              <option value="Keur Massar">Keur Massar</option>
+              <option value="Saly / Mbour">Saly / Mbour</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Type de bien</label>
+            <select id="propType">
+              <option value="Villa">Villa individuelle</option>
+              <option value="Appartement">Appartement indépendant</option>
+              <option value="Studio">Studio meublé</option>
+              <option value="Magasin">Magasin commercial</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Loyer mensuel (FCFA)</label>
+            <input type="number" id="propRent" placeholder="Ex: 250000" required>
+          </div>
+          <div class="form-group">
+            <label>Charges locatives (FCFA)</label>
+            <input type="number" id="propCharges" placeholder="Ex: 20000" value="0">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Nom complet du Locataire</label>
+            <input type="text" id="propTenantName" placeholder="Ex: Abdoulaye Ndiaye" required>
+          </div>
+          <div class="form-group">
+            <label>Numéro WhatsApp du Locataire</label>
+            <input type="text" id="propTenantPhone" placeholder="Ex: +221 77 123 45 67" required>
+          </div>
+        </div>
+
+        <!-- STATUT DU MOIS -->
+        <div class="form-group initial-status-box">
+          <label>Statut pour ce mois d'Octobre 2026 :</label>
+          <div class="status-radio-group">
+            <label class="radio-label">
+              <input type="radio" name="propInitialStatus" value="late" checked>
+              <span>⏳ <strong>En attente de paiement</strong> (Recommandé)</span>
+            </label>
+            <label class="radio-label">
+              <input type="radio" name="propInitialStatus" value="paid">
+              <span>✅ <strong>Déjà payé</strong> (Émettre la quittance)</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group" id="agencyOwnerField" style="display: none;">
+          <label>Propriétaire Mandant (Mode Agence)</label>
+          <input type="text" id="propOwnerName" placeholder="Ex: M. Babacar Ndiaye">
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" onclick="closeAddPropertyModal()">Annuler</button>
+          <button type="submit" class="btn btn-primary">Enregistrer le logement</button>
+        </div>
+      </form>
+
+      <!-- FORMULAIRE 2 : CRÉATEUR D'IMMEUBLE AVEC CONFIGURATION DES LOCATAIRES -->
+      <form id="formBuildingGenerator" style="display: none;" onsubmit="handleGenerateBuilding(event)">
+        <div class="building-callout">
+          🏢 <strong>Gestionnaire d'Immeuble :</strong> Configurez l'immeuble et personnalisez les locataires de chaque appartement.
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Nom de l'immeuble</label>
+            <input type="text" id="bldName" placeholder="Ex: Immeuble Teranga 2" required>
+          </div>
+          <div class="form-group">
+            <label>Quartier</label>
+            <select id="bldNeighborhood" required>
+              <option value="Mermoz">Mermoz</option>
+              <option value="Almadies">Almadies</option>
+              <option value="Ngor">Ngor</option>
+              <option value="Ouakam">Ouakam</option>
+              <option value="Maristes">Maristes</option>
+              <option value="Plateau">Dakar Plateau</option>
+              <option value="Fann Résidence">Fann Résidence</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Nombre d'appartements</label>
+            <input type="number" id="bldUnitCount" min="2" max="12" value="4" onchange="renderBuildingUnitsSetup()" required>
+          </div>
+          <div class="form-group">
+            <label>Loyer standard par appartement (FCFA)</label>
+            <input type="number" id="bldDefaultRent" value="220000" onchange="renderBuildingUnitsSetup()" required>
+          </div>
+        </div>
+
+        <!-- ZONE INTERACTIVE : DÉTAIL DES LOCATAIRES PAR APPARTEMENT -->
+        <div class="form-group">
+          <label style="margin-top: 10px;">Détail des appartements et locataires :</label>
+          <div class="building-units-setup-list" id="buildingUnitsSetupList">
+            <!-- Rempli dynamiquement pour permettre la saisie des locataires -->
+          </div>
+        </div>
+
+        <div class="form-group" id="bldAgencyOwnerField" style="display: none;">
+          <label>Propriétaire de cet immeuble (Mode Agence)</label>
+          <input type="text" id="bldOwnerName" placeholder="Ex: Famille Ndiaye">
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" onclick="closeAddPropertyModal()">Annuler</button>
+          <button type="submit" class="btn btn-primary">🏢 Créer l'immeuble et ses appartements</button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+
+  <!-- Toast Notification moderne pour les retours utilisateurs (remplace alert) -->
+  <div id="toastNotification" class="toast-notification"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

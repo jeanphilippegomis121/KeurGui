@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KeurGui — Dossier Maître du Projet (Masterplan)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #090d16;
+      --card: rgba(18, 24, 38, 0.85);
+      --border: rgba(255, 255, 255, 0.08);
+      --emerald: #10b981;
+      --gold: #f59e0b;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      padding: 40px 20px;
+    }
+    .container {
+      max-width: 860px;
+      margin: 0 auto;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+    .badge {
+      display: inline-block;
+      padding: 6px 14px;
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--emerald);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 12px;
+      background: linear-gradient(135deg, #fff 40%, var(--emerald));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .meta-box {
+      background: rgba(255, 255, 255, 0.03);
+      border-left: 4px solid var(--emerald);
+      padding: 16px 20px;
+      border-radius: 0 12px 12px 0;
+      margin: 20px 0 35px 0;
+      font-size: 0.95rem;
+      color: var(--muted);
+    }
+    .meta-box strong { color: var(--text); }
+    h2 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #fff;
+      margin: 35px 0 16px 0;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    p { margin-bottom: 16px; color: #cbd5e1; }
+    ul, ol { margin-left: 24px; margin-bottom: 20px; color: #cbd5e1; }
+    li { margin-bottom: 8px; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 0.92rem;
+    }
+    th, td {
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    th {
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--emerald);
+      font-weight: 700;
+    }
+    .code-box {
+      background: #050811;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 14px 18px;
+      font-family: monospace;
+      font-size: 0.9rem;
+      color: var(--gold);
+      margin: 12px 0 20px 0;
+      word-break: break-all;
+    }
+    .quote-box {
+      background: rgba(245, 158, 11, 0.08);
+      border-left: 4px solid var(--gold);
+      padding: 16px 20px;
+      border-radius: 0 12px 12px 0;
+      margin: 20px 0;
+      font-style: italic;
+      color: #fde68a;
+    }
+    .btn-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 30px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      padding: 12px 24px;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 0.95rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+    .btn-primary {
+      background: var(--emerald);
+      color: #042f2e;
+    }
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="badge">Dossier Maître Officiel & Sauvegarde Permanente</div>
+    <h1>📁 KeurGui — Le Dossier Maître</h1>
+    
+    <div class="meta-box">
+      <strong>Fondateur :</strong> Jean Philippe Gomis<br>
+      <strong>Projet :</strong> KeurGui (SaaS Gestion Locative Sénégal & Diaspora)<br>
+      <strong>Statut :</strong> Prototype, Landing Page & Audit validés avec succès ✅<br>
+      <strong>Date :</strong> 17 Octobre 2026<br>
+      <strong>Garantie :</strong> Fichiers et mémoire 100% sécurisés sur votre PC et dans l'IDE.
+    </div>
+
+    <h2>1. La Promesse et la Vision</h2>
+    <p>Rendre la gestion locative à Dakar et au Sénégal aussi simple et fluide qu'un message WhatsApp.</p>
+    <ul>
+      <li><strong>Suivi instantané :</strong> Tableaux de bord clairs (qui a payé, qui est en retard, total encaissé).</li>
+      <li><strong>Quittances A4 officielles :</strong> Générées en 1 clic avec montants en lettres sans faute et tampon certifié.</li>
+      <li><strong>Rappels WhatsApp :</strong> Message pré-rédigé automatique et détection de l'indicatif +221.</li>
+      <li><strong>Mode Agence :</strong> Commission de 10% calculée automatiquement et suivi des reversements propriétaires.</li>
+    </ul>
+
+    <h2>2. Vos Fichiers Sauvegardés sur ce PC</h2>
+    <p>Tous vos fichiers sont enregistrés de façon permanente dans votre dossier Bureau :</p>
+    <div class="code-box">C:\Users\Reivi\Desktop\KeurGui-App\</div>
+    <ul>
+      <li><strong>landing.html</strong> : Le site vitrine VIP pour recruter vos 50 premiers testeurs.</li>
+      <li><strong>index.html</strong> : L'application complète de gestion locative avec tableau de bord.</li>
+      <li><strong>app.js</strong> & <strong>style.css</strong> : Le moteur JavaScript et le design luxueux sombre.</li>
+      <li><strong>KEURGUI_MASTERPLAN.md</strong> : Le fichier source récapitulatif.</li>
+    </ul>
+
+    <h2>3. Ce qui a été accompli et audité</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Fonctionnalité</th>
+          <th>État</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Bouton Démo Ultra-Visible</strong></td>
+          <td>✅ Grand bouton animé doré/émeraude « Nettoyer pour mettre mes vrais biens »</td>
+        </tr>
+        <tr>
+          <td><strong>Génération Quittance PDF A4</strong></td>
+          <td>✅ Téléchargement direct sans boîte de dialogue encombrante</td>
+        </tr>
+        <tr>
+          <td><strong>Conversion Montant en Lettres</strong></td>
+          <td>✅ Orthographe française et FCFA parfaits (sans faute)</td>
+        </tr>
+        <tr>
+          <td><strong>Sauvegarde Locale (LocalStorage)</strong></td>
+          <td>✅ Vos données restent enregistrées même en fermant le navigateur</td>
+        </tr>
+        <tr>
+          <td><strong>Landing Page VIP</strong></td>
+          <td>✅ Capture des 50 testeurs VIP + redirection vers la démo</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>4. Message de Prospection prêt pour les Groupes Diaspora</h2>
+    <div class="quote-box">
+      « Salam à tous,<br>
+      Étant souvent confronté aux difficultés de gestion des loyers et aux retards à Dakar, j'ai développé une application simple appelée <strong>KeurGui</strong> pour aider les propriétaires et la diaspora à suivre leurs encaissements Wave/OM et générer des quittances PDF officielles en 1 clic.<br><br>
+      Je recherche <strong>15 propriétaires bienveillants</strong> pour tester l'outil gratuitement et me donner leur avis franc.<br>
+      Vous pouvez tester la démo directement ici sans rien installer : [Lien du site]<br>
+      Merci d'avance pour votre soutien aux initiatives locales ! »
+    </div>
+
+    <h2>5. Comment Reprendre Demain Matin ☀️</h2>
+    <ol>
+      <li>Ouvrez Antigravity.</li>
+      <li>Écrivez simplement : <strong>« Bonjour, on reprend ! »</strong></li>
+      <li>Antigravity possède toute la mémoire du projet et enchaînera directement sur l'étape suivante : <strong>mettre la page en ligne gratuitement sur Internet</strong> (pour avoir une vraie URL partageable sur WhatsApp et Facebook) !</li>
+    </ol>
+
+    <div class="btn-row">
+      <a href="./index.html" class="btn btn-primary" target="_blank">🌐 Ouvrir la Landing Page</a>
+      <a href="./app.html" class="btn btn-secondary" target="_blank">📱 Ouvrir l'Application KeurGui</a>
+    </div>
+  </div>
+</body>
+</html>
