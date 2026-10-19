@@ -34,10 +34,10 @@
       </div>
 
       <div class="nav-actions">
-        <a href="app.html" class="btn btn-nav-cta">
+        <button onclick="handleDemoAccessRequest()" class="btn btn-nav-cta">
           <span>Tester la démo en direct</span>
           <span class="btn-arrow">→</span>
-        </a>
+        </button>
       </div>
     </div>
   </nav>
@@ -65,10 +65,10 @@
       </p>
 
       <div class="hero-cta-group">
-        <a href="app.html" class="btn btn-hero-primary">
+        <button onclick="handleDemoAccessRequest()" class="btn btn-hero-primary">
           <span class="btn-icon">🚀</span>
           <span>Essayer l'application (Démo interactive)</span>
-        </a>
+        </button>
         <a href="#vip" class="btn btn-hero-secondary">
           <span>Rejoindre les 50 testeurs VIP</span>
           <span class="btn-arrow">↓</span>
@@ -265,9 +265,9 @@
         <div class="diaspora-badge-live">Accès à distance 24/7</div>
         <h3>Vos loyers en toute transparence</h3>
         <p style="color:#94a3b8; font-size: 13px; margin: 10px 0 20px 0;">Vos chiffres sont toujours à jour et protégés sur votre espace sécurisé.</p>
-        <a href="app.html" class="btn btn-primary" style="width:100%; text-align:center;">
+        <button onclick="handleDemoAccessRequest()" class="btn btn-primary" style="width:100%; text-align:center;">
           Tester l'expérience KeurGui →
-        </a>
+        </button>
       </div>
     </div>
   </section>
@@ -340,6 +340,53 @@
     </div>
   </section>
 
+  <!-- ============================================== -->
+  <!-- MODAL ACCÈS DÉMO RAPIDE ($100M LEADS - CAPTURE 100%) -->
+  <!-- ============================================== -->
+  <div class="modal-overlay" id="quickAccessModal" style="display: none;" onclick="closeModalOnBackdrop(event)">
+    <div class="modal-quick-box">
+      <button class="modal-close-btn" onclick="closeQuickAccessModal()" title="Fermer">✕</button>
+      <span class="qa-badge">🇸🇳 Accès Démo Immédiat</span>
+      <h3>Débloquez votre accès démo à KeurGui ⚡</h3>
+      <p class="qa-sub">Rejoignez les 50 propriétaires privilégiés. Entrez votre prénom et votre numéro WhatsApp pour accéder à l'application interactive en direct.</p>
+
+      <form id="modalQuickForm" onsubmit="handleModalSignup(event)">
+        <div class="form-field">
+          <label>Votre Prénom et Nom <span style="color:#ef4444;">*</span></label>
+          <input type="text" id="modalVipName" placeholder="Ex: Amadou Sow" required>
+        </div>
+
+        <div class="form-field">
+          <label>Votre Numéro WhatsApp <span style="color:#ef4444;">*</span></label>
+          <input type="tel" id="modalVipPhone" placeholder="Ex: +221 77 123 45 67 ou +33 6..." required>
+        </div>
+
+        <div class="form-field">
+          <label>Votre situation <span style="color:#ef4444;">*</span></label>
+          <select id="modalVipRole" required>
+            <option value="Propriétaire particulier (à Dakar)">Propriétaire particulier (à Dakar)</option>
+            <option value="Propriétaire de la Diaspora (à l'étranger)">Propriétaire de la Diaspora (à l'étranger)</option>
+            <option value="Propriétaire d'un immeuble entier">Propriétaire d'un immeuble entier</option>
+            <option value="Agence immobilière ou Démarcheur">Agence immobilière ou Démarcheur</option>
+          </select>
+        </div>
+
+        <div class="form-field">
+          <label>Adresse Email <span style="color:#64748b; font-weight:normal; text-transform:none;">(Facultatif)</span></label>
+          <input type="email" id="modalVipEmail" placeholder="Ex: amadou@gmail.com (optionnel)">
+        </div>
+
+        <button type="submit" id="modalSubmitBtn" class="btn btn-vip-submit" style="width: 100%; margin-top: 10px;">
+          <span>Accéder à la démo maintenant 🚀</span>
+        </button>
+
+        <small class="form-privacy" style="display:block; text-align:center; margin-top:12px; color:#94a3b8; font-size:11px;">
+          🔒 100% gratuit • Zéro engagement • Vos coordonnées restent confidentielles
+        </small>
+      </form>
+    </div>
+  </div>
+
   <!-- FOOTER -->
   <footer class="landing-footer">
     <div class="container footer-content">
@@ -358,21 +405,51 @@
     // ⚙️ URL DU SCRIPT GOOGLE SHEETS OFFICIEL DE JEAN PHILIPPE
     const GOOGLE_SHEETS_WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbyq-4fs2XGdsdMSPWRjvwyuut-V8PgZ-_38_titTXmfz6G4jxCDZy6yuCwpWnmYm_IN/exec";
 
-    async function handleVipSignup(e) {
-      e.preventDefault();
-      
-      const submitBtn = document.getElementById('vipSubmitBtn');
-      const originalText = submitBtn.innerHTML;
-      
-      const name = document.getElementById('vipName').value.trim();
-      const phone = document.getElementById('vipPhone').value.trim();
-      const email = document.getElementById('vipEmail').value.trim();
-      const role = document.getElementById('vipRole').value;
-      const dateStr = new Date().toLocaleString('fr-FR', { timeZone: 'Africa/Dakar' });
+    // Gestion de l'accès à la démo : Si le prospect s'est déjà inscrit, accès direct. Sinon, ouverture du formulaire rapide.
+    function handleDemoAccessRequest() {
+      const alreadyRegistered = localStorage.getItem('keurgui_lead_registered');
+      if (alreadyRegistered === 'true') {
+        const savedName = localStorage.getItem('keurgui_lead_name') || '';
+        window.location.href = 'app.html?welcome=1&name=' + encodeURIComponent(savedName);
+      } else {
+        openQuickAccessModal();
+      }
+    }
 
-      // Bouton en état de chargement
+    function openQuickAccessModal() {
+      const modal = document.getElementById('quickAccessModal');
+      if (modal) {
+        modal.style.display = 'flex';
+        setTimeout(() => {
+          const nameInput = document.getElementById('modalVipName');
+          if (nameInput) nameInput.focus();
+        }, 100);
+      }
+    }
+
+    function closeQuickAccessModal() {
+      const modal = document.getElementById('quickAccessModal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    function closeModalOnBackdrop(e) {
+      if (e.target.id === 'quickAccessModal') {
+        closeQuickAccessModal();
+      }
+    }
+
+    // Soumission du formulaire rapide Modal
+    async function handleModalSignup(e) {
+      e.preventDefault();
+      const submitBtn = document.getElementById('modalSubmitBtn');
       submitBtn.disabled = true;
-      submitBtn.innerHTML = '<span>Enregistrement sécurisé...</span> ⏳';
+      submitBtn.innerHTML = '<span>Accès en cours...</span> ⏳';
+
+      const name = document.getElementById('modalVipName').value.trim();
+      const phone = document.getElementById('modalVipPhone').value.trim();
+      const email = document.getElementById('modalVipEmail').value.trim();
+      const role = document.getElementById('modalVipRole').value;
+      const dateStr = new Date().toLocaleString('fr-FR', { timeZone: 'Africa/Dakar' });
 
       const leadData = {
         date: dateStr,
@@ -382,17 +459,68 @@
         role: role
       };
 
-      // 1. Sauvegarde locale de sécurité
+      // 1. Sauvegarde locale
+      localStorage.setItem('keurgui_lead_registered', 'true');
+      localStorage.setItem('keurgui_lead_name', name);
       try {
         const vipLeads = JSON.parse(localStorage.getItem('keurgui_vip_leads') || '[]');
         vipLeads.push(leadData);
         localStorage.setItem('keurgui_vip_leads', JSON.stringify(vipLeads));
-      } catch (err) {
-        console.warn('Erreur localStorage:', err);
+      } catch (err) {}
+
+      // 2. Envoi silencieux à Google Sheets
+      if (GOOGLE_SHEETS_WEBHOOK_URL) {
+        try {
+          fetch(GOOGLE_SHEETS_WEBHOOK_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(leadData)
+          });
+        } catch (err) {
+          console.warn('Envoi Google Sheets différé', err);
+        }
       }
 
-      // 2. Envoi direct vers Google Sheets
-      if (GOOGLE_SHEETS_WEBHOOK_URL && !GOOGLE_SHEETS_WEBHOOK_URL.includes("VOTRE_URL")) {
+      // 3. Redirection instantanée vers l'application démo avec accueil personnalisé !
+      setTimeout(() => {
+        window.location.href = 'app.html?welcome=1&name=' + encodeURIComponent(name);
+      }, 400);
+    }
+
+    // Soumission du formulaire bas de page (Pionniers)
+    async function handleVipSignup(e) {
+      e.preventDefault();
+      
+      const submitBtn = document.getElementById('vipSubmitBtn');
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span>Enregistrement sécurisé...</span> ⏳';
+      
+      const name = document.getElementById('vipName').value.trim();
+      const phone = document.getElementById('vipPhone').value.trim();
+      const email = document.getElementById('vipEmail').value.trim();
+      const role = document.getElementById('vipRole').value;
+      const dateStr = new Date().toLocaleString('fr-FR', { timeZone: 'Africa/Dakar' });
+
+      const leadData = {
+        date: dateStr,
+        name: name,
+        phone: phone,
+        email: email ? email : 'Non renseigné',
+        role: role
+      };
+
+      // 1. Sauvegarde locale
+      localStorage.setItem('keurgui_lead_registered', 'true');
+      localStorage.setItem('keurgui_lead_name', name);
+      try {
+        const vipLeads = JSON.parse(localStorage.getItem('keurgui_vip_leads') || '[]');
+        vipLeads.push(leadData);
+        localStorage.setItem('keurgui_vip_leads', JSON.stringify(vipLeads));
+      } catch (err) {}
+
+      // 2. Envoi vers Google Sheets
+      if (GOOGLE_SHEETS_WEBHOOK_URL) {
         try {
           await fetch(GOOGLE_SHEETS_WEBHOOK_URL, {
             method: 'POST',
@@ -400,12 +528,10 @@
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(leadData)
           });
-        } catch (error) {
-          console.error("Erreur envoi Google Sheets:", error);
-        }
+        } catch (error) {}
       }
 
-      // 3. Affichage immédiat du succès
+      // 3. Affichage immédiat du succès avec bouton vers l'app
       document.getElementById('vipEarlyAccessForm').style.display = 'none';
       document.getElementById('vipSuccessName').textContent = name;
       document.getElementById('vipSuccessBox').style.display = 'block';

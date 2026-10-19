@@ -1946,3 +1946,141 @@ input:checked + .slider:before {
     grid-template-columns: 1fr;
   }
 }
+
+/* ===================================================
+   BANNIÈRE D'ACCUEIL PERSONNALISÉE (SUBTILE & CHALEUREUSE)
+   =================================================== */
+.welcome-banner {
+  background: linear-gradient(90deg, #ecfdf5 0%, #f0fdf4 100%);
+  border-bottom: 2px solid #10b981;
+  padding: 14px 0;
+  animation: slideDownWelcome 0.35s ease;
+}
+
+@keyframes slideDownWelcome {
+  from { transform: translateY(-100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.welcome-banner-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.welcome-text {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.welcome-wave {
+  font-size: 24px;
+}
+
+.welcome-text strong {
+  display: block;
+  font-size: 14px;
+  color: #065f46;
+  font-weight: 800;
+}
+
+.welcome-text p {
+  font-size: 13px;
+  color: #047857;
+  margin: 0;
+}
+
+.btn-welcome-dismiss {
+  background: #059669;
+  color: #ffffff;
+  border: none;
+  font-size: 13px;
+  font-weight: 800;
+  padding: 8px 18px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 4px 10px rgba(5, 150, 105, 0.2);
+}
+
+.btn-welcome-dismiss:hover {
+  background: #047857;
+  transform: translateY(-1px);
+}
+
+/* ===================================================
+   BOUTON FLOTTANT D'AVIS CLIENT (SERVICE CLIENT $100M)
+   =================================================== */
+.btn-feedback-floating {
+  position: fixed;
+  bottom: 24px;
+  left: 24px;
+  background: linear-gradient(135deg, #064e3b 0%, #0f172a 100%);
+  color: #ffffff;
+  border: 2px solid #10b981;
+  padding: 12px 20px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 9999;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  letter-spacing: 0.3px;
+}
+
+.btn-feedback-floating:hover {
+  transform: translateY(-3px) scale(1.04);
+  box-shadow: 0 14px 35px rgba(16, 185, 129, 0.4);
+  border-color: #34d399;
+}
+
+.rating-stars-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.star-rating-pill {
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #334155;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.star-rating-pill:hover,
+.star-rating-pill.active {
+  background: #ecfdf5;
+  border-color: #10b981;
+  color: #065f46;
+  font-weight: 800;
+}
+
+@media (max-width: 768px) {
+  .welcome-banner-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .btn-welcome-dismiss {
+    width: 100%;
+    text-align: center;
+  }
+  .btn-feedback-floating {
+    bottom: 16px;
+    left: 16px;
+    padding: 9px 15px;
+    font-size: 12px;
+  }
+}
+

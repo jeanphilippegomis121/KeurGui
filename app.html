@@ -32,7 +32,7 @@
         </div>
         <div>
           <h1 class="logo-title">Keur<span>Gui</span></h1>
-          <p class="logo-sub">Gestion locative intelligente • Sénégal</p>
+          <p class="logo-sub">Vos loyers au pays, en toute sérénité 🇸🇳</p>
         </div>
       </div>
 
@@ -51,15 +51,29 @@
         <a href="index.html" class="btn-link-landing" style="font-size: 12px; font-weight: 700; color: #059669; text-decoration: none; padding: 6px 12px; background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 999px; display: flex; align-items: center; gap: 4px;">
           <span>🌐</span> Site Vitrine VIP
         </a>
-        <div class="user-avatar">JP</div>
+        <div class="user-avatar" id="headerAvatar">JP</div>
         <div class="user-meta">
-          <span class="user-name">Jean Philippe Gomis</span>
+          <span class="user-name" id="headerUserName">Jean Philippe Gomis</span>
           <span class="user-badge" id="userRoleBadge">Propriétaire</span>
         </div>
         <button class="btn-icon-subtle" title="Réinitialiser les données de démo" onclick="resetDemoData()">🔄</button>
       </div>
     </div>
   </header>
+
+  <!-- Bannière d'Accueil Personnalisée Subtile & Chaleureuse -->
+  <div id="welcomeBanner" class="welcome-banner" style="display: none;">
+    <div class="container welcome-banner-content">
+      <div class="welcome-text">
+        <span class="welcome-wave">👋</span>
+        <div>
+          <strong>Dalal ak jàmm <span id="welcomeUserName"></span> !</strong>
+          <p>Bienvenue sur votre démo interactive KeurGui. Explorez le tableau de bord, testez une quittance officielle en 1 clic ou nettoyez les exemples pour ajouter vos vrais biens.</p>
+        </div>
+      </div>
+      <button class="btn-welcome-dismiss" onclick="dismissWelcomeBanner()">C'est parti ! 🚀</button>
+    </div>
+  </div>
 
   <!-- Bannière d'accueil Démo Interactive Ultra-Visible -->
   <div class="notification-bar demo-banner-highlight">
@@ -500,6 +514,52 @@
         </div>
       </form>
 
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- BOUTON FLOTTANT D'AVIS CLIENT ($100M SERVICE CLIENT) -->
+  <!-- ============================================== -->
+  <button class="btn-feedback-floating" onclick="openFeedbackModal()" title="Donner votre avis à Jean Philippe ou faire une suggestion">
+    <span class="fb-icon">💬</span>
+    <span>Votre avis ?</span>
+  </button>
+
+  <!-- MODAL DE RECUEIL DE FEEDBACK CLIENT -->
+  <div class="modal-overlay" id="feedbackModalOverlay" style="display: none;" onclick="closeModalOnBackdropFb(event)">
+    <div class="modal-card feedback-modal-card">
+      <button class="modal-close-btn" onclick="closeFeedbackModal()" title="Fermer">✕</button>
+      <span class="tag-live" style="background:#ecfdf5; color:#059669; border:1px solid #a7f3d0; margin-bottom:10px; display:inline-block;">🌟 Service Client Dédié</span>
+      <h3 style="font-size: 20px; font-weight: 800; color: var(--dark); margin-bottom: 6px;">Votre avis compte énormément ! 🇸🇳</h3>
+      <p style="font-size: 13px; color: var(--gray-600); line-height: 1.5; margin-bottom: 18px;">
+        Jean Philippe Gomis et l'équipe KeurGui lisent personnellement chaque suggestion pour bâtir l'outil idéal pour vos loyers.
+      </p>
+
+      <form id="feedbackForm" onsubmit="handleFeedbackSubmit(event)">
+        <div class="form-group">
+          <label style="font-size: 12px; font-weight: 700; color: var(--gray-600); margin-bottom: 6px; display:block;">Votre note globale :</label>
+          <div class="rating-stars-row" id="ratingStarsRow">
+            <button type="button" class="star-rating-pill active" onclick="selectRating(5, this)">⭐️⭐️⭐️⭐️⭐️ (Excellent)</button>
+            <button type="button" class="star-rating-pill" onclick="selectRating(4, this)">⭐️⭐️⭐️⭐️ (Très bien)</button>
+            <button type="button" class="star-rating-pill" onclick="selectRating(3, this)">⭐️⭐️⭐️ (Moyen)</button>
+          </div>
+          <input type="hidden" id="selectedRatingValue" value="5">
+        </div>
+
+        <div class="form-group" style="margin-top: 14px;">
+          <label style="font-size: 12px; font-weight: 700; color: var(--gray-600); margin-bottom: 6px; display:block;">Une suggestion, un besoin ou une remarque ?</label>
+          <textarea id="feedbackComment" rows="3" class="search-input" style="width:100%; height:auto; border-radius:10px; padding:12px; font-family:inherit; font-size:13px;" placeholder="Ex: J'aimerais pouvoir ajouter des photos des compteurs Senelec/Sde, ou partager le récapitulatif par email..." required></textarea>
+        </div>
+
+        <div class="modal-actions" style="margin-top: 18px; display: flex; gap: 10px; flex-wrap: wrap;">
+          <button type="submit" class="btn btn-primary" id="btnSendFeedback" style="flex: 1; justify-content: center;">
+            <span>Envoyer mon avis 🚀</span>
+          </button>
+          <button type="button" class="btn" onclick="sendFeedbackWhatsAppDirect()" style="background:#25D366; color:#ffffff; font-weight:800; border-radius:12px; padding:10px 16px; border:none; display:inline-flex; align-items:center; gap:6px; cursor:pointer;">
+            <span>Parler à Jean Philippe sur WhatsApp 📲</span>
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 

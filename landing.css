@@ -1095,3 +1095,112 @@ a {
     text-align: center;
   }
 }
+
+/* ===================================================
+   MODAL ACCÈS DÉMO RAPIDE (CAPTURE PROSPECTS $100M LEADS)
+   =================================================== */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(4, 8, 16, 0.88);
+  backdrop-filter: blur(10px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fadeInModal 0.25s ease;
+}
+
+@keyframes fadeInModal {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUpModal {
+  from { transform: translateY(30px) scale(0.96); opacity: 0; }
+  to { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+.modal-quick-box {
+  background: #ffffff;
+  color: #1e293b;
+  width: 100%;
+  max-width: 480px;
+  border-radius: 20px;
+  padding: 34px;
+  position: relative;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+  animation: slideUpModal 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  background: #f1f5f9;
+  border: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.modal-close-btn:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+  transform: rotate(90deg);
+}
+
+.qa-badge {
+  display: inline-block;
+  background: #ecfdf5;
+  color: #059669;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 4px 12px;
+  border-radius: 999px;
+  margin-bottom: 12px;
+  border: 1px solid #a7f3d0;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.modal-quick-box h3 {
+  font-size: 22px;
+  font-weight: 900;
+  color: #0f172a;
+  margin-bottom: 6px;
+  letter-spacing: -0.3px;
+}
+
+.qa-sub {
+  font-size: 13px;
+  color: #64748b;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+@media (max-width: 600px) {
+  .modal-overlay {
+    padding: 0;
+    align-items: flex-end;
+  }
+  .modal-quick-box {
+    border-radius: 20px 20px 0 0;
+    padding: 26px 20px;
+    max-height: 92vh;
+    overflow-y: auto;
+  }
+}
+

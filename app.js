@@ -196,6 +196,7 @@ document.addEventListener('DOMContentLoaded', () => {
   renderProperties();
   updateStats();
   renderBuildingUnitsSetup();
+  checkWelcomeGreeting();
 
   // Support touche Échap pour fermer les fenêtres
   document.addEventListener('keydown', (e) => {
@@ -203,6 +204,7 @@ document.addEventListener('DOMContentLoaded', () => {
       closeReceiptModal();
       closePayModal();
       closeAddPropertyModal();
+      closeFeedbackModal();
     }
   });
 });
@@ -928,4 +930,122 @@ function closeModalOnOverlay(e) {
   if (e.target.classList.contains('modal-overlay')) {
     e.target.classList.remove('active');
   }
+}
+
+// ===================================================
+// BANNIÈRE D'ACCUEIL PERSONNALISÉE SUBTILE & CHALEUREUSE
+// ===================================================
+function checkWelcomeGreeting() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const welcomeParam = urlParams.get('welcome');
+  const nameParam = urlParams.get('name') || localStorage.getItem('keurgui_lead_name');
+  
+  if (nameParam) {
+    const avatarEl = document.getElementById('headerAvatar');
+    const nameEl = document.getElementById('headerUserName');
+    if (avatarEl && nameParam.length > 0) {
+      avatarEl.textContent = nameParam.substring(0, 2).toUpperCase();
+    }
+    if (nameEl) {
+      nameEl.textContent = nameParam;
+    }
+  }
+
+  const dismissed = sessionStorage.getItem('keurgui_welcome_dismissed');
+  if (!dismissed && (welcomeParam === '1' || nameParam)) {
+    const banner = document.getElementById('welcomeBanner');
+    const nameSpan = document.getElementById('welcomeUserName');
+    if (banner && nameSpan) {
+      nameSpan.textContent = nameParam || 'Cher Propriétaire';
+      banner.style.display = 'block';
+    }
+  }
+}
+
+function dismissWelcomeBanner() {
+  const banner = document.getElementById('welcomeBanner');
+  if (banner) banner.style.display = 'none';
+  sessionStorage.setItem('keurgui_welcome_dismissed', 'true');
+}
+
+// ===================================================
+// GESTION DU SERVICE CLIENT & FEEDBACK DIRECT ($100M)
+// ===================================================
+const GOOGLE_SHEETS_FEEDBACK_URL = "https://script.google.com/macros/s/AKfycbyq-4fs2XGdsdMSPWRjvwyuut-V8PgZ-_38_titTXmfz6G4jxCDZy6yuCwpWnmYm_IN/exec";
+
+function openFeedbackModal() {
+  const modal = document.getElementById('feedbackModalOverlay');
+  if (modal) {
+    modal.style.display = 'flex';
+    setTimeout(() => {
+      const commentInput = document.getElementById('feedbackComment');
+      if (commentInput) commentInput.focus();
+    }, 100);
+  }
+}
+
+function closeFeedbackModal() {
+  const modal = document.getElementById('feedbackModalOverlay');
+  if (modal) modal.style.display = 'none';
+}
+
+function closeModalOnBackdropFb(e) {
+  if (e.target.id === 'feedbackModalOverlay') {
+    closeFeedbackModal();
+  }
+}
+
+function selectRating(val, el) {
+  document.getElementById('selectedRatingValue').value = val;
+  document.querySelectorAll('.star-rating-pill').forEach(btn => btn.classList.remove('active'));
+  if (el) el.classList.add('active');
+}
+
+async function handleFeedbackSubmit(e) {
+  e.preventDefault();
+  const btn = document.getElementById('btnSendFeedback');
+  const original = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<span>Envoi en cours...</span> ⏳';
+
+  const rating = document.getElementById('selectedRatingValue').value;
+  const comment = document.getElementById('feedbackComment').value.trim();
+  const userName = localStorage.getItem('keurgui_lead_name') || 'Visiteur Démo';
+  const dateStr = new Date().toLocaleString('fr-FR', { timeZone: 'Africa/Dakar' });
+
+  const payload = {
+    date: dateStr,
+    name: userName,
+    phone: "⭐ Avis Client (" + rating + "/5)",
+    email: "Note : " + rating + " étoiles",
+    role: "Suggestion : " + comment
+  };
+
+  if (GOOGLE_SHEETS_FEEDBACK_URL) {
+    try {
+      await fetch(GOOGLE_SHEETS_FEEDBACK_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+    } catch (err) {
+      console.warn('Feedback envoi différé', err);
+    }
+  }
+
+  closeFeedbackModal();
+  showToast("Merci infiniment ! Votre avis a été directement transmis à Jean Philippe.", "success");
+  document.getElementById('feedbackForm').reset();
+  btn.disabled = false;
+  btn.innerHTML = original;
+}
+
+function sendFeedbackWhatsAppDirect() {
+  const rating = document.getElementById('selectedRatingValue').value;
+  const comment = document.getElementById('feedbackComment').value.trim() || 'Bonjour Jean Philippe, je viens de tester KeurGui !';
+  const text = `Salam Jean Philippe, voici mon avis sur KeurGui (Note : ${rating}/5) : "${comment}"`;
+  const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+  window.open(url, '_blank');
+  closeFeedbackModal();
 }
