@@ -724,7 +724,105 @@ function closeReceiptModal() {
   document.getElementById('receiptModalOverlay').classList.remove('active');
 }
 
-// Téléchargement direct PDF
+// ===================================================
+// MOTEUR D'EXPORTATION PDF A4 UNIFIÉ, ISOLÉ & SANS COUPURE
+// Compatible Desktop (1080p/4K), Tablettes et Mobiles
+// ===================================================
+function exportElementToA4Pdf(sourceElement, filename, btn, originalText) {
+  // 1. Cloner l'élément source pour ne pas altérer l'affichage visuel de l'utilisateur
+  const clone = sourceElement.cloneNode(true);
+  clone.id = 'pdf-isolated-clone';
+
+  // 2. Créer une sandbox d'exportation temporaire ancrée exactement à (0, 0)
+  // Largeur standard A4 : 794px (soit 210mm à 96DPI)
+  const container = document.createElement('div');
+  container.id = 'pdf-render-sandbox';
+  container.style.position = 'fixed';
+  container.style.top = '0px';
+  container.style.left = '0px';
+  container.style.width = '794px';
+  container.style.minWidth = '794px';
+  container.style.maxWidth = '794px';
+  container.style.background = '#ffffff';
+  container.style.zIndex = '999999';
+  container.style.overflow = 'visible';
+  container.style.boxSizing = 'border-box';
+  container.style.margin = '0';
+  container.style.padding = '0';
+  container.style.pointerEvents = 'none';
+
+  // 3. Forcer le gabarit strict A4 sur le clone sans scrollbar ni décalage de modal flex
+  clone.style.width = '794px';
+  clone.style.minWidth = '794px';
+  clone.style.maxWidth = '794px';
+  clone.style.margin = '0';
+  clone.style.boxShadow = 'none';
+  clone.style.borderRadius = '0';
+  clone.style.transform = 'none';
+  clone.style.boxSizing = 'border-box';
+  clone.style.background = '#ffffff';
+  clone.style.padding = '24px 30px';
+
+  // Neutraliser les animations et fixer les tampons dans le clone
+  const badges = clone.querySelectorAll('.receipt-badge-paid');
+  badges.forEach(b => {
+    b.style.opacity = '1';
+    b.style.animation = 'none';
+    b.style.transform = 'rotate(-3deg)';
+  });
+
+  container.appendChild(clone);
+  document.body.appendChild(container);
+
+  const opt = {
+    margin: [6, 6, 6, 6],
+    filename: filename,
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: {
+      scale: 2,
+      useCORS: true,
+      logging: false,
+      scrollY: 0,
+      scrollX: 0,
+      x: 0,
+      y: 0,
+      width: 794,
+      windowWidth: 794
+    },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+    pagebreak: { mode: ['avoid-all', 'css'] }
+  };
+
+  const cleanup = () => {
+    if (document.body.contains(container)) {
+      document.body.removeChild(container);
+    }
+  };
+
+  if (window.html2pdf) {
+    html2pdf().set(opt).from(clone).save().then(() => {
+      cleanup();
+      btn.innerHTML = '<span>✅</span> Téléchargé !';
+      setTimeout(() => {
+        btn.innerHTML = originalText;
+        btn.classList.remove('loading');
+      }, 2500);
+    }).catch(err => {
+      cleanup();
+      console.error('Erreur PDF:', err);
+      window.print();
+      btn.innerHTML = originalText;
+      btn.classList.remove('loading');
+    });
+  } else {
+    cleanup();
+    window.print();
+    btn.innerHTML = originalText;
+    btn.classList.remove('loading');
+  }
+}
+
+// Téléchargement direct PDF (Quittance / Facture Locataire)
 function downloadDirectPDF() {
   if (!currentActiveProperty) return;
 
@@ -738,39 +836,7 @@ function downloadDirectPDF() {
   const docTypePrefix = currentActiveProperty.isCommercial ? 'Facture_Loyer' : 'Quittance';
   const filename = `${docTypePrefix}_${currentActiveProperty.receiptNo}_${cleanTenantName}.pdf`;
 
-  // Forcer le gabarit strict A4 1 seule page
-  element.classList.add('exporting-a4-pdf');
-
-  const opt = {
-    margin: [6, 6, 6, 6],
-    filename: filename,
-    image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { scale: 2, useCORS: true, scrollY: 0, scrollX: 0, windowWidth: 794 },
-    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-    pagebreak: { mode: ['avoid-all', 'css'] }
-  };
-
-  if (window.html2pdf) {
-    html2pdf().set(opt).from(element).save().then(() => {
-      element.classList.remove('exporting-a4-pdf');
-      btn.innerHTML = '<span>✅</span> Téléchargé !';
-      setTimeout(() => {
-        btn.innerHTML = originalText;
-        btn.classList.remove('loading');
-      }, 2500);
-    }).catch(err => {
-      element.classList.remove('exporting-a4-pdf');
-      console.error('Erreur PDF:', err);
-      window.print();
-      btn.innerHTML = originalText;
-      btn.classList.remove('loading');
-    });
-  } else {
-    element.classList.remove('exporting-a4-pdf');
-    window.print();
-    btn.innerHTML = originalText;
-    btn.classList.remove('loading');
-  }
+  exportElementToA4Pdf(element, filename, btn, originalText);
 }
 
 // Impression papier
@@ -1314,6 +1380,7 @@ function updateAgencyInvoiceView() {
   if (invRefEl) invRefEl.textContent = invoiceRef;
 }
 
+// Téléchargement Facture d'Honoraires Agence PDF (Bailleur Mandant)
 function downloadAgencyInvoicePdf() {
   const btn = document.getElementById('btnAgencyPdf');
   const originalText = btn.innerHTML;
@@ -1325,46 +1392,7 @@ function downloadAgencyInvoicePdf() {
   const ownerClean = (select ? select.value : 'Global').replace(/[^a-zA-Z0-9]/g, '_');
   const filename = `Facture_Honoraires_KeurGui_${ownerClean}_Octobre_2026.pdf`;
 
-  // Forcer le gabarit strict A4 1 seule page
-  element.classList.add('exporting-a4-pdf');
-
-  const opt = {
-    margin: [6, 6, 6, 6],
-    filename: filename,
-    image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { 
-      scale: 2, 
-      useCORS: true, 
-      scrollY: 0, 
-      scrollX: 0,
-      windowWidth: 794,
-      logging: false 
-    },
-    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-    pagebreak: { mode: ['avoid-all', 'css'] }
-  };
-
-  if (window.html2pdf) {
-    html2pdf().set(opt).from(element).save().then(() => {
-      element.classList.remove('exporting-a4-pdf');
-      btn.innerHTML = '<span>✅</span> Facture Téléchargée !';
-      setTimeout(() => {
-        btn.innerHTML = originalText;
-        btn.classList.remove('loading');
-      }, 2500);
-    }).catch(err => {
-      element.classList.remove('exporting-a4-pdf');
-      console.error('Erreur PDF Facture:', err);
-      window.print();
-      btn.innerHTML = originalText;
-      btn.classList.remove('loading');
-    });
-  } else {
-    element.classList.remove('exporting-a4-pdf');
-    window.print();
-    btn.innerHTML = originalText;
-    btn.classList.remove('loading');
-  }
+  exportElementToA4Pdf(element, filename, btn, originalText);
 }
 
 function printAgencyInvoice() {
