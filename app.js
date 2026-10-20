@@ -738,28 +738,35 @@ function downloadDirectPDF() {
   const docTypePrefix = currentActiveProperty.isCommercial ? 'Facture_Loyer' : 'Quittance';
   const filename = `${docTypePrefix}_${currentActiveProperty.receiptNo}_${cleanTenantName}.pdf`;
 
+  // Forcer le gabarit strict A4 1 seule page
+  element.classList.add('exporting-a4-pdf');
+
   const opt = {
-    margin: [10, 10, 10, 10],
+    margin: [6, 6, 6, 6],
     filename: filename,
     image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { scale: 2, useCORS: true },
-    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    html2canvas: { scale: 2, useCORS: true, scrollY: 0, scrollX: 0, windowWidth: 794 },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+    pagebreak: { mode: ['avoid-all', 'css'] }
   };
 
   if (window.html2pdf) {
     html2pdf().set(opt).from(element).save().then(() => {
+      element.classList.remove('exporting-a4-pdf');
       btn.innerHTML = '<span>✅</span> Téléchargé !';
       setTimeout(() => {
         btn.innerHTML = originalText;
         btn.classList.remove('loading');
       }, 2500);
     }).catch(err => {
+      element.classList.remove('exporting-a4-pdf');
       console.error('Erreur PDF:', err);
       window.print();
       btn.innerHTML = originalText;
       btn.classList.remove('loading');
     });
   } else {
+    element.classList.remove('exporting-a4-pdf');
     window.print();
     btn.innerHTML = originalText;
     btn.classList.remove('loading');
@@ -1156,7 +1163,7 @@ async function handleFeedbackSubmit(e) {
   const btn = document.getElementById('btnSendFeedback');
   const original = btn.innerHTML;
   btn.disabled = true;
-  btn.innerHTML = '<span>Envoi en cours...</span> ⏳';
+  btn.innerHTML = '<span>Transmission...</span> ⏳';
 
   const rating = document.getElementById('selectedRatingValue').value;
   const comment = document.getElementById('feedbackComment').value.trim();
@@ -1171,21 +1178,28 @@ async function handleFeedbackSubmit(e) {
     role: "Suggestion : " + comment
   };
 
+  // 1. Sauvegarde discrète dans le Google Sheet
   if (GOOGLE_SHEETS_FEEDBACK_URL) {
     try {
-      await fetch(GOOGLE_SHEETS_FEEDBACK_URL, {
+      fetch(GOOGLE_SHEETS_FEEDBACK_URL, {
         method: 'POST',
         mode: 'no-cors',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
-      });
+      }).catch(err => console.warn('Feedback envoi différé', err));
     } catch (err) {
       console.warn('Feedback envoi différé', err);
     }
   }
 
+  // 2. Notification et ouverture directe de WhatsApp pour que Jean Philippe reçoive le message en temps réel sur son téléphone
+  const text = `Salam Jean Philippe, voici mon avis sur KeurGui :\n\n⭐ Note : ${rating}/5\n👤 De la part de : ${userName}\n💬 Message : "${comment}"\n\n(Envoyé depuis l'application KeurGui - ${dateStr})`;
+  const jpPhone = "221788182104";
+  const url = `https://wa.me/${jpPhone}?text=${encodeURIComponent(text)}`;
+  window.open(url, '_blank');
+
   closeFeedbackModal();
-  showToast("Merci infiniment ! Votre avis a été directement transmis à Jean Philippe.", "success");
+  showToast("Merci infiniment ! Votre avis a été directement transmis à Jean Philippe via WhatsApp.", "success");
   document.getElementById('feedbackForm').reset();
   btn.disabled = false;
   btn.innerHTML = original;
@@ -1194,7 +1208,8 @@ async function handleFeedbackSubmit(e) {
 function sendFeedbackWhatsAppDirect() {
   const rating = document.getElementById('selectedRatingValue').value;
   const comment = document.getElementById('feedbackComment').value.trim() || 'Bonjour Jean Philippe, je viens de tester KeurGui !';
-  const text = `Salam Jean Philippe, voici mon avis sur KeurGui (Note : ${rating}/5) :\n\n"${comment}"`;
+  const userName = localStorage.getItem('keurgui_lead_name') || 'Visiteur Démo';
+  const text = `Salam Jean Philippe, voici mon avis sur KeurGui :\n\n⭐ Note : ${rating}/5\n👤 De la part de : ${userName}\n💬 Message : "${comment}"`;
   const jpPhone = "221788182104"; // Numéro direct WhatsApp de Jean Philippe
   const url = `https://wa.me/${jpPhone}?text=${encodeURIComponent(text)}`;
   window.open(url, '_blank');
@@ -1310,28 +1325,42 @@ function downloadAgencyInvoicePdf() {
   const ownerClean = (select ? select.value : 'Global').replace(/[^a-zA-Z0-9]/g, '_');
   const filename = `Facture_Honoraires_KeurGui_${ownerClean}_Octobre_2026.pdf`;
 
+  // Forcer le gabarit strict A4 1 seule page
+  element.classList.add('exporting-a4-pdf');
+
   const opt = {
-    margin: [10, 10, 10, 10],
+    margin: [6, 6, 6, 6],
     filename: filename,
     image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { scale: 2, useCORS: true },
-    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    html2canvas: { 
+      scale: 2, 
+      useCORS: true, 
+      scrollY: 0, 
+      scrollX: 0,
+      windowWidth: 794,
+      logging: false 
+    },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+    pagebreak: { mode: ['avoid-all', 'css'] }
   };
 
   if (window.html2pdf) {
     html2pdf().set(opt).from(element).save().then(() => {
+      element.classList.remove('exporting-a4-pdf');
       btn.innerHTML = '<span>✅</span> Facture Téléchargée !';
       setTimeout(() => {
         btn.innerHTML = originalText;
         btn.classList.remove('loading');
       }, 2500);
     }).catch(err => {
+      element.classList.remove('exporting-a4-pdf');
       console.error('Erreur PDF Facture:', err);
       window.print();
       btn.innerHTML = originalText;
       btn.classList.remove('loading');
     });
   } else {
+    element.classList.remove('exporting-a4-pdf');
     window.print();
     btn.innerHTML = originalText;
     btn.classList.remove('loading');

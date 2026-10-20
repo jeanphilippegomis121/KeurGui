@@ -2235,3 +2235,157 @@ input:checked + .slider:before {
   box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.15);
 }
 
+/* ===================================================
+   FEUILLE DE FACTURE D'HONORAIRES AGENCE COMPACTE (FORMAT A4 PARFAIT 1 PAGE)
+   =================================================== */
+.agency-invoice-sheet {
+  background: #ffffff;
+  padding: 24px 28px !important;
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  color: #1e293b;
+  font-size: 11.5px;
+  line-height: 1.4;
+  box-sizing: border-box;
+}
+
+.agency-invoice-sheet .receipt-header {
+  margin-bottom: 0;
+}
+
+.agency-invoice-sheet .receipt-brand h2 {
+  font-size: 16px !important;
+}
+
+.agency-invoice-sheet .receipt-divider {
+  margin: 10px 0 !important;
+  height: 1.5px;
+}
+
+.agency-invoice-sheet .receipt-document-title {
+  margin-bottom: 12px !important;
+}
+
+.agency-invoice-sheet .receipt-document-title h1 {
+  font-size: 16px !important;
+  margin-bottom: 2px;
+}
+
+.agency-invoice-sheet .receipt-document-title p {
+  font-size: 11px !important;
+}
+
+.agency-invoice-sheet .receipt-parties-grid {
+  gap: 12px !important;
+  margin-bottom: 12px !important;
+  padding: 10px 14px !important;
+}
+
+.agency-invoice-sheet .party-box h4 {
+  font-size: 13px !important;
+  margin-bottom: 2px !important;
+}
+
+.agency-invoice-sheet .party-box p {
+  font-size: 11px !important;
+  line-height: 1.35 !important;
+  margin: 1px 0;
+}
+
+.agency-invoice-sheet .receipt-table {
+  margin-bottom: 10px !important;
+}
+
+.agency-invoice-sheet .receipt-table th {
+  padding: 6px 10px !important;
+  font-size: 10px !important;
+}
+
+.agency-invoice-sheet .receipt-table td {
+  padding: 6px 10px !important;
+  font-size: 11.5px !important;
+}
+
+.agency-invoice-sheet .receipt-total-row td {
+  padding: 8px 10px !important;
+}
+
+.agency-invoice-sheet .net-payout-box {
+  margin: 10px 0 !important;
+  padding: 10px 14px !important;
+  border-radius: 8px !important;
+}
+
+.agency-invoice-sheet .net-payout-label {
+  font-size: 11px !important;
+}
+
+.agency-invoice-sheet .net-payout-sub {
+  font-size: 10px !important;
+}
+
+.agency-invoice-sheet .net-payout-amount {
+  font-size: 18px !important;
+}
+
+.agency-invoice-sheet .receipt-words-box {
+  padding: 8px 12px !important;
+  margin-bottom: 10px !important;
+  font-size: 11px !important;
+}
+
+.agency-invoice-sheet .receipt-legal-note {
+  font-size: 9px !important;
+  line-height: 1.35 !important;
+  margin-bottom: 12px !important;
+}
+
+.agency-invoice-sheet .receipt-footer-signatures {
+  padding-top: 6px !important;
+}
+
+.agency-invoice-sheet .qr-box {
+  width: 44px !important;
+  height: 44px !important;
+  font-size: 8px !important;
+}
+
+.agency-invoice-sheet .digital-stamp {
+  padding: 6px 12px !important;
+}
+
+.agency-invoice-sheet .digital-stamp strong {
+  font-size: 12px !important;
+}
+
+/* ANTI-COUPURE DE PAGE STRICT POUR L'EXPORT PDF ET IMPRESSION */
+.receipt-header,
+.receipt-parties-grid,
+.receipt-table,
+.net-payout-box,
+.receipt-words-box,
+.receipt-legal-note,
+.receipt-footer-signatures {
+  page-break-inside: avoid !important;
+  break-inside: avoid !important;
+}
+
+/* GABARIT STRICT DE RENDU PDF A4 (794px à 96DPI = 210mm) */
+.exporting-a4-pdf {
+  width: 794px !important;
+  max-width: 794px !important;
+  min-width: 794px !important;
+  background: #ffffff !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  overflow: visible !important;
+  margin: 0 !important;
+}
+
+.exporting-a4-pdf .receipt-badge-paid {
+  opacity: 1 !important;
+  animation: none !important;
+  transform: rotate(-3deg) !important;
+}
+
+
