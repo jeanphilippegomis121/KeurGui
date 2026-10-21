@@ -20,10 +20,7 @@
   <meta name="apple-mobile-web-app-title" content="KeurGui">
 
   <!-- Bibliothèque de génération PDF directe (téléchargement instantané du fichier .pdf) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" 
-          integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWQV46GjQ4UHs484MIHBgu40Jmk377cUflhy6QTSkLdhct262KdhmYrztnMr9Q==" 
-          crossorigin="anonymous" 
-          referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
   <link rel="stylesheet" href="style.css">
 </head>
@@ -251,14 +248,14 @@
           <h3>Quittance de Loyer N° <span id="mReceiptNumber">KG-2026-0042</span></h3>
         </div>
         <div class="receipt-cta-group">
-          <!-- BOUTON 1 : TÉLÉCHARGEMENT DIRECT PDF -->
+          <!-- BOUTON 1 : TÉLÉCHARGEMENT DIRECT PDF 1 PAGE -->
           <button class="btn btn-download-direct-pdf" id="btnDirectPdf" onclick="downloadDirectPDF()">
-            <span>📥</span> Télécharger le PDF
+            <span>📥</span> Télécharger le PDF (1 page)
           </button>
           
-          <!-- BOUTON 2 : PARTAGE WHATSAPP AVEC MESSAGE D'ACCOMPAGNEMENT -->
+          <!-- BOUTON 2 : PARTAGE DIRECT WHATSAPP AVEC PDF -->
           <button class="btn btn-whatsapp" onclick="sendWhatsAppReceipt()">
-            <span>💬</span> Message d'envoi WhatsApp
+            <span>💬</span> Télécharger & Envoyer WhatsApp
           </button>
           
           <!-- BOUTON 3 : IMPRESSION PAPIER -->

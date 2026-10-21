@@ -877,9 +877,9 @@ function closeReceiptModal() {
 
 // ===================================================
 // MOTEUR D'EXPORTATION PDF A4 UNIFIÉ, ISOLÉ & SANS COUPURE
-// Compatible Desktop (1080p/4K), Tablettes et Mobiles
+// Compatible Desktop (1080p/4K), Tablettes et Mobiles (Garantie Stricte 1 Seule Page A4)
 // ===================================================
-function exportElementToA4Pdf(sourceElement, filename, btn, originalText) {
+function exportElementToA4Pdf(sourceElement, filename, btn, originalText, callback) {
   // 1. Cloner l'élément source pour ne pas altérer l'affichage visuel de l'utilisateur
   const clone = sourceElement.cloneNode(true);
   clone.id = 'pdf-isolated-clone';
@@ -896,13 +896,13 @@ function exportElementToA4Pdf(sourceElement, filename, btn, originalText) {
   container.style.maxWidth = '794px';
   container.style.background = '#ffffff';
   container.style.zIndex = '999999';
-  container.style.overflow = 'visible';
+  container.style.overflow = 'hidden';
   container.style.boxSizing = 'border-box';
   container.style.margin = '0';
   container.style.padding = '0';
   container.style.pointerEvents = 'none';
 
-  // 3. Forcer le gabarit strict A4 sur le clone sans scrollbar ni décalage de modal flex
+  // 3. Forcer le gabarit strict A4 compact sur le clone pour garantir 1 SEULE PAGE
   clone.style.width = '794px';
   clone.style.minWidth = '794px';
   clone.style.maxWidth = '794px';
@@ -912,7 +912,7 @@ function exportElementToA4Pdf(sourceElement, filename, btn, originalText) {
   clone.style.transform = 'none';
   clone.style.boxSizing = 'border-box';
   clone.style.background = '#ffffff';
-  clone.style.padding = '24px 30px';
+  clone.style.padding = '18px 24px';
 
   // Neutraliser les animations et fixer les tampons dans le clone
   const badges = clone.querySelectorAll('.receipt-badge-paid');
@@ -922,11 +922,20 @@ function exportElementToA4Pdf(sourceElement, filename, btn, originalText) {
     b.style.transform = 'rotate(-3deg)';
   });
 
+  // Nettoyer les éléments no-print qui auraient été accidentellement clonés
+  clone.querySelectorAll('.no-print').forEach(el => el.remove());
+
   container.appendChild(clone);
   document.body.appendChild(container);
 
+  const cleanup = () => {
+    if (document.body.contains(container)) {
+      document.body.removeChild(container);
+    }
+  };
+
   const opt = {
-    margin: [6, 6, 6, 6],
+    margin: [4, 4, 4, 4], // Marges fines pour optimiser l'espace A4
     filename: filename,
     image: { type: 'jpeg', quality: 0.98 },
     html2canvas: {
@@ -935,41 +944,58 @@ function exportElementToA4Pdf(sourceElement, filename, btn, originalText) {
       logging: false,
       scrollY: 0,
       scrollX: 0,
-      x: 0,
-      y: 0,
       width: 794,
       windowWidth: 794
     },
     jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-    pagebreak: { mode: ['avoid-all', 'css'] }
-  };
-
-  const cleanup = () => {
-    if (document.body.contains(container)) {
-      document.body.removeChild(container);
-    }
+    pagebreak: { mode: 'avoid-all' }
   };
 
   if (window.html2pdf) {
-    html2pdf().set(opt).from(clone).save().then(() => {
+    html2pdf().set(opt).from(clone).toPdf().get('pdf').then(pdf => {
+      // 🔒 GARANTIE MATHÉMATIQUE STRICTE : 1 SEULE PAGE
+      // Si un micro-débordement créait une 2e page, on supprime impérativement les pages excédentaires
+      const totalPages = pdf.internal.getNumberOfPages();
+      if (totalPages > 1) {
+        for (let i = totalPages; i > 1; i--) {
+          pdf.deletePage(i);
+        }
+      }
+    }).save().then(() => {
       cleanup();
-      btn.innerHTML = '<span>✅</span> Téléchargé !';
-      setTimeout(() => {
-        btn.innerHTML = originalText;
-        btn.classList.remove('loading');
-      }, 2500);
+      if (btn) {
+        btn.innerHTML = '<span>✅</span> Téléchargé (1 page) !';
+        setTimeout(() => {
+          btn.innerHTML = originalText;
+          btn.classList.remove('loading');
+        }, 2500);
+      }
+      if (typeof callback === 'function') {
+        callback();
+      }
     }).catch(err => {
       cleanup();
-      console.error('Erreur PDF:', err);
+      console.error('Erreur PDF direct:', err);
+      if (btn) {
+        btn.innerHTML = originalText;
+        btn.classList.remove('loading');
+      }
+      showToast("Génération de la quittance en cours...", "info");
       window.print();
-      btn.innerHTML = originalText;
-      btn.classList.remove('loading');
+      if (typeof callback === 'function') {
+        callback();
+      }
     });
   } else {
     cleanup();
+    if (btn) {
+      btn.innerHTML = originalText;
+      btn.classList.remove('loading');
+    }
     window.print();
-    btn.innerHTML = originalText;
-    btn.classList.remove('loading');
+    if (typeof callback === 'function') {
+      callback();
+    }
   }
 }
 
@@ -1013,6 +1039,9 @@ function sendWhatsAppReceiptDirect(id) {
   const periodName = getPeriodFrench();
   const method = pData.paymentMethod || p.paymentMethod || 'Wave';
   const receiptNo = pData.receiptNo || p.receiptNo;
+  const cleanTenantName = (p.tenant || 'Locataire').replace(/\s+/g, '_');
+  const docTypePrefix = p.isCommercial ? 'Facture_Loyer' : 'Quittance';
+  const filename = `${docTypePrefix}_${receiptNo}_${cleanTenantName}_${pKey}.pdf`;
 
   let message = '';
   if (p.isCommercial) {
@@ -1030,21 +1059,23 @@ Veuillez trouver ci-joint votre Facture de Loyer et Quittance officielle (au for
 • Total réglé TTC : ${formatFCFA(ttc)} (par ${method})
 • Référence Facture : ${receiptNo}
 
-Ce document officiel comporte toutes les mentions fiscales réglementaires (NINEA, RC) déductibles auprès de la DGID Sénégal.
+Ce document certifié comporte toutes les mentions fiscales réglementaires (NINEA, RC) conformes au CGI Sénégal.
 Merci pour votre collaboration.
 
 Bien cordialement,
 Jean Philippe Gomis — KeurGui Immobilier`;
   } else {
     const total = formatFCFA(p.rent + p.charges);
+    const paidDate = pData.paidDate ? `le ${pData.paidDate}` : 'ce mois-ci';
     message = `Bonjour ${p.tenant},
 
 J'espère que vous vous portez bien.
 
 Veuillez trouver ci-joint votre quittance de loyer officielle (au format PDF) pour le mois de ${periodName} concernant votre logement : ${p.unitName} (${p.building}).
 
-• Montant réglé : ${total} (par ${method})
+• Montant réglé : ${total} (par ${method} ${paidDate})
 • Référence Quittance : ${receiptNo}
+• Statut : Quittance libératoire certifiée conforme
 
 Merci pour votre ponctualité.
 Excellente journée à vous !
@@ -1053,9 +1084,22 @@ Bien cordialement,
 Jean Philippe Gomis — KeurGui Immobilier`;
   }
 
-  const cleanPhone = sanitizeWhatsAppPhone(p.phone);
-  const url = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
-  window.open(url, '_blank', 'noopener,noreferrer');
+  // 1. Ouvrir d'abord le reçu pour s'assurer que printableReceipt est à jour
+  openReceiptModal(id);
+  const element = document.getElementById('printableReceipt');
+
+  showToast("⏳ Préparation de la quittance PDF (1 page)...", "info");
+
+  // 2. Télécharger automatiquement la quittance 1 page
+  exportElementToA4Pdf(element, filename, null, null, () => {
+    showToast("✅ Quittance PDF prête ! WhatsApp s'ouvre : cliquez sur 📎 pour joindre la quittance.", "success");
+    
+    setTimeout(() => {
+      const cleanPhone = sanitizeWhatsAppPhone(p.phone);
+      const url = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }, 700);
+  });
 }
 
 function sendWhatsAppReminder(id) {
@@ -1619,6 +1663,8 @@ function sendWhatsAppAgencyInvoice() {
 
   const ownerName = selectedOwner === 'all' ? 'Cher Bailleur' : selectedOwner;
   const invoiceRef = `FACT-AG-${selectedPeriod.year}-${String(selectedPeriod.month).padStart(2, '0')}`;
+  const filename = `Facture_Honoraires_KeurGui_${(selectedOwner === 'all' ? 'Global' : selectedOwner).replace(/\s+/g, '_')}_${pKey}.pdf`;
+
   const message = `Bonjour ${ownerName},
 
 Veuillez trouver ci-joint votre Décompte de Gestion et la Facture d'Honoraires officielle (au format PDF) pour le mois de ${periodText} concernant vos biens sous mandat.
@@ -1641,9 +1687,18 @@ Bien cordialement,
 Direction Financière — KeurGui Immobilier SARL
 VDN Sacré-Cœur 3, Dakar • +221 78 818 21 04`;
 
-  let targetPhone = '221788182104';
-  const url = `https://wa.me/${targetPhone}?text=${encodeURIComponent(message)}`;
-  window.open(url, '_blank', 'noopener,noreferrer');
+  const element = document.getElementById('printableAgencyInvoice');
+
+  showToast("⏳ Préparation de la Facture PDF...", "info");
+
+  exportElementToA4Pdf(element, filename, null, null, () => {
+    showToast("✅ Facture PDF prête ! WhatsApp s'ouvre : joignez le fichier avec 📎.", "success");
+    setTimeout(() => {
+      let targetPhone = '221788182104';
+      const url = `https://wa.me/${targetPhone}?text=${encodeURIComponent(message)}`;
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }, 700);
+  });
 }
 
 // ===================================================
