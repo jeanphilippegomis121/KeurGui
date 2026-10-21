@@ -90,45 +90,49 @@
   <!-- Contenu Principal -->
   <main class="container main-content">
 
-    <!-- BARRE DE PÉRIODE & CALENDRIER MENSUEL (MULTI-ANNÉES) -->
-    <section class="period-navigator-bar">
-      <div class="period-nav-left">
-        <span class="period-badge">📅 Période</span>
-        <div class="period-controls">
-          <button class="btn-period-arrow" onclick="changePeriod(-1)" title="Mois précédent">◀</button>
-          <div class="period-picker-container">
-            <select id="periodMonthSelect" onchange="onPeriodPickerChange()" class="period-select" title="Choisir le mois">
-              <option value="1">Janvier</option>
-              <option value="2">Février</option>
-              <option value="3">Mars</option>
-              <option value="4">Avril</option>
-              <option value="5">Mai</option>
-              <option value="6">Juin</option>
-              <option value="7">Juillet</option>
-              <option value="8">Août</option>
-              <option value="9">Septembre</option>
-              <option value="10" selected>Octobre</option>
-              <option value="11">Novembre</option>
-              <option value="12">Décembre</option>
-            </select>
-            <select id="periodYearSelect" onchange="onPeriodPickerChange()" class="period-select year-select" title="Choisir l'année">
-              <option value="2025">2025</option>
-              <option value="2026" selected>2026</option>
-              <option value="2027">2027</option>
-              <option value="2028">2028</option>
-              <option value="2029">2029</option>
-              <option value="2030">2030</option>
-            </select>
-          </div>
-          <button class="btn-period-arrow" onclick="changePeriod(1)" title="Mois suivant">▶</button>
-        </div>
-        <button class="btn-period-today" onclick="goToCurrentPeriod()">Ce mois-ci</button>
+    <!-- EN-TÊTE DU TABLEAU DE BORD AVEC SÉLECTEUR DE PÉRIODE SUBTIL & ÉLÉGANT -->
+    <div class="dashboard-executive-header">
+      <div class="dash-title-block">
+        <h1 class="dash-main-title">Tableau de bord</h1>
+        <p class="dash-subtitle">Suivi des encaissements • <span id="activePeriodLabel" class="period-text-highlight">Octobre 2026</span></p>
       </div>
 
-      <div class="period-nav-right">
-        <span class="period-indicator-label">Mois actif : <strong id="activePeriodLabel">Octobre 2026</strong></span>
+      <!-- Sélecteur de période épuré (visible mais subtil) -->
+      <div class="period-pill-subtle">
+        <button class="btn-period-arrow-subtle" onclick="changePeriod(-1)" title="Mois précédent" aria-label="Mois précédent">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        </button>
+        <div class="period-dropdowns-group">
+          <span class="period-icon-cal">📅</span>
+          <select id="periodMonthSelect" onchange="onPeriodPickerChange()" class="select-period-subtle" title="Choisir le mois">
+            <option value="1">Janvier</option>
+            <option value="2">Février</option>
+            <option value="3">Mars</option>
+            <option value="4">Avril</option>
+            <option value="5">Mai</option>
+            <option value="6">Juin</option>
+            <option value="7">Juillet</option>
+            <option value="8">Août</option>
+            <option value="9">Septembre</option>
+            <option value="10" selected>Octobre</option>
+            <option value="11">Novembre</option>
+            <option value="12">Décembre</option>
+          </select>
+          <select id="periodYearSelect" onchange="onPeriodPickerChange()" class="select-period-subtle select-year-subtle" title="Choisir l'année">
+            <option value="2025">2025</option>
+            <option value="2026" selected>2026</option>
+            <option value="2027">2027</option>
+            <option value="2028">2028</option>
+            <option value="2029">2029</option>
+            <option value="2030">2030</option>
+          </select>
+        </div>
+        <button class="btn-period-arrow-subtle" onclick="changePeriod(1)" title="Mois suivant" aria-label="Mois suivant">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </button>
+        <button class="btn-period-today-subtle" onclick="goToCurrentPeriod()" title="Revenir au mois en cours">Mois en cours</button>
       </div>
-    </section>
+    </div>
 
     <!-- Statistiques Clés -->
     <section class="stats-grid">

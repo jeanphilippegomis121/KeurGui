@@ -2397,134 +2397,145 @@ input:checked + .slider:before {
 
 /* ===================================================
    BARRE DE PÉRIODE & CALENDRIER MENSUEL (MULTI-ANNÉES)
+/* ===================================================
+   SÉLECTEUR DE PÉRIODE SUBTIL & ÉLÉGANT ("VISIBLE MAIS SUBTIL")
    =================================================== */
-.period-navigator-bar {
-  background: #ffffff;
-  border-radius: var(--radius-lg);
-  padding: 14px 22px;
+.dashboard-executive-header {
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  margin-bottom: 24px;
-  border: 1px solid var(--gray-200);
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
-  flex-wrap: wrap;
-  gap: 16px;
-}
-
-.period-nav-left {
-  display: flex;
   align-items: center;
+  margin-bottom: 22px;
+  flex-wrap: wrap;
   gap: 12px;
-  flex-wrap: wrap;
 }
 
-.period-badge {
-  font-size: 11px;
+.dash-title-block {
+  display: flex;
+  flex-direction: column;
+}
+
+.dash-main-title {
+  font-size: 24px;
   font-weight: 800;
-  color: #064e3b;
-  background: #ecfdf5;
-  border: 1px solid #a7f3d0;
-  padding: 6px 12px;
-  border-radius: 999px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  color: #0f172a;
+  letter-spacing: -0.5px;
+  margin: 0;
+  line-height: 1.2;
 }
 
-.period-controls {
-  display: flex;
-  align-items: center;
-  background: var(--gray-100);
-  border: 1px solid var(--gray-200);
-  border-radius: 12px;
-  padding: 4px;
-  gap: 4px;
+.dash-subtitle {
+  font-size: 13px;
+  color: #64748b;
+  margin: 3px 0 0 0;
+  font-weight: 500;
 }
 
-.btn-period-arrow {
+.period-text-highlight {
+  color: #059669;
+  font-weight: 700;
+}
+
+.period-pill-subtle {
+  display: inline-flex;
+  align-items: center;
   background: #ffffff;
-  border: 1px solid var(--gray-200);
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  font-size: 11px;
-  font-weight: 800;
+  border: 1px solid #e2e8f0;
+  border-radius: 9999px;
+  padding: 4px 6px 4px 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s ease;
+  gap: 6px;
+}
+
+.period-pill-subtle:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.period-dropdowns-group {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.period-icon-cal {
+  font-size: 13px;
+  margin-right: 3px;
+  opacity: 0.85;
+}
+
+.select-period-subtle {
+  background: transparent;
+  border: none;
+  font-size: 13px;
+  font-weight: 700;
+  color: #0f172a;
+  padding: 4px 6px;
   cursor: pointer;
+  border-radius: 6px;
+  outline: none;
+  font-family: inherit;
+  transition: background 0.15s ease;
+}
+
+.select-period-subtle:hover,
+.select-period-subtle:focus {
+  background: #f1f5f9;
+}
+
+.select-year-subtle {
+  color: #475569;
+  font-weight: 600;
+}
+
+.btn-period-arrow-subtle {
+  background: transparent;
+  border: none;
+  color: #64748b;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--gray-600);
-  transition: all 0.2s;
-}
-
-.btn-period-arrow:hover {
-  background: var(--primary);
-  color: #ffffff;
-  border-color: var(--primary);
-}
-
-.period-picker-container {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.period-select {
-  background: #ffffff;
-  border: 1px solid var(--gray-200);
-  border-radius: 8px;
-  padding: 6px 12px;
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--dark);
   cursor: pointer;
-  outline: none;
-  font-family: inherit;
-  transition: border-color 0.2s;
+  transition: all 0.15s ease;
 }
 
-.period-select:focus {
-  border-color: var(--primary);
+.btn-period-arrow-subtle:hover {
+  background: #f1f5f9;
+  color: #059669;
 }
 
-.btn-period-today {
-  background: #ffffff;
-  border: 1px solid var(--gray-200);
-  border-radius: 999px;
-  padding: 6px 14px;
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--primary);
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.btn-period-today:hover {
+.btn-period-today-subtle {
   background: #ecfdf5;
-  border-color: var(--primary);
-}
-
-.period-nav-right {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.period-indicator-label {
-  font-size: 13px;
-  color: var(--gray-600);
-}
-
-.period-indicator-label strong {
-  color: #064e3b;
-  background: #f0fdf4;
+  color: #059669;
+  border: 1px solid #a7f3d0;
+  font-size: 11px;
+  font-weight: 700;
   padding: 4px 10px;
-  border-radius: 6px;
-  font-weight: 800;
-  border: 1px solid #bbf7d0;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  margin-left: 2px;
+  white-space: nowrap;
+}
+
+.btn-period-today-subtle:hover {
+  background: #059669;
+  color: #ffffff;
+  border-color: #059669;
+}
+
+@media (max-width: 640px) {
+  .dashboard-executive-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .period-pill-subtle {
+    width: 100%;
+    justify-content: space-between;
+  }
 }
 
 

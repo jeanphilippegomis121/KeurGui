@@ -756,10 +756,6 @@ function renderProperties() {
         </div>
       </div>
     `;
-          }).join('')}
-        </div>
-      </div>
-    `;
   }).join('');
 }
 
