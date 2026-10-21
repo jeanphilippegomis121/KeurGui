@@ -167,35 +167,142 @@ function saveProperties() {
   }
 }
 
-function resetDemoData() {
-  if (confirm("Voulez-vous réinitialiser le tableau de bord avec les données de démonstration ?")) {
-    localStorage.removeItem('keurgui_properties_data');
-    properties = JSON.parse(JSON.stringify(DEFAULT_PROPERTIES));
-    saveProperties();
-    renderProperties();
-    updateStats();
+// ===================================================
+// GESTION DU CALENDRIER PÉRIODIQUE MENSUEL (MULTI-ANNÉES)
+// ===================================================
+const MONTH_NAMES_FR = [
+  "Janvier", "Février", "Mars", "Avril", "Mai", "Juin",
+  "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"
+];
 
-    // Réafficher le bandeau démo
-    const demoBanner = document.querySelector('.demo-banner-highlight');
-    if (demoBanner) demoBanner.classList.remove('hidden');
+let selectedPeriod = {
+  year: 2026,
+  month: 10 // Octobre par défaut
+};
 
-    showToast("Données de démo réactivées !", "success");
+// Charge la période sauvegardée ou initialise
+try {
+  const savedPeriod = localStorage.getItem('keurgui_selected_period');
+  if (savedPeriod) {
+    selectedPeriod = JSON.parse(savedPeriod);
+  }
+} catch (e) {}
+
+function getPeriodKey(year = selectedPeriod.year, month = selectedPeriod.month) {
+  return `${year}-${String(month).padStart(2, '0')}`;
+}
+
+function getPeriodFrench(year = selectedPeriod.year, month = selectedPeriod.month) {
+  return `${MONTH_NAMES_FR[month - 1]} ${year}`;
+}
+
+// Obtient ou initialise les données de paiement d'un bien pour la période sélectionnée
+function getPropertyPeriodData(prop, pKey = getPeriodKey()) {
+  if (!prop.periods) {
+    prop.periods = {};
+  }
+  
+  if (!prop.periods[pKey]) {
+    // Si c'est la période initiale de base (Octobre 2026), on reprend le statut de base
+    if (pKey === '2026-10') {
+      prop.periods['2026-10'] = {
+        status: prop.status || 'late',
+        paymentMethod: prop.paymentMethod || null,
+        paidDate: prop.paidDate || null,
+        receiptNo: prop.receiptNo || `KG-2026-${String(prop.id).padStart(4, '0')}`
+      };
+    } else {
+      // Pour tout autre mois (ex: Nov 2026, Jan 2027), le loyer commence en attente ("late")
+      prop.periods[pKey] = {
+        status: 'late',
+        paymentMethod: null,
+        paidDate: null,
+        receiptNo: `KG-${pKey.split('-')[0]}-${String(prop.id).padStart(4, '0')}`
+      };
+    }
+  }
+  return prop.periods[pKey];
+}
+
+function updatePeriodDisplay() {
+  const mSelect = document.getElementById('periodMonthSelect');
+  const ySelect = document.getElementById('periodYearSelect');
+  const label = document.getElementById('activePeriodLabel');
+
+  if (mSelect) mSelect.value = selectedPeriod.month;
+  if (ySelect) ySelect.value = selectedPeriod.year;
+  if (label) label.textContent = getPeriodFrench();
+
+  try {
+    localStorage.setItem('keurgui_selected_period', JSON.stringify(selectedPeriod));
+  } catch (e) {}
+
+  renderProperties();
+  updateStats();
+}
+
+function changePeriod(delta) {
+  let newMonth = selectedPeriod.month + delta;
+  let newYear = selectedPeriod.year;
+
+  if (newMonth < 1) {
+    newMonth = 12;
+    newYear -= 1;
+  } else if (newMonth > 12) {
+    newMonth = 1;
+    newYear += 1;
+  }
+
+  selectedPeriod.month = newMonth;
+  selectedPeriod.year = newYear;
+  updatePeriodDisplay();
+  showToast(`Affichage basculé sur ${getPeriodFrench()} 📅`, "info");
+}
+
+function onPeriodPickerChange() {
+  const mSelect = document.getElementById('periodMonthSelect');
+  const ySelect = document.getElementById('periodYearSelect');
+  if (mSelect && ySelect) {
+    selectedPeriod.month = parseInt(mSelect.value, 10);
+    selectedPeriod.year = parseInt(ySelect.value, 10);
+    updatePeriodDisplay();
+    showToast(`Période sélectionnée : ${getPeriodFrench()} 📅`, "info");
   }
 }
 
+function goToCurrentPeriod() {
+  const now = new Date();
+  selectedPeriod.year = now.getFullYear();
+  selectedPeriod.month = now.getMonth() + 1;
+  updatePeriodDisplay();
+  showToast(`Retour au mois en cours (${getPeriodFrench()})`, "success");
+}
+
+// Réinitialisation démo directe SANS boîte de confirmation bloquante du navigateur
+function resetDemoData() {
+  localStorage.removeItem('keurgui_properties_data');
+  properties = JSON.parse(JSON.stringify(DEFAULT_PROPERTIES));
+  saveProperties();
+  updatePeriodDisplay();
+
+  // Réafficher le bandeau démo
+  const demoBanner = document.querySelector('.demo-banner-highlight');
+  if (demoBanner) demoBanner.classList.remove('hidden');
+
+  showToast("Données de démonstration rechargées avec succès !", "success");
+}
+
+// Nettoyage direct SANS boîte de confirmation bloquante du navigateur
 function clearToMyProperties() {
-  if (confirm("Voulez-vous vider les exemples de démo pour commencer à ajouter vos propres biens ? (Vous pourrez restaurer la démo à tout moment avec le bouton 🔄 en haut à droite)")) {
-    properties = [];
-    saveProperties();
-    renderProperties();
-    updateStats();
+  properties = [];
+  saveProperties();
+  updatePeriodDisplay();
 
-    // Masquer le bandeau démo car l'utilisateur passe en mode réel
-    const demoBanner = document.querySelector('.demo-banner-highlight');
-    if (demoBanner) demoBanner.classList.add('hidden');
+  // Masquer le bandeau démo car l'utilisateur passe en mode réel
+  const demoBanner = document.querySelector('.demo-banner-highlight');
+  if (demoBanner) demoBanner.classList.add('hidden');
 
-    showToast("Votre tableau de bord est prêt pour vos vrais biens !", "success");
-  }
+  showToast("✨ Prêt pour vos vrais biens ! Les exemples ont été effacés.", "success");
 }
 
 // Système de Toast moderne (remplace les alertes brutes)
@@ -219,8 +326,7 @@ let propertyToPay = null;
 
 // Initialisation
 document.addEventListener('DOMContentLoaded', () => {
-  renderProperties();
-  updateStats();
+  updatePeriodDisplay();
   renderBuildingUnitsSetup();
   checkWelcomeGreeting();
 
@@ -384,10 +490,13 @@ function updateStats() {
   let totalPending = 0;
   let paidCount = 0;
   let lateCount = 0;
+  const pKey = getPeriodKey();
+  const currentPeriodName = getPeriodFrench();
 
   properties.forEach(p => {
+    const pData = getPropertyPeriodData(p, pKey);
     const totalAmount = p.rent + p.charges;
-    if (p.status === 'paid') {
+    if (pData.status === 'paid') {
       totalCollected += totalAmount;
       paidCount++;
     } else {
@@ -429,19 +538,19 @@ function updateStats() {
     }
   }
 
-  // Tags dynamiques explicites et valorisants
+  // Tags dynamiques explicites et contextualisés sur le mois actif
   const collectedTag = document.querySelector('.stat-card.stat-success .stat-tag');
   if (collectedTag) {
     collectedTag.textContent = paidCount > 0 
-      ? `↑ ${paidCount} loyer${paidCount > 1 ? 's' : ''} encaissé${paidCount > 1 ? 's' : ''}` 
-      : 'Aucun encaissement ce mois';
+      ? `↑ ${paidCount} loyer${paidCount > 1 ? 's' : ''} encaissé${paidCount > 1 ? 's' : ''} (${currentPeriodName})` 
+      : `Aucun encaissement en ${currentPeriodName}`;
   }
 
   const pendingTag = document.querySelector('.stat-card.stat-warning .stat-tag');
   if (pendingTag) {
     pendingTag.textContent = lateCount > 0 
-      ? `⚠️ ${lateCount} retard${lateCount > 1 ? 's' : ''} à régulariser` 
-      : '✓ Tous les loyers sont réglés';
+      ? `⚠️ ${lateCount} loyer${lateCount > 1 ? 's' : ''} en attente (${currentPeriodName})` 
+      : `✓ Tous les loyers réglés pour ${currentPeriodName}`;
   }
 
   // Compteurs d'onglets
@@ -471,6 +580,7 @@ function searchProperties() {
 function renderProperties() {
   const container = document.getElementById('buildingsContainer');
   const search = normalizeStr(document.getElementById('searchInput').value.trim());
+  const pKey = getPeriodKey();
 
   // Si l'utilisateur a vidé la démo et n'a aucun bien encore enregistré
   if (properties.length === 0) {
@@ -494,10 +604,11 @@ function renderProperties() {
     return;
   }
 
-  // 1. Filtrer les lots avec recherche insensible aux accents
+  // 1. Filtrer les lots avec recherche insensible aux accents et statut de la période active
   let filtered = properties.filter(p => {
-    if (activeFilter === 'paid' && p.status !== 'paid') return false;
-    if (activeFilter === 'late' && p.status !== 'late') return false;
+    const pData = getPropertyPeriodData(p, pKey);
+    if (activeFilter === 'paid' && pData.status !== 'paid') return false;
+    if (activeFilter === 'late' && pData.status !== 'late') return false;
 
     if (search) {
       const matchBld = normalizeStr(p.building).includes(search);
@@ -516,7 +627,7 @@ function renderProperties() {
       <div style="background: white; padding: 48px; text-align: center; border-radius: 16px; border: 1px dashed #cbd5e1;">
         <span style="font-size: 36px;">🔍</span>
         <h3 style="margin-top: 12px; color: #1e293b; font-weight: 800;">Aucun logement ne correspond à cette recherche</h3>
-        <p style="color: #64748b; font-size: 13px;">Vérifiez l'orthographe ou effacez la recherche.</p>
+        <p style="color: #64748b; font-size: 13px;">Vérifiez l'orthographe ou effacez la recherche pour ce mois.</p>
         <button class="btn btn-secondary" style="margin-top:16px;" onclick="document.getElementById('searchInput').value=''; setFilter('all');">
           Effacer la recherche
         </button>
@@ -535,18 +646,19 @@ function renderProperties() {
     groups[bldName].push(p);
   });
 
-  // 3. Générer les cartes d'immeubles propres et aérées
+  // 3. Générer les cartes d'immeubles propres et aérées pour la période affichée
   container.innerHTML = Object.keys(groups).map(bldName => {
     const units = groups[bldName];
     const firstUnit = units[0];
     const neighborhood = firstUnit.neighborhood;
     
-    // Calculs de l'immeuble
+    // Calculs de l'immeuble pour la période active
     let bldTotal = 0;
     let bldPaidCount = 0;
     units.forEach(u => {
+      const uData = getPropertyPeriodData(u, pKey);
       bldTotal += (u.rent + u.charges);
-      if (u.status === 'paid') bldPaidCount++;
+      if (uData.status === 'paid') bldPaidCount++;
     });
 
     const isFullPaid = bldPaidCount === units.length;
@@ -576,16 +688,18 @@ function renderProperties() {
         <div class="building-units-list">
           ${units.map(u => {
             const total = u.rent + u.charges;
+            const uData = getPropertyPeriodData(u, pKey);
 
-            // Statut de paiement
+            // Statut de paiement dynamique par période
             let statusBadge = '';
-            if (u.status === 'paid') {
-              if (u.paymentMethod === 'Wave') {
-                statusBadge = `<span class="unit-badge-status status-paid-wave">🌊 Wave • ${u.paidDate}</span>`;
-              } else if (u.paymentMethod === 'Orange Money') {
-                statusBadge = `<span class="unit-badge-status status-paid-om">🟠 OM • ${u.paidDate}</span>`;
+            if (uData.status === 'paid') {
+              const paidDateText = uData.paidDate || 'Payé';
+              if (uData.paymentMethod === 'Wave') {
+                statusBadge = `<span class="unit-badge-status status-paid-wave">🌊 Wave • ${paidDateText}</span>`;
+              } else if (uData.paymentMethod === 'Orange Money') {
+                statusBadge = `<span class="unit-badge-status status-paid-om">🟠 OM • ${paidDateText}</span>`;
               } else {
-                statusBadge = `<span class="unit-badge-status status-paid-cash">💵 Espèces • ${u.paidDate}</span>`;
+                statusBadge = `<span class="unit-badge-status status-paid-cash">💵 Espèces • ${paidDateText}</span>`;
               }
             } else {
               statusBadge = `<span class="unit-badge-status status-late">⏳ En attente de loyer</span>`;
@@ -594,9 +708,9 @@ function renderProperties() {
             const ownerBadge = isAgencyMode ? `<span class="agency-tag-owner">Bailleur : ${u.owner}</span>` : '';
             const commercialBadge = u.isCommercial ? `<span class="badge-commercial">Bail Pro (TVA 18%)</span>` : '';
 
-            // Boutons d'action
+            // Boutons d'action adaptés au statut de ce mois
             let actionButtons = '';
-            if (u.status === 'paid') {
+            if (uData.status === 'paid') {
               const receiptBtnLabel = u.isCommercial ? 'Facture TVA' : 'Quittance PDF';
               actionButtons = `
                 <button class="btn-receipt-sm" onclick="openReceiptModal(${u.id})">
@@ -642,6 +756,10 @@ function renderProperties() {
         </div>
       </div>
     `;
+          }).join('')}
+        </div>
+      </div>
+    `;
   }).join('');
 }
 
@@ -653,7 +771,11 @@ function openReceiptModal(id) {
   if (!p) return;
   currentActiveProperty = p;
 
+  const pKey = getPeriodKey();
+  const pData = getPropertyPeriodData(p, pKey);
+  const periodText = getPeriodFrench();
   const isComm = !!p.isCommercial;
+
   const docTitle = document.getElementById('mDocumentMainTitle');
   const rentLabel = document.getElementById('mTableRentLabel');
   const rowSubtotal = document.getElementById('mTableRowSubtotalHt');
@@ -661,15 +783,37 @@ function openReceiptModal(id) {
   const totalLabel = document.getElementById('mTableTotalLabel');
   const legalNote = document.getElementById('mDocumentLegalNote');
 
-  document.getElementById('mReceiptNumber').textContent = p.receiptNo;
-  document.getElementById('mReceiptRef').textContent = p.receiptNo;
-  document.getElementById('mPaymentMethodBadge').textContent = 'Par ' + (p.paymentMethod || 'Wave');
+  const receiptNo = pData.receiptNo || p.receiptNo;
+  document.getElementById('mReceiptNumber').textContent = receiptNo;
+  document.getElementById('mReceiptRef').textContent = receiptNo;
+  document.getElementById('mPaymentMethodBadge').textContent = 'Par ' + (pData.paymentMethod || p.paymentMethod || 'Wave');
   document.getElementById('mTenantName').textContent = p.tenant;
   document.getElementById('mTenantPhone').textContent = p.phone;
   document.getElementById('mPropertyAddress').textContent = `${p.unitName}, ${p.building} — ${p.neighborhood}, Dakar`;
   document.getElementById('mTablePropertyDetails').textContent = p.type;
   document.getElementById('mTableBaseRent').textContent = formatFCFA(p.rent);
   document.getElementById('mTableCharges').textContent = formatFCFA(p.charges);
+
+  // Mise à jour de la période dynamique sur la quittance
+  const mPeriod = document.getElementById('mPeriod');
+  if (mPeriod) mPeriod.textContent = `Mois de ${periodText}`;
+
+  const mTablePeriod = document.getElementById('mTablePeriod');
+  if (mTablePeriod) {
+    const lastDay = new Date(selectedPeriod.year, selectedPeriod.month, 0).getDate();
+    const mStr = String(selectedPeriod.month).padStart(2, '0');
+    mTablePeriod.textContent = `01/${mStr}/${selectedPeriod.year} au ${lastDay}/${mStr}/${selectedPeriod.year}`;
+  }
+
+  const mTableChargesPeriod = document.getElementById('mTableChargesPeriod');
+  if (mTableChargesPeriod) {
+    mTableChargesPeriod.textContent = periodText;
+  }
+
+  const mIssueDate = document.getElementById('mIssueDate');
+  if (mIssueDate) {
+    mIssueDate.textContent = pData.paidDate ? pData.paidDate : `05 ${periodText}`;
+  }
 
   if (isComm) {
     if (docTitle) docTitle.textContent = "FACTURE DE LOYER & CHARGES LOCATIVES";
@@ -831,10 +975,13 @@ function downloadDirectPDF() {
   btn.innerHTML = '<span>⏳</span> Création du PDF...';
   btn.classList.add('loading');
 
+  const pKey = getPeriodKey();
+  const pData = getPropertyPeriodData(currentActiveProperty, pKey);
   const element = document.getElementById('printableReceipt');
-  const cleanTenantName = currentActiveProperty.tenant.replace(/\s+/g, '_');
+  const cleanTenantName = (currentActiveProperty.tenant || 'Locataire').replace(/\s+/g, '_');
   const docTypePrefix = currentActiveProperty.isCommercial ? 'Facture_Loyer' : 'Quittance';
-  const filename = `${docTypePrefix}_${currentActiveProperty.receiptNo}_${cleanTenantName}.pdf`;
+  const recNo = pData.receiptNo || currentActiveProperty.receiptNo;
+  const filename = `${docTypePrefix}_${recNo}_${cleanTenantName}_${pKey}.pdf`;
 
   exportElementToA4Pdf(element, filename, btn, originalText);
 }
@@ -854,6 +1001,12 @@ function sendWhatsAppReceiptDirect(id) {
   const p = properties.find(item => item.id === id);
   if (!p) return;
 
+  const pKey = getPeriodKey();
+  const pData = getPropertyPeriodData(p, pKey);
+  const periodName = getPeriodFrench();
+  const method = pData.paymentMethod || p.paymentMethod || 'Wave';
+  const receiptNo = pData.receiptNo || p.receiptNo;
+
   let message = '';
   if (p.isCommercial) {
     const ht = p.rent + p.charges;
@@ -863,12 +1016,12 @@ function sendWhatsAppReceiptDirect(id) {
 
 J'espère que vous vous portez bien.
 
-Veuillez trouver ci-joint votre Facture de Loyer et Quittance officielle (au format PDF) avec décompte de TVA 18% pour le mois d'Octobre 2026 concernant vos locaux professionnels : ${p.unitName} (${p.building}).
+Veuillez trouver ci-joint votre Facture de Loyer et Quittance officielle (au format PDF) avec décompte de TVA 18% pour le mois de ${periodName} concernant vos locaux professionnels : ${p.unitName} (${p.building}).
 
 • Montant HT (Loyer + charges) : ${formatFCFA(ht)}
 • TVA légale (18% - CGI Sénégal) : ${formatFCFA(tva)}
-• Total réglé TTC : ${formatFCFA(ttc)} (par ${p.paymentMethod})
-• Référence Facture : ${p.receiptNo}
+• Total réglé TTC : ${formatFCFA(ttc)} (par ${method})
+• Référence Facture : ${receiptNo}
 
 Ce document officiel comporte toutes les mentions fiscales réglementaires (NINEA, RC) déductibles auprès de la DGID Sénégal.
 Merci pour votre collaboration.
@@ -881,10 +1034,10 @@ Jean Philippe Gomis — KeurGui Immobilier`;
 
 J'espère que vous vous portez bien.
 
-Veuillez trouver ci-joint votre quittance de loyer officielle (au format PDF) pour le mois d'Octobre 2026 concernant votre logement : ${p.unitName} (${p.building}).
+Veuillez trouver ci-joint votre quittance de loyer officielle (au format PDF) pour le mois de ${periodName} concernant votre logement : ${p.unitName} (${p.building}).
 
-• Montant réglé : ${total} (par ${p.paymentMethod})
-• Référence Quittance : ${p.receiptNo}
+• Montant réglé : ${total} (par ${method})
+• Référence Quittance : ${receiptNo}
 
 Merci pour votre ponctualité.
 Excellente journée à vous !
@@ -903,9 +1056,10 @@ function sendWhatsAppReminder(id) {
   if (!p) return;
 
   const total = formatFCFA(p.rent + p.charges);
+  const periodName = getPeriodFrench();
   const message = `Bonjour ${p.tenant},
 
-Petit rappel amical concernant votre loyer d'Octobre 2026 pour le logement : ${p.unitName} (${p.building}).
+Petit rappel amical concernant votre loyer de ${periodName} pour le logement : ${p.unitName} (${p.building}).
 Montant à régler : ${total}.
 
 Le règlement peut être effectué par Wave ou Orange Money.
@@ -963,9 +1117,18 @@ function confirmPayment() {
   if (!propertyToPay) return;
 
   const selectedMethod = document.querySelector('input[name="payMethod"]:checked').value;
+  const pKey = getPeriodKey();
+  const pData = getPropertyPeriodData(propertyToPay, pKey);
+  const today = getTodayFormatted();
+
+  pData.status = 'paid';
+  pData.paymentMethod = selectedMethod;
+  pData.paidDate = today;
+
+  // Synchronisation de l'état
   propertyToPay.status = 'paid';
   propertyToPay.paymentMethod = selectedMethod;
-  propertyToPay.paidDate = getTodayFormatted();
+  propertyToPay.paidDate = today;
 
   saveProperties(); // Sauvegarde permanente
   closePayModal();
@@ -975,7 +1138,7 @@ function confirmPayment() {
   // Motion Design : Onde de choc lumineuse Wave
   triggerPaymentSuccessBurst();
 
-  showToast(`Paiement de ${propertyToPay.tenant} enregistré (${selectedMethod}) !`, "success");
+  showToast(`Paiement de ${propertyToPay.tenant} enregistré pour ${getPeriodFrench()} (${selectedMethod}) !`, "success");
   setTimeout(() => {
     openReceiptModal(propertyToPay.id);
   }, 450);
@@ -1022,7 +1185,7 @@ function switchAddMode(mode) {
   }
 }
 
-// Génère les champs interactifs pour renseigner le locataire de chaque appartement
+// Génère les champs interactifs pour renseigner le locataire de chaque appartement (SANS pré-remplissage)
 function renderBuildingUnitsSetup() {
   const unitCount = parseInt(document.getElementById('bldUnitCount').value, 10) || 4;
   const listContainer = document.getElementById('buildingUnitsSetupList');
@@ -1039,8 +1202,8 @@ function renderBuildingUnitsSetup() {
     html += `
       <div class="unit-setup-row">
         <span class="unit-setup-badge">🚪 ${unitLabel}</span>
-        <input type="text" id="unitTenant_${i}" placeholder="Nom du locataire (ex: Moussa Fall)" value="Locataire ${unitLabel}">
-        <input type="text" id="unitPhone_${i}" placeholder="Téléphone (+221 77...)" value="+221 77 000 00 0${i}">
+        <input type="text" id="unitTenant_${i}" placeholder="Nom du locataire (ex: Moussa Fall)" value="">
+        <input type="text" id="unitPhone_${i}" placeholder="WhatsApp (ex: +221 77 123 45 67)" value="">
       </div>
     `;
   }
@@ -1065,10 +1228,12 @@ function handleAddNewProperty(e) {
     ? document.getElementById('propIsCommercial').checked 
     : (type === 'Commercial' || type === 'Bureaux');
 
+  const pKey = getPeriodKey();
+  const today = getTodayFormatted();
   const newId = Date.now();
   const newReceiptNo = isCommercial 
-    ? `FACT-${new Date().getFullYear()}-${String(newId).slice(-6)}`
-    : `KG-${new Date().getFullYear()}-${String(newId).slice(-6)}`;
+    ? `FACT-${selectedPeriod.year}-${String(newId).slice(-6)}`
+    : `KG-${selectedPeriod.year}-${String(newId).slice(-6)}`;
 
   const newProp = {
     id: newId,
@@ -1078,14 +1243,22 @@ function handleAddNewProperty(e) {
     type: type,
     rent: rent,
     charges: charges,
-    tenant: tenant,
-    phone: phone,
+    tenant: tenant || "Non assigné",
+    phone: phone || "Non renseigné",
     status: initialStatus,
     paymentMethod: initialStatus === 'paid' ? 'Wave' : null,
-    paidDate: initialStatus === 'paid' ? '17/10/2026' : null,
+    paidDate: initialStatus === 'paid' ? today : null,
     owner: owner,
     receiptNo: newReceiptNo,
-    isCommercial: isCommercial
+    isCommercial: isCommercial,
+    periods: {
+      [pKey]: {
+        status: initialStatus,
+        paymentMethod: initialStatus === 'paid' ? 'Wave' : null,
+        paidDate: initialStatus === 'paid' ? today : null,
+        receiptNo: newReceiptNo
+      }
+    }
   };
 
   properties.unshift(newProp);
@@ -1094,7 +1267,7 @@ function handleAddNewProperty(e) {
   renderProperties();
   updateStats();
 
-  showToast(`Logement "${name}" ajouté avec succès !`, "success");
+  showToast(`Logement "${name}" ajouté avec succès pour ${getPeriodFrench()} !`, "success");
 }
 
 // Création d'un immeuble avec tous ses locataires personnalisés
@@ -1108,6 +1281,7 @@ function handleGenerateBuilding(e) {
   const owner = (document.getElementById('bldOwnerName') && document.getElementById('bldOwnerName').value) || 'Jean Philippe Gomis';
 
   const letters = ['A', 'B', 'C', 'D'];
+  const pKey = getPeriodKey();
 
   for (let i = 1; i <= unitCount; i++) {
     const floor = Math.ceil(i / 2);
@@ -1117,11 +1291,11 @@ function handleGenerateBuilding(e) {
     const tenantInput = document.getElementById(`unitTenant_${i}`);
     const phoneInput = document.getElementById(`unitPhone_${i}`);
 
-    const tenantName = (tenantInput && tenantInput.value.trim()) || `Locataire ${unitLabel}`;
-    const tenantPhone = (phoneInput && phoneInput.value.trim()) || '+221 77 000 00 00';
+    const tenantName = (tenantInput && tenantInput.value.trim()) || unitLabel;
+    const tenantPhone = (phoneInput && phoneInput.value.trim()) || 'Non renseigné';
 
     const newId = properties.length + 1;
-    const newReceiptNo = `KG-2026-00${50 + newId}`;
+    const newReceiptNo = `KG-${selectedPeriod.year}-00${50 + newId}`;
 
     properties.push({
       id: newId,
@@ -1133,11 +1307,19 @@ function handleGenerateBuilding(e) {
       charges: 15000,
       tenant: tenantName,
       phone: tenantPhone,
-      status: "late", // En attente par défaut !
+      status: "late", // En attente par défaut pour la période
       paymentMethod: null,
       paidDate: null,
       owner: owner,
-      receiptNo: newReceiptNo
+      receiptNo: newReceiptNo,
+      periods: {
+        [pKey]: {
+          status: "late",
+          paymentMethod: null,
+          paidDate: null,
+          receiptNo: newReceiptNo
+        }
+      }
     });
   }
 
@@ -1329,9 +1511,14 @@ function onAgencyOwnerFilterChange() {
 function updateAgencyInvoiceView() {
   const select = document.getElementById('agencyInvoiceOwnerSelect');
   const selectedOwner = select ? select.value : 'all';
+  const pKey = getPeriodKey();
+  const periodText = getPeriodFrench();
 
-  // Filtrer les biens encaissés
-  const paidProps = properties.filter(p => p.status === 'paid' && (selectedOwner === 'all' || p.owner === selectedOwner));
+  // Filtrer les biens encaissés pour la période sélectionnée
+  const paidProps = properties.filter(p => {
+    const pData = getPropertyPeriodData(p, pKey);
+    return pData.status === 'paid' && (selectedOwner === 'all' || p.owner === selectedOwner);
+  });
   
   let totalCollected = 0;
   paidProps.forEach(p => {
@@ -1353,12 +1540,12 @@ function updateAgencyInvoiceView() {
   
   if (selectedOwner === 'all') {
     if (ownerDisplay) ownerDisplay.textContent = "Portefeuille Global de l'Agence";
-    if (portfolioDesc) portfolioDesc.textContent = `${paidProps.length} lots gérés avec encaissement au Sénégal`;
-    if (unitsDetail) unitsDetail.textContent = `Globalité des encaissements (${paidProps.length} loyers perçus)`;
+    if (portfolioDesc) portfolioDesc.textContent = `${paidProps.length} lots encaissés au Sénégal (${periodText})`;
+    if (unitsDetail) unitsDetail.textContent = `Globalité des encaissements (${paidProps.length} loyers perçus en ${periodText})`;
   } else {
     if (ownerDisplay) ownerDisplay.textContent = selectedOwner;
-    if (portfolioDesc) portfolioDesc.textContent = `${paidProps.length} lot(s) en gérance mandatée`;
-    if (unitsDetail) unitsDetail.textContent = `Encaissements perçus pour ${selectedOwner} (${paidProps.length} lot(s))`;
+    if (portfolioDesc) portfolioDesc.textContent = `${paidProps.length} lot(s) en gérance mandatée (${periodText})`;
+    if (unitsDetail) unitsDetail.textContent = `Encaissements perçus pour ${selectedOwner} (${paidProps.length} lot(s) en ${periodText})`;
   }
 
   // Remplir les montants
@@ -1370,14 +1557,18 @@ function updateAgencyInvoiceView() {
   document.getElementById('agencyAmountWords').textContent = numberToWordsFR(commissionTtc);
   
   // Date et Réf
-  const now = new Date();
-  const year = now.getFullYear();
-  const invoiceRef = `FACT-AG-${year}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  const invoiceRef = `FACT-AG-${selectedPeriod.year}-${String(selectedPeriod.month).padStart(2, '0')}`;
   
   const invNumberEl = document.getElementById('mAgencyInvoiceNumber');
   const invRefEl = document.getElementById('agencyInvoiceRef');
   if (invNumberEl) invNumberEl.textContent = invoiceRef;
   if (invRefEl) invRefEl.textContent = invoiceRef;
+
+  const invPeriodEl = document.getElementById('agencyInvoicePeriod');
+  if (invPeriodEl) invPeriodEl.textContent = `Mois de ${periodText}`;
+
+  const invPayDateEl = document.getElementById('agencyInvoicePaymentDate');
+  if (invPayDateEl) invPayDateEl.textContent = periodText;
 }
 
 // Téléchargement Facture d'Honoraires Agence PDF (Bailleur Mandant)
@@ -1387,10 +1578,11 @@ function downloadAgencyInvoicePdf() {
   btn.innerHTML = '<span>⏳</span> Création du PDF...';
   btn.classList.add('loading');
 
+  const pKey = getPeriodKey();
   const element = document.getElementById('printableAgencyInvoice');
   const select = document.getElementById('agencyInvoiceOwnerSelect');
   const ownerClean = (select ? select.value : 'Global').replace(/[^a-zA-Z0-9]/g, '_');
-  const filename = `Facture_Honoraires_KeurGui_${ownerClean}_Octobre_2026.pdf`;
+  const filename = `Facture_Honoraires_KeurGui_${ownerClean}_${pKey}.pdf`;
 
   exportElementToA4Pdf(element, filename, btn, originalText);
 }
@@ -1402,8 +1594,14 @@ function printAgencyInvoice() {
 function sendWhatsAppAgencyInvoice() {
   const select = document.getElementById('agencyInvoiceOwnerSelect');
   const selectedOwner = select ? select.value : 'all';
+  const pKey = getPeriodKey();
+  const periodText = getPeriodFrench();
 
-  const paidProps = properties.filter(p => p.status === 'paid' && (selectedOwner === 'all' || p.owner === selectedOwner));
+  const paidProps = properties.filter(p => {
+    const pData = getPropertyPeriodData(p, pKey);
+    return pData.status === 'paid' && (selectedOwner === 'all' || p.owner === selectedOwner);
+  });
+
   let totalCollected = 0;
   paidProps.forEach(p => { totalCollected += (p.rent + p.charges); });
 
@@ -1413,11 +1611,12 @@ function sendWhatsAppAgencyInvoice() {
   const netPayout = Math.max(0, totalCollected - commissionTtc);
 
   const ownerName = selectedOwner === 'all' ? 'Cher Bailleur' : selectedOwner;
+  const invoiceRef = `FACT-AG-${selectedPeriod.year}-${String(selectedPeriod.month).padStart(2, '0')}`;
   const message = `Bonjour ${ownerName},
 
-Veuillez trouver ci-joint votre Décompte de Gestion et la Facture d'Honoraires officielle (au format PDF) pour le mois d'Octobre 2026 concernant vos biens sous mandat.
+Veuillez trouver ci-joint votre Décompte de Gestion et la Facture d'Honoraires officielle (au format PDF) pour le mois de ${periodText} concernant vos biens sous mandat.
 
-📊 RÉCAPITULATIF FINANCIER DU MOIS :
+📊 RÉCAPITULATIF FINANCIER DU MOIS (${periodText}) :
 • Total des loyers encaissés : ${formatFCFA(totalCollected)}
 • Honoraires de gestion (10% HT) : ${formatFCFA(commissionHt)}
 • TVA sur honoraires (18% - CGI Sénégal) : ${formatFCFA(tva)}
@@ -1426,7 +1625,7 @@ Veuillez trouver ci-joint votre Décompte de Gestion et la Facture d'Honoraires 
 💰 NET REVERSÉ SUR VOTRE COMPTE : ${formatFCFA(netPayout)}
 (Virement / Wave effectué avec succès)
 
-• Réf Facture : FACT-AG-2026-10
+• Réf Facture : ${invoiceRef}
 
 Merci pour votre confiance continue.
 Excellente journée à vous !
@@ -1435,7 +1634,6 @@ Bien cordialement,
 Direction Financière — KeurGui Immobilier SARL
 VDN Sacré-Cœur 3, Dakar • +221 78 818 21 04`;
 
-  // Trouver un numéro WhatsApp si dispo ou Jean Philippe par défaut
   let targetPhone = '221788182104';
   const url = `https://wa.me/${targetPhone}?text=${encodeURIComponent(message)}`;
   window.open(url, '_blank');

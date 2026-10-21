@@ -75,3 +75,35 @@
 - **Retour Agent Immobilier (1er testeur) :** Validation du mode Agence avec commission 10% HT + TVA 18%.
 - **Prochaine amélioration actée :** Mention légale d'honoraires fermes et non remboursables sur la facture de mandat.
 
+---
+
+## 💎 Séance d'Optimisation SaaS & Expérience Utilisateur (21 Octobre 2026 — Session 2)
+
+### 1. 📅 Moteur Calendrier Périodique Multi-Mois / Multi-Années (Résolution du cas Nov 2026 / Janv 2027)
+- **Problématique résolue :** Un bailleur consultant son tableau de bord en Janvier 2027 ou voulant retrouver l'historique d'un paiement de Novembre 2026 doit voir des données strictement cloisonnées par période.
+- **Architecture de données développée :**
+  - Ajout d'une structure `periods: { [year-month]: { status, paymentMethod, paidDate, receiptNo } }` pour chaque lot.
+  - Si un bailleur navigue sur Novembre 2026 ou Janvier 2027, les statistiques de recouvrement, les jauges, les badges Wave/Orange Money/Espèces, les quittances PDF et les messages WhatsApp reflètent fidèlement le mois sélectionné.
+  - Barre de contrôle supérieure élégante (`.period-navigator-bar`) : flèches `◀` et `▶`, sélecteurs dynamiques du mois (Janvier à Décembre) et de l'année (2025 à 2030), ainsi qu'un bouton de retour instantané `⚡ Ce mois-ci`.
+
+### 2. 🛡️ Simplification Radicale des Formulaires & Suppression des Pré-remplissages Factices
+- **Problématique résolue :** Tout le monde n'est pas à l'aise avec la tech. Des champs pré-remplis de faux noms ("Locataire Appt 1A", "+221 77 000 00 01") ou de montants par défaut créent de la confusion et obligent l'utilisateur à effacer du texte manuellement.
+- **Correctifs apportés :**
+  - Formulaire de création d'immeuble et générateur de lots : suppression intégrale des valeurs injectées dans les inputs (`value=""`).
+  - Ajout d'exemples discrets et bienveillants dans les placeholders (`Nom du locataire (ex: Moussa Fall)`, `WhatsApp (ex: +221 77 123 45 67)`).
+  - Statut par défaut adapté : les logements sont créés en statut d'attente de loyer pour la période choisie, permettant une mise en route intuitive.
+
+### 3. 🚫 Suppression Définitive des Boîtes de Dialogue Bloquantes du Navigateur
+- **Problématique résolue :** Les popups natifs du navigateur demandant d'appuyer sur "OK" cassaient la fluidité et donnaient une impression de logiciel ancien ou bugué.
+- **Correctifs apportés :**
+  - Éradication de tous les `confirm()` et `alert()` natifs.
+  - Remplacement par des toasts in-app fluides et non-bloquants (`#toastNotification`) avec icônes animées, disparaissant automatiquement après 3,5 secondes.
+
+### 4. 💎 Refonte Élite du Formulaire VIP & Call-to-Action ($100M Offers)
+- **Design Dark Obsidian Emerald Glassmorphism :**
+  - Bordure néon avec halo vert émeraude, champs polis avec surbrillance au focus.
+  - Badge de valeur irréversible : *« 💎 PACK PIONNIER : 0 FCFA À VIE (Valeur : 25 000 FCFA/mois) »*.
+  - Call-to-action ultra-persuasif et engageant : *« ⚡ Réclamer mon accès gratuit à vie (12 places restantes) → »*.
+  - Garanties concrètes : 0 engagement, 0 carte bancaire requise, configuration assistée par WhatsApp.
+
+

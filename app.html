@@ -90,6 +90,46 @@
   <!-- Contenu Principal -->
   <main class="container main-content">
 
+    <!-- BARRE DE PÉRIODE & CALENDRIER MENSUEL (MULTI-ANNÉES) -->
+    <section class="period-navigator-bar">
+      <div class="period-nav-left">
+        <span class="period-badge">📅 Période</span>
+        <div class="period-controls">
+          <button class="btn-period-arrow" onclick="changePeriod(-1)" title="Mois précédent">◀</button>
+          <div class="period-picker-container">
+            <select id="periodMonthSelect" onchange="onPeriodPickerChange()" class="period-select" title="Choisir le mois">
+              <option value="1">Janvier</option>
+              <option value="2">Février</option>
+              <option value="3">Mars</option>
+              <option value="4">Avril</option>
+              <option value="5">Mai</option>
+              <option value="6">Juin</option>
+              <option value="7">Juillet</option>
+              <option value="8">Août</option>
+              <option value="9">Septembre</option>
+              <option value="10" selected>Octobre</option>
+              <option value="11">Novembre</option>
+              <option value="12">Décembre</option>
+            </select>
+            <select id="periodYearSelect" onchange="onPeriodPickerChange()" class="period-select year-select" title="Choisir l'année">
+              <option value="2025">2025</option>
+              <option value="2026" selected>2026</option>
+              <option value="2027">2027</option>
+              <option value="2028">2028</option>
+              <option value="2029">2029</option>
+              <option value="2030">2030</option>
+            </select>
+          </div>
+          <button class="btn-period-arrow" onclick="changePeriod(1)" title="Mois suivant">▶</button>
+        </div>
+        <button class="btn-period-today" onclick="goToCurrentPeriod()">Ce mois-ci</button>
+      </div>
+
+      <div class="period-nav-right">
+        <span class="period-indicator-label">Mois actif : <strong id="activePeriodLabel">Octobre 2026</strong></span>
+      </div>
+    </section>
+
     <!-- Statistiques Clés -->
     <section class="stats-grid">
       <div class="stat-card stat-success">
@@ -259,7 +299,7 @@
                 <strong>Charges locatives forfaitaires</strong><br>
                 <small class="text-muted">Parties communes, gardiennage & entretien</small>
               </td>
-              <td>Octobre 2026</td>
+              <td id="mTableChargesPeriod">Octobre 2026</td>
               <td class="text-right font-mono" id="mTableCharges">20 000 FCFA</td>
             </tr>
             <!-- Ligne sous-total HT (visible pour commercial) -->
@@ -575,13 +615,13 @@
       <!-- FORMULAIRE 1 : LOGEMENT UNIQUE -->
       <form id="formSingleProperty" onsubmit="handleAddNewProperty(event)">
         <div class="form-group">
-          <label>Nom du logement</label>
-          <input type="text" id="propName" placeholder="Ex: Villa Keur Mariama" required>
+          <label>Nom ou numéro du logement <span style="color:#ef4444;">*</span></label>
+          <input type="text" id="propName" placeholder="Ex: Appt 3B, Studio Mermoz, Villa Keur Mariama..." required>
         </div>
         
         <div class="form-row">
           <div class="form-group">
-            <label>Quartier</label>
+            <label>Quartier <span style="color:#ef4444;">*</span></label>
             <select id="propNeighborhood" required>
               <option value="Mermoz">Mermoz</option>
               <option value="Almadies">Almadies</option>
@@ -597,10 +637,10 @@
           <div class="form-group">
             <label>Type de bien</label>
             <select id="propType">
+              <option value="Appartement">Appartement</option>
               <option value="Villa">Villa individuelle</option>
-              <option value="Appartement">Appartement indépendant</option>
               <option value="Studio">Studio meublé</option>
-              <option value="Magasin">Magasin / Boutique commerciale</option>
+              <option value="Magasin">Magasin / Boutique</option>
               <option value="Bureaux">Bureaux / Local professionnel</option>
             </select>
           </div>
@@ -616,37 +656,37 @@
 
         <div class="form-row">
           <div class="form-group">
-            <label>Loyer mensuel (FCFA)</label>
+            <label>Loyer mensuel (FCFA) <span style="color:#ef4444;">*</span></label>
             <input type="number" id="propRent" placeholder="Ex: 250000" required>
           </div>
           <div class="form-group">
-            <label>Charges locatives (FCFA)</label>
-            <input type="number" id="propCharges" placeholder="Ex: 20000" value="0">
+            <label>Charges locatives (FCFA) <small style="color:#64748b; font-weight:normal;">(Optionnel)</small></label>
+            <input type="number" id="propCharges" placeholder="0 (si aucune)">
           </div>
         </div>
 
         <div class="form-row">
           <div class="form-group">
-            <label>Nom complet du Locataire</label>
-            <input type="text" id="propTenantName" placeholder="Ex: Abdoulaye Ndiaye" required>
+            <label>Nom du Locataire <small style="color:#64748b; font-weight:normal;">(Optionnel si vacant)</small></label>
+            <input type="text" id="propTenantName" placeholder="Ex: Abdoulaye Ndiaye">
           </div>
           <div class="form-group">
-            <label>Numéro WhatsApp du Locataire</label>
-            <input type="text" id="propTenantPhone" placeholder="Ex: +221 77 123 45 67" required>
+            <label>Numéro WhatsApp du Locataire <small style="color:#64748b; font-weight:normal;">(Optionnel)</small></label>
+            <input type="text" id="propTenantPhone" placeholder="Ex: +221 77 123 45 67">
           </div>
         </div>
 
-        <!-- STATUT DU MOIS -->
+        <!-- STATUT DU MOIS SÉLECTIONNÉ -->
         <div class="form-group initial-status-box">
-          <label>Statut pour ce mois d'Octobre 2026 :</label>
+          <label>Statut pour le mois sélectionné :</label>
           <div class="status-radio-group">
             <label class="radio-label">
               <input type="radio" name="propInitialStatus" value="late" checked>
-              <span>⏳ <strong>En attente de paiement</strong> (Recommandé)</span>
+              <span>⏳ <strong>En attente de paiement</strong></span>
             </label>
             <label class="radio-label">
               <input type="radio" name="propInitialStatus" value="paid">
-              <span>✅ <strong>Déjà payé</strong> (Émettre la quittance)</span>
+              <span>✅ <strong>Déjà réglé</strong> (Émettre la quittance)</span>
             </label>
           </div>
         </div>
@@ -662,19 +702,19 @@
         </div>
       </form>
 
-      <!-- FORMULAIRE 2 : CRÉATEUR D'IMMEUBLE AVEC CONFIGURATION DES LOCATAIRES -->
+      <!-- FORMULAIRE 2 : CRÉATEUR D'IMMEUBLE ÉPURÉ ET SIMPLE -->
       <form id="formBuildingGenerator" style="display: none;" onsubmit="handleGenerateBuilding(event)">
         <div class="building-callout">
-          🏢 <strong>Gestionnaire d'Immeuble :</strong> Configurez l'immeuble et personnalisez les locataires de chaque appartement.
+          🏢 <strong>Gestionnaire d'Immeuble Simple :</strong> Indiquez le nom de l'immeuble, le nombre d'appartements et le loyer standard. Vous pouvez laisser les locataires vides et les renseigner plus tard.
         </div>
 
         <div class="form-row">
           <div class="form-group">
-            <label>Nom de l'immeuble</label>
-            <input type="text" id="bldName" placeholder="Ex: Immeuble Teranga 2" required>
+            <label>Nom de l'immeuble ou de la résidence <span style="color:#ef4444;">*</span></label>
+            <input type="text" id="bldName" placeholder="Ex: Résidence Teranga, Immeuble Horizon..." required>
           </div>
           <div class="form-group">
-            <label>Quartier</label>
+            <label>Quartier <span style="color:#ef4444;">*</span></label>
             <select id="bldNeighborhood" required>
               <option value="Mermoz">Mermoz</option>
               <option value="Almadies">Almadies</option>
@@ -689,20 +729,20 @@
 
         <div class="form-row">
           <div class="form-group">
-            <label>Nombre d'appartements</label>
-            <input type="number" id="bldUnitCount" min="2" max="12" value="4" onchange="renderBuildingUnitsSetup()" required>
+            <label>Nombre d'appartements <span style="color:#ef4444;">*</span></label>
+            <input type="number" id="bldUnitCount" min="1" max="24" placeholder="Ex: 4" onchange="renderBuildingUnitsSetup()" required>
           </div>
           <div class="form-group">
-            <label>Loyer standard par appartement (FCFA)</label>
-            <input type="number" id="bldDefaultRent" value="220000" onchange="renderBuildingUnitsSetup()" required>
+            <label>Loyer standard par appartement (FCFA) <span style="color:#ef4444;">*</span></label>
+            <input type="number" id="bldDefaultRent" placeholder="Ex: 220000" onchange="renderBuildingUnitsSetup()" required>
           </div>
         </div>
 
-        <!-- ZONE INTERACTIVE : DÉTAIL DES LOCATAIRES PAR APPARTEMENT -->
+        <!-- ZONE INTERACTIVE : DÉTAIL DES LOCATAIRES (NON PRÉ-REMPLIS) -->
         <div class="form-group">
-          <label style="margin-top: 10px;">Détail des appartements et locataires :</label>
+          <label style="margin-top: 10px;">Locataires par appartement <small style="color:#64748b; font-weight:normal;">(Optionnel : laissez vide pour les appartements non loués)</small> :</label>
           <div class="building-units-setup-list" id="buildingUnitsSetupList">
-            <!-- Rempli dynamiquement pour permettre la saisie des locataires -->
+            <!-- Rempli dynamiquement et sans aucun faux pré-remplissage -->
           </div>
         </div>
 
