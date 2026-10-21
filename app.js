@@ -311,12 +311,23 @@ function showToast(message, type = "info") {
   if (!toast) return;
 
   const icon = type === 'success' ? '✅' : '🔔';
-  toast.innerHTML = `<span>${icon}</span> <span>${message}</span>`;
+  toast.innerHTML = `<span>${icon}</span> <span>${escapeHtml(message)}</span>`;
   toast.classList.add('active');
 
   setTimeout(() => {
     toast.classList.remove('active');
   }, 3500);
+}
+
+// Fonction de sécurisation contre les failles XSS (Échappement HTML strict)
+function escapeHtml(str) {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
 }
 
 let isAgencyMode = false;
@@ -674,8 +685,8 @@ function renderProperties() {
           <div class="building-title-area">
             <div class="building-icon">${icon}</div>
             <div>
-              <h3 class="building-name">${bldName}</h3>
-              <div class="building-meta">📍 ${neighborhood} • ${units.length} logement${units.length > 1 ? 's' : ''}</div>
+              <h3 class="building-name">${escapeHtml(bldName)}</h3>
+              <div class="building-meta">📍 ${escapeHtml(neighborhood)} • ${units.length} logement${units.length > 1 ? 's' : ''}</div>
             </div>
           </div>
           <div class="building-summary-chips">
@@ -695,17 +706,17 @@ function renderProperties() {
             if (uData.status === 'paid') {
               const paidDateText = uData.paidDate || 'Payé';
               if (uData.paymentMethod === 'Wave') {
-                statusBadge = `<span class="unit-badge-status status-paid-wave">🌊 Wave • ${paidDateText}</span>`;
+                statusBadge = `<span class="unit-badge-status status-paid-wave">🌊 Wave • ${escapeHtml(paidDateText)}</span>`;
               } else if (uData.paymentMethod === 'Orange Money') {
-                statusBadge = `<span class="unit-badge-status status-paid-om">🟠 OM • ${paidDateText}</span>`;
+                statusBadge = `<span class="unit-badge-status status-paid-om">🟠 OM • ${escapeHtml(paidDateText)}</span>`;
               } else {
-                statusBadge = `<span class="unit-badge-status status-paid-cash">💵 Espèces • ${paidDateText}</span>`;
+                statusBadge = `<span class="unit-badge-status status-paid-cash">💵 Espèces • ${escapeHtml(paidDateText)}</span>`;
               }
             } else {
               statusBadge = `<span class="unit-badge-status status-late">⏳ En attente de loyer</span>`;
             }
 
-            const ownerBadge = isAgencyMode ? `<span class="agency-tag-owner">Bailleur : ${u.owner}</span>` : '';
+            const ownerBadge = isAgencyMode ? `<span class="agency-tag-owner">Bailleur : ${escapeHtml(u.owner)}</span>` : '';
             const commercialBadge = u.isCommercial ? `<span class="badge-commercial">Bail Pro (TVA 18%)</span>` : '';
 
             // Boutons d'action adaptés au statut de ce mois
@@ -734,10 +745,10 @@ function renderProperties() {
             return `
               <div class="unit-row">
                 <div class="unit-info-col">
-                  <div class="unit-name">${u.unitName} ${commercialBadge} ${ownerBadge}</div>
+                  <div class="unit-name">${escapeHtml(u.unitName)} ${commercialBadge} ${ownerBadge}</div>
                   <div class="unit-tenant">
-                    Locataire : <strong>${u.tenant}</strong>
-                    <span class="unit-phone">(${u.phone})</span>
+                    Locataire : <strong>${escapeHtml(u.tenant)}</strong>
+                    <span class="unit-phone">(${escapeHtml(u.phone)})</span>
                   </div>
                 </div>
 
@@ -1044,7 +1055,7 @@ Jean Philippe Gomis — KeurGui Immobilier`;
 
   const cleanPhone = sanitizeWhatsAppPhone(p.phone);
   const url = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
-  window.open(url, '_blank');
+  window.open(url, '_blank', 'noopener,noreferrer');
 }
 
 function sendWhatsAppReminder(id) {
@@ -1066,7 +1077,7 @@ KeurGui Gestion — Jean Philippe Gomis`;
 
   const cleanPhone = sanitizeWhatsAppPhone(p.phone);
   const url = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
-  window.open(url, '_blank');
+  window.open(url, '_blank', 'noopener,noreferrer');
 }
 
 // ===================================================
@@ -1440,7 +1451,7 @@ async function handleFeedbackSubmit(e) {
   const text = `Salam Jean Philippe, voici mon avis sur KeurGui :\n\n⭐ Note : ${rating}/5\n👤 De la part de : ${userName}\n💬 Message : "${comment}"\n\n(Envoyé depuis l'application KeurGui - ${dateStr})`;
   const jpPhone = "221788182104";
   const url = `https://wa.me/${jpPhone}?text=${encodeURIComponent(text)}`;
-  window.open(url, '_blank');
+  window.open(url, '_blank', 'noopener,noreferrer');
 
   closeFeedbackModal();
   showToast("Merci infiniment ! Votre avis a été directement transmis à Jean Philippe via WhatsApp.", "success");
@@ -1456,7 +1467,7 @@ function sendFeedbackWhatsAppDirect() {
   const text = `Salam Jean Philippe, voici mon avis sur KeurGui :\n\n⭐ Note : ${rating}/5\n👤 De la part de : ${userName}\n💬 Message : "${comment}"`;
   const jpPhone = "221788182104"; // Numéro direct WhatsApp de Jean Philippe
   const url = `https://wa.me/${jpPhone}?text=${encodeURIComponent(text)}`;
-  window.open(url, '_blank');
+  window.open(url, '_blank', 'noopener,noreferrer');
   closeFeedbackModal();
 }
 
@@ -1632,7 +1643,7 @@ VDN Sacré-Cœur 3, Dakar • +221 78 818 21 04`;
 
   let targetPhone = '221788182104';
   const url = `https://wa.me/${targetPhone}?text=${encodeURIComponent(message)}`;
-  window.open(url, '_blank');
+  window.open(url, '_blank', 'noopener,noreferrer');
 }
 
 // ===================================================
