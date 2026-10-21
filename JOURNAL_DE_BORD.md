@@ -125,5 +125,24 @@
   - Remplacement des styles sombres par le véritable thème clair, épuré et premium de l'application SaaS KeurGui.
   - Cartes blanches sur fond gris doux (`#f8fafc`), typographies ardoise contrastées, badges officiels Wave (`#0284c7`), Orange Money (`#ea580c`), boutons verts et barre de statut iOS fidèle.
 
----
+### 7. 🛡️ Audit de Sécurité & Optimisation Définitive des Quittances (Session 4)
+- **Résolution Définitive du Problème des Pages Multiples en PDF :**
+  - **Diagnostic :** Deux causes conjuguées créaient le bug des pages multiples :
+    1. Dans `@media print`, toutes les modales (`.modal-overlay`) étaient affichées en `display: block !important`, imprimant toutes les fenêtres inactives de l'application les unes après les autres.
+    2. La hauteur de la feuille de quittance débordait légèrement au-delà de 1123px, provoquant un saut de page pour quelques lignes de signatures.
+  - **Solution mise en place :**
+    - `@media print` nettoyé : strict masquage de toutes les modales inactives (`.modal-overlay:not(.active) { display: none !important; }`).
+    - Compactage élégant des styles de la quittance (`padding: 20px 26px`, hauteurs de lignes et espacements aérés mais compacts).
+    - Verrou mathématique strict dans `exportElementToA4Pdf` : suppression automatique de toute page excédentaire (`pdf.deletePage(i)`).
+    - **Résultat :** Exactement 1 seule page A4 nette, cadrée et conforme, sur ordinateur comme sur smartphone.
+- **Automatisation Fluide de l'Envoi WhatsApp :**
+  - Clic sur « 💬 Télécharger & Envoyer WhatsApp » :
+    1. Le PDF officiel 1 page A4 est automatiquement téléchargé dans l'appareil.
+    2. Toast d'accompagnement clair : *« Quittance prête ! WhatsApp s'ouvre : cliquez sur le trombone 📎 pour joindre la quittance. »*
+    3. WhatsApp s'ouvre instantanément vers le numéro du locataire avec le message officiel pré-rempli (distinct du message de relance).
+- **Renforcement de la Sécurité Globale :**
+  - Éradication des risques XSS via `escapeHtml()`.
+  - En-têtes HTTP de sécurité renforcés dans `vercel.json` (anti-clickjacking, nosniff, permissions policy).
+  - Sécurisation des liens `window.open` avec `noopener, noreferrer`.
 
+---
