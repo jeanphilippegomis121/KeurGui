@@ -221,6 +221,9 @@
       </div>
 
       <div class="action-buttons">
+        <button class="btn btn-history-action" onclick="openReceiptsHistoryModal()" title="Consulter l'historique complet des quittances délivrées">
+          <span>📑</span> Historique Quittances (<span id="historyCountBadge">0</span>)
+        </button>
         <input type="text" id="searchInput" placeholder="Rechercher (Mermoz, Diallo, Teranga...)" class="search-input" onkeyup="searchProperties()">
         <button class="btn btn-primary" onclick="openAddPropertyModal()">
           <span>+</span> Ajouter un bien / immeuble
@@ -234,6 +237,54 @@
     </section>
 
   </main>
+
+  <!-- ============================================== -->
+  <!-- MODAL : REGISTRE & HISTORIQUE DES QUITTANCES -->
+  <!-- ============================================== -->
+  <div class="modal-overlay" id="receiptsHistoryModalOverlay" onclick="closeReceiptsHistoryOnOverlay(event)">
+    <div class="modal-history-card">
+      <div class="modal-header">
+        <div>
+          <span class="tag-live" style="background:#ecfdf5; color:#059669;">Archives Certifiées</span>
+          <h3 style="margin-top:4px; font-size:17px; font-weight:800; color:var(--dark);">📑 Registre & Historique des Quittances</h3>
+          <p style="font-size:12px; color:var(--gray-600); margin-top:2px;">
+            Retrouvez et renvoyez en 1 clic n'importe quelle quittance (mois en cours, il y a 6 mois, 1 an ou 2 ans).
+          </p>
+        </div>
+        <button class="btn-close-modal" onclick="closeReceiptsHistoryModal()">✕</button>
+      </div>
+
+      <!-- Filtres et Recherche de l'historique -->
+      <div class="history-controls-bar">
+        <div class="history-search-wrapper">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="historySearchInput" placeholder="Rechercher par locataire, immeuble, réf (ex: Diallo, Teranga, KG-2026)..." class="history-search-input" oninput="filterReceiptsHistory()">
+        </div>
+        <div class="history-filters-group">
+          <select id="historyYearFilter" class="history-select-subtle" onchange="filterReceiptsHistory()">
+            <option value="all">Toutes les années</option>
+            <option value="2026" selected>2026</option>
+            <option value="2025">2025</option>
+            <option value="2024">2024</option>
+          </select>
+          <select id="historyBuildingFilter" class="history-select-subtle" onchange="filterReceiptsHistory()">
+            <option value="all">Tous les biens / immeubles</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Compteur et format hint -->
+      <div class="history-summary-strip">
+        <span id="historySummaryText">Affichage de <strong>0</strong> quittance(s)</span>
+        <span class="history-format-hint">📄 100% Conformes 1 page A4 • Export direct</span>
+      </div>
+
+      <!-- Liste défilante des quittances -->
+      <div class="history-list-container" id="historyListContainer">
+        <!-- Rempli dynamiquement en JS -->
+      </div>
+    </div>
+  </div>
 
   <!-- ============================================== -->
   <!-- MODAL QUITTANCE DE LOYER OFFICIELLE -->

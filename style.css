@@ -2715,6 +2715,484 @@ input:checked + .slider:before {
   }
 }
 
+/* ===================================================
+   VERROU ABSOLU POUR EXPORT PDF A4 (1 SEULE PAGE GARANTIE)
+   Neutralise les contraintes d'écrans mobiles lors de la capture PDF
+   =================================================== */
+#pdf-render-sandbox {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 794px !important;
+  min-width: 794px !important;
+  max-width: 794px !important;
+  background: #ffffff !important;
+  z-index: 999999 !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  pointer-events: none !important;
+}
+
+#pdf-render-sandbox .receipt-sheet,
+#pdf-isolated-clone.receipt-sheet,
+#pdf-render-sandbox .agency-invoice-sheet,
+#pdf-isolated-clone.agency-invoice-sheet {
+  width: 794px !important;
+  min-width: 794px !important;
+  max-width: 794px !important;
+  padding: 16px 22px !important;
+  font-size: 11px !important;
+  line-height: 1.35 !important;
+  box-sizing: border-box !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  background: #ffffff !important;
+  color: #1e293b !important;
+}
+
+#pdf-render-sandbox .receipt-parties-grid,
+#pdf-isolated-clone .receipt-parties-grid,
+#pdf-render-sandbox .invoice-parties-grid,
+#pdf-isolated-clone .invoice-parties-grid {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 12px !important;
+  margin-bottom: 10px !important;
+  padding: 8px 12px !important;
+  background: #f8fafc !important;
+  border: 1px solid #e2e8f0 !important;
+}
+
+#pdf-render-sandbox .receipt-divider,
+#pdf-isolated-clone .receipt-divider {
+  margin: 8px 0 !important;
+  height: 1px !important;
+  background: #e2e8f0 !important;
+}
+
+#pdf-render-sandbox .receipt-document-title,
+#pdf-isolated-clone .receipt-document-title {
+  margin-bottom: 8px !important;
+  text-align: center !important;
+}
+
+#pdf-render-sandbox .receipt-document-title h1,
+#pdf-isolated-clone .receipt-document-title h1 {
+  font-size: 15px !important;
+  font-weight: 800 !important;
+  margin-bottom: 2px !important;
+}
+
+#pdf-render-sandbox .receipt-table,
+#pdf-isolated-clone .receipt-table {
+  width: 100% !important;
+  margin-bottom: 8px !important;
+  border-collapse: collapse !important;
+}
+
+#pdf-render-sandbox .receipt-table th,
+#pdf-render-sandbox .receipt-table td,
+#pdf-isolated-clone .receipt-table th,
+#pdf-isolated-clone .receipt-table td {
+  padding: 5px 8px !important;
+  font-size: 10.5px !important;
+}
+
+#pdf-render-sandbox .receipt-words-box,
+#pdf-isolated-clone .receipt-words-box {
+  padding: 6px 10px !important;
+  margin-bottom: 8px !important;
+  font-size: 10px !important;
+  background: #f8fafc !important;
+  border: 1px solid #e2e8f0 !important;
+}
+
+#pdf-render-sandbox .receipt-legal-note,
+#pdf-isolated-clone .receipt-legal-note {
+  font-size: 8px !important;
+  line-height: 1.3 !important;
+  margin-bottom: 8px !important;
+  color: #64748b !important;
+}
+
+#pdf-render-sandbox .receipt-footer-signatures,
+#pdf-isolated-clone .receipt-footer-signatures {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: flex-end !important;
+  padding-top: 4px !important;
+}
+
+/* ===================================================
+   BOUTON HISTORIQUE DES QUITTANCES (BARRE D'ACTION)
+   =================================================== */
+.btn-history-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #f0fdf4;
+  color: #166534;
+  border: 1.5px solid #bbf7d0;
+  padding: 9px 16px;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.btn-history-action:hover {
+  background: #dcfce7;
+  border-color: #86efac;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
+}
+
+.history-badge-count {
+  background: #059669;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 999px;
+  display: inline-block;
+  min-width: 18px;
+  text-align: center;
+}
+
+/* ===================================================
+   MODAL REGISTRE & HISTORIQUE DES QUITTANCES
+   =================================================== */
+.modal-history-card {
+  max-width: 980px !important;
+  width: 95% !important;
+  max-height: 90vh !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  padding: 0 !important;
+  background: #ffffff;
+  border-radius: var(--radius-xl);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.modal-history-card .modal-header {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--gray-200);
+  background: #ffffff;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.history-controls-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 24px;
+  background: #f8fafc;
+  border-bottom: 1px solid var(--gray-200);
+  flex-wrap: wrap;
+}
+
+.history-search-wrapper {
+  position: relative;
+  flex: 1;
+  min-width: 260px;
+}
+
+.history-search-wrapper .search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 13px;
+  color: var(--gray-400);
+}
+
+.history-search-input {
+  width: 100%;
+  padding: 9px 12px 9px 34px;
+  border: 1px solid var(--gray-300);
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  background: #ffffff;
+  transition: all 0.2s;
+}
+
+.history-search-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.15);
+}
+
+.history-filters-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.history-select-subtle {
+  padding: 9px 12px;
+  border: 1px solid var(--gray-300);
+  border-radius: var(--radius-md);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--gray-700);
+  background: #ffffff;
+  cursor: pointer;
+}
+
+.history-select-subtle:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.history-summary-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 24px;
+  background: #f1f5f9;
+  font-size: 12px;
+  color: var(--gray-600);
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.history-format-hint {
+  font-size: 11px;
+  font-weight: 700;
+  color: #059669;
+}
+
+.history-list-container {
+  padding: 16px 24px;
+  overflow-y: auto;
+  max-height: calc(90vh - 230px);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.history-item-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: #ffffff;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  padding: 14px 18px;
+  transition: all 0.2s ease;
+}
+
+.history-item-row:hover {
+  border-color: #a7f3d0;
+  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.08);
+  transform: translateY(-1px);
+}
+
+.history-item-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.history-item-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+
+.history-badge-ref {
+  background: #0f172a;
+  color: #ffffff;
+  font-family: monospace;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+}
+
+.history-badge-period {
+  background: #e0f2fe;
+  color: #0369a1;
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.history-badge-method {
+  font-size: 11px;
+  color: var(--gray-500);
+  font-weight: 600;
+}
+
+.history-item-tenant {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--dark);
+}
+
+.history-item-tenant strong {
+  font-weight: 800;
+}
+
+.history-tenant-phone {
+  font-size: 12px;
+  color: var(--gray-500);
+  font-weight: 500;
+}
+
+.history-item-property {
+  font-size: 12px;
+  color: var(--gray-600);
+  margin-top: 2px;
+}
+
+.history-item-amount-side {
+  text-align: right;
+  min-width: 140px;
+}
+
+.history-item-price {
+  font-size: 15px;
+  font-weight: 800;
+  color: #059669;
+  letter-spacing: -0.3px;
+}
+
+.history-item-type {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--gray-500);
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+.history-item-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.btn-history-view {
+  background: #f1f5f9;
+  color: #334155;
+  border: 1px solid #cbd5e1;
+  padding: 7px 12px;
+  border-radius: var(--radius-md);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.15s;
+}
+
+.btn-history-view:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.btn-history-pdf {
+  background: var(--primary);
+  color: #ffffff;
+  border: none;
+  padding: 7px 12px;
+  border-radius: var(--radius-md);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.15s;
+}
+
+.btn-history-pdf:hover {
+  background: var(--primary-hover);
+  transform: translateY(-1px);
+}
+
+.btn-history-wa {
+  background: #25D366;
+  color: #ffffff;
+  border: none;
+  padding: 7px 12px;
+  border-radius: var(--radius-md);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.15s;
+}
+
+.btn-history-wa:hover {
+  background: #1eb855;
+  transform: translateY(-1px);
+}
+
+.history-empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--gray-500);
+}
+
+.history-empty-state .empty-icon {
+  font-size: 38px;
+  margin-bottom: 8px;
+}
+
+@media (max-width: 768px) {
+  .history-item-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .history-item-amount-side {
+    text-align: left;
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+  .history-item-actions {
+    width: 100%;
+    justify-content: stretch;
+  }
+  .history-item-actions button {
+    flex: 1;
+    justify-content: center;
+  }
+  .history-controls-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .history-search-wrapper {
+    min-width: 100%;
+  }
+  .history-filters-group {
+    width: 100%;
+  }
+  .history-select-subtle {
+    flex: 1;
+  }
+}
+
 
 
 

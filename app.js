@@ -281,9 +281,11 @@ function goToCurrentPeriod() {
 // Réinitialisation démo directe SANS boîte de confirmation bloquante du navigateur
 function resetDemoData() {
   localStorage.removeItem('keurgui_properties_data');
+  localStorage.removeItem('keurgui_receipts_history');
   properties = JSON.parse(JSON.stringify(DEFAULT_PROPERTIES));
   saveProperties();
   updatePeriodDisplay();
+  initReceiptsHistory();
 
   // Réafficher le bandeau démo
   const demoBanner = document.querySelector('.demo-banner-highlight');
@@ -296,6 +298,7 @@ function resetDemoData() {
 function clearToMyProperties() {
   properties = [];
   saveProperties();
+  saveReceiptsHistory([]);
   updatePeriodDisplay();
 
   // Masquer le bandeau démo car l'utilisateur passe en mode réel
@@ -340,6 +343,7 @@ document.addEventListener('DOMContentLoaded', () => {
   updatePeriodDisplay();
   renderBuildingUnitsSetup();
   checkWelcomeGreeting();
+  initReceiptsHistory();
 
   // Support touche Échap pour fermer les fenêtres
   document.addEventListener('keydown', (e) => {
@@ -348,6 +352,7 @@ document.addEventListener('DOMContentLoaded', () => {
       closePayModal();
       closeAddPropertyModal();
       closeFeedbackModal();
+      closeReceiptsHistoryModal();
     }
   });
 });
@@ -773,14 +778,22 @@ function renderProperties() {
 // ===================================================
 // MODAL QUITTANCE DE LOYER
 // ===================================================
-function openReceiptModal(id) {
+let currentActiveReceiptPeriodKey = null;
+
+function openReceiptModal(id, targetPeriodKey = null) {
   const p = properties.find(item => item.id === id);
   if (!p) return;
   currentActiveProperty = p;
 
-  const pKey = getPeriodKey();
+  const pKey = targetPeriodKey || getPeriodKey();
+  currentActiveReceiptPeriodKey = pKey;
+
   const pData = getPropertyPeriodData(p, pKey);
-  const periodText = getPeriodFrench();
+  const parts = pKey.split('-');
+  const y = parseInt(parts[0], 10);
+  const m = parseInt(parts[1], 10);
+  const monthsFr = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+  const periodText = `${monthsFr[m - 1]} ${y}`;
   const isComm = !!p.isCommercial;
 
   const docTitle = document.getElementById('mDocumentMainTitle');
@@ -790,7 +803,7 @@ function openReceiptModal(id) {
   const totalLabel = document.getElementById('mTableTotalLabel');
   const legalNote = document.getElementById('mDocumentLegalNote');
 
-  const receiptNo = pData.receiptNo || p.receiptNo;
+  const receiptNo = pData.receiptNo || p.receiptNo || `KG-${y}-${String(p.id).padStart(4, '0')}`;
   document.getElementById('mReceiptNumber').textContent = receiptNo;
   document.getElementById('mReceiptRef').textContent = receiptNo;
   document.getElementById('mPaymentMethodBadge').textContent = 'Par ' + (pData.paymentMethod || p.paymentMethod || 'Wave');
@@ -807,9 +820,9 @@ function openReceiptModal(id) {
 
   const mTablePeriod = document.getElementById('mTablePeriod');
   if (mTablePeriod) {
-    const lastDay = new Date(selectedPeriod.year, selectedPeriod.month, 0).getDate();
-    const mStr = String(selectedPeriod.month).padStart(2, '0');
-    mTablePeriod.textContent = `01/${mStr}/${selectedPeriod.year} au ${lastDay}/${mStr}/${selectedPeriod.year}`;
+    const lastDay = new Date(y, m, 0).getDate();
+    const mStr = String(m).padStart(2, '0');
+    mTablePeriod.textContent = `01/${mStr}/${y} au ${lastDay}/${mStr}/${y}`;
   }
 
   const mTableChargesPeriod = document.getElementById('mTableChargesPeriod');
@@ -879,7 +892,7 @@ function closeReceiptModal() {
 // MOTEUR D'EXPORTATION PDF A4 UNIFIÉ, ISOLÉ & SANS COUPURE
 // Compatible Desktop (1080p/4K), Tablettes et Mobiles (Garantie Stricte 1 Seule Page A4)
 // ===================================================
-function exportElementToA4Pdf(sourceElement, filename, btn, originalText, callback) {
+function exportElementToA4Pdf(sourceElement, filename, btn, originalText, callback, autoSave = true) {
   // 1. Cloner l'élément source pour ne pas altérer l'affichage visuel de l'utilisateur
   const clone = sourceElement.cloneNode(true);
   clone.id = 'pdf-isolated-clone';
@@ -912,7 +925,7 @@ function exportElementToA4Pdf(sourceElement, filename, btn, originalText, callba
   clone.style.transform = 'none';
   clone.style.boxSizing = 'border-box';
   clone.style.background = '#ffffff';
-  clone.style.padding = '18px 24px';
+  clone.style.padding = '16px 22px';
 
   // Neutraliser les animations et fixer les tampons dans le clone
   const badges = clone.querySelectorAll('.receipt-badge-paid');
@@ -945,7 +958,7 @@ function exportElementToA4Pdf(sourceElement, filename, btn, originalText, callba
       scrollY: 0,
       scrollX: 0,
       width: 794,
-      windowWidth: 794
+      windowWidth: 1024 // Neutralise les media queries mobiles (max-width: 768px)
     },
     jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
     pagebreak: { mode: 'avoid-all' }
@@ -961,8 +974,15 @@ function exportElementToA4Pdf(sourceElement, filename, btn, originalText, callba
           pdf.deletePage(i);
         }
       }
-    }).save().then(() => {
+
+      const blob = pdf.output('blob');
+
+      if (autoSave) {
+        pdf.save(filename);
+      }
+
       cleanup();
+
       if (btn) {
         btn.innerHTML = '<span>✅</span> Téléchargé (1 page) !';
         setTimeout(() => {
@@ -970,8 +990,9 @@ function exportElementToA4Pdf(sourceElement, filename, btn, originalText, callba
           btn.classList.remove('loading');
         }, 2500);
       }
+
       if (typeof callback === 'function') {
-        callback();
+        callback(blob, pdf);
       }
     }).catch(err => {
       cleanup();
@@ -983,7 +1004,7 @@ function exportElementToA4Pdf(sourceElement, filename, btn, originalText, callba
       showToast("Génération de la quittance en cours...", "info");
       window.print();
       if (typeof callback === 'function') {
-        callback();
+        callback(null, null);
       }
     });
   } else {
@@ -994,7 +1015,7 @@ function exportElementToA4Pdf(sourceElement, filename, btn, originalText, callba
     }
     window.print();
     if (typeof callback === 'function') {
-      callback();
+      callback(null, null);
     }
   }
 }
@@ -1008,7 +1029,7 @@ function downloadDirectPDF() {
   btn.innerHTML = '<span>⏳</span> Création du PDF...';
   btn.classList.add('loading');
 
-  const pKey = getPeriodKey();
+  const pKey = currentActiveReceiptPeriodKey || getPeriodKey();
   const pData = getPropertyPeriodData(currentActiveProperty, pKey);
   const element = document.getElementById('printableReceipt');
   const cleanTenantName = (currentActiveProperty.tenant || 'Locataire').replace(/\s+/g, '_');
@@ -1024,82 +1045,71 @@ function printReceiptPaper() {
   window.print();
 }
 
-// MESSAGE D'ACCOMPAGNEMENT WHATSAPP POUR LE PDF (POLI & PRÉCIS)
+// MESSAGE D'ACCOMPAGNEMENT WHATSAPP POUR LE PDF (POLI, COURT & DIRECT)
 function sendWhatsAppReceipt() {
   if (!currentActiveProperty) return;
-  sendWhatsAppReceiptDirect(currentActiveProperty.id);
+  sendWhatsAppReceiptDirect(currentActiveProperty.id, currentActiveReceiptPeriodKey);
 }
 
-function sendWhatsAppReceiptDirect(id) {
+function sendWhatsAppReceiptDirect(id, customPeriodKey = null) {
   const p = properties.find(item => item.id === id);
   if (!p) return;
 
-  const pKey = getPeriodKey();
+  const pKey = customPeriodKey || currentActiveReceiptPeriodKey || getPeriodKey();
   const pData = getPropertyPeriodData(p, pKey);
-  const periodName = getPeriodFrench();
-  const method = pData.paymentMethod || p.paymentMethod || 'Wave';
+  const parts = pKey.split('-');
+  const y = parseInt(parts[0], 10);
+  const m = parseInt(parts[1], 10);
+  const monthsFr = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+  const periodName = `${monthsFr[m - 1]} ${y}`;
   const receiptNo = pData.receiptNo || p.receiptNo;
   const cleanTenantName = (p.tenant || 'Locataire').replace(/\s+/g, '_');
   const docTypePrefix = p.isCommercial ? 'Facture_Loyer' : 'Quittance';
+  const docTypeName = p.isCommercial ? 'facture de loyer' : 'quittance de loyer';
   const filename = `${docTypePrefix}_${receiptNo}_${cleanTenantName}_${pKey}.pdf`;
 
-  let message = '';
-  if (p.isCommercial) {
-    const ht = p.rent + p.charges;
-    const tva = Math.round(ht * 0.18);
-    const ttc = ht + tva;
-    message = `Bonjour ${p.tenant},
+  // Message ultra-court, poli et droit au but (demandé expressément par Jean Philippe)
+  const message = `Bonjour ${p.tenant},
 
-J'espère que vous vous portez bien.
+Veuillez trouver ci-joint votre ${docTypeName} de ${periodName} (${p.unitName}).
 
-Veuillez trouver ci-joint votre Facture de Loyer et Quittance officielle (au format PDF) avec décompte de TVA 18% pour le mois de ${periodName} concernant vos locaux professionnels : ${p.unitName} (${p.building}).
+Merci et très bonne journée !`;
 
-• Montant HT (Loyer + charges) : ${formatFCFA(ht)}
-• TVA légale (18% - CGI Sénégal) : ${formatFCFA(tva)}
-• Total réglé TTC : ${formatFCFA(ttc)} (par ${method})
-• Référence Facture : ${receiptNo}
-
-Ce document certifié comporte toutes les mentions fiscales réglementaires (NINEA, RC) conformes au CGI Sénégal.
-Merci pour votre collaboration.
-
-Bien cordialement,
-Jean Philippe Gomis — KeurGui Immobilier`;
-  } else {
-    const total = formatFCFA(p.rent + p.charges);
-    const paidDate = pData.paidDate ? `le ${pData.paidDate}` : 'ce mois-ci';
-    message = `Bonjour ${p.tenant},
-
-J'espère que vous vous portez bien.
-
-Veuillez trouver ci-joint votre quittance de loyer officielle (au format PDF) pour le mois de ${periodName} concernant votre logement : ${p.unitName} (${p.building}).
-
-• Montant réglé : ${total} (par ${method} ${paidDate})
-• Référence Quittance : ${receiptNo}
-• Statut : Quittance libératoire certifiée conforme
-
-Merci pour votre ponctualité.
-Excellente journée à vous !
-
-Bien cordialement,
-Jean Philippe Gomis — KeurGui Immobilier`;
-  }
-
-  // 1. Ouvrir d'abord le reçu pour s'assurer que printableReceipt est à jour
-  openReceiptModal(id);
+  // 1. Ouvrir le reçu pour s'assurer que printableReceipt est à jour
+  openReceiptModal(id, pKey);
   const element = document.getElementById('printableReceipt');
 
   showToast("⏳ Préparation de la quittance PDF (1 page)...", "info");
 
-  // 2. Télécharger automatiquement la quittance 1 page
-  exportElementToA4Pdf(element, filename, null, null, () => {
-    showToast("✅ Quittance PDF prête ! WhatsApp s'ouvre : cliquez sur 📎 pour joindre la quittance.", "success");
-    
+  // 2. Générer le PDF et partager directement sur WhatsApp
+  exportElementToA4Pdf(element, filename, null, null, async (blob) => {
+    // Si l'appareil supporte le partage direct de fichiers (smartphones Android & iOS)
+    if (blob && navigator.canShare) {
+      try {
+        const file = new File([blob], filename, { type: 'application/pdf' });
+        if (navigator.canShare({ files: [file] })) {
+          showToast("📲 Ouverture de WhatsApp avec la quittance jointe...", "success");
+          await navigator.share({
+            files: [file],
+            title: filename,
+            text: message
+          });
+          return;
+        }
+      } catch (err) {
+        if (err.name === 'AbortError') return; // L'utilisateur a simplement fermé la boîte de dialogue
+        console.log("Web Share fallback:", err);
+      }
+    }
+
+    // Fallback Ordinateur / Navigateur Desktop (WhatsApp Web)
+    const cleanPhone = sanitizeWhatsAppPhone(p.phone);
+    const url = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
+    showToast("✅ PDF téléchargé ! Sur WhatsApp, cliquez sur 📎 pour joindre la quittance.", "success");
     setTimeout(() => {
-      const cleanPhone = sanitizeWhatsAppPhone(p.phone);
-      const url = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
       window.open(url, '_blank', 'noopener,noreferrer');
-    }, 700);
-  });
+    }, 600);
+  }, true);
 }
 
 function sendWhatsAppReminder(id) {
@@ -1182,6 +1192,7 @@ function confirmPayment() {
   propertyToPay.paidDate = today;
 
   saveProperties(); // Sauvegarde permanente
+  registerReceiptInHistory(propertyToPay, pKey); // Enregistrement dans le Registre Historique
   closePayModal();
   renderProperties();
   updateStats();
@@ -1200,6 +1211,414 @@ function triggerPaymentSuccessBurst() {
   burst.className = 'payment-success-burst';
   document.body.appendChild(burst);
   setTimeout(() => burst.remove(), 800);
+}
+
+// ===================================================
+// REGISTRE & HISTORIQUE DES QUITTANCES (ARCHIVES SÉCURISÉES)
+// ===================================================
+const RECEIPTS_HISTORY_STORAGE_KEY = 'keurgui_receipts_history';
+
+function getReceiptsHistory() {
+  try {
+    const raw = localStorage.getItem(RECEIPTS_HISTORY_STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch (e) {}
+  return [];
+}
+
+function saveReceiptsHistory(history) {
+  try {
+    localStorage.setItem(RECEIPTS_HISTORY_STORAGE_KEY, JSON.stringify(history));
+    updateReceiptsHistoryBadge();
+  } catch (e) {}
+}
+
+function initReceiptsHistory() {
+  let history = getReceiptsHistory();
+  if (!history || history.length === 0) {
+    history = [
+      // Mois en cours (Octobre 2026)
+      {
+        receiptNo: "KG-2026-0042",
+        propertyId: 1,
+        tenant: "Mamadou Diallo",
+        tenantPhone: "+221 77 123 45 67",
+        unitName: "Appartement 3B",
+        building: "Résidence Teranga",
+        neighborhood: "Mermoz",
+        periodKey: "2026-10",
+        periodFrench: "Octobre 2026",
+        total: 250000,
+        paymentMethod: "Wave",
+        paidDate: "05/10/2026",
+        isCommercial: false
+      },
+      {
+        receiptNo: "KG-2026-0043",
+        propertyId: 2,
+        tenant: "Aïssatou Ba",
+        tenantPhone: "+221 78 234 56 78",
+        unitName: "Studio 1A",
+        building: "Résidence Teranga",
+        neighborhood: "Mermoz",
+        periodKey: "2026-10",
+        periodFrench: "Octobre 2026",
+        total: 220000,
+        paymentMethod: "Wave",
+        paidDate: "04/10/2026",
+        isCommercial: false
+      },
+      {
+        receiptNo: "KG-2026-0044",
+        propertyId: 3,
+        tenant: "Cheikh Ndiaye",
+        tenantPhone: "+221 76 345 67 89",
+        unitName: "Appartement 2A",
+        building: "Résidence Teranga",
+        neighborhood: "Mermoz",
+        periodKey: "2026-10",
+        periodFrench: "Octobre 2026",
+        total: 180000,
+        paymentMethod: "Espèces",
+        paidDate: "02/10/2026",
+        isCommercial: false
+      },
+      {
+        receiptNo: "KG-2026-0045",
+        propertyId: 4,
+        tenant: "Fatou Sow",
+        tenantPhone: "+221 70 456 78 90",
+        unitName: "Appartement 4A",
+        building: "Résidence Teranga",
+        neighborhood: "Mermoz",
+        periodKey: "2026-10",
+        periodFrench: "Octobre 2026",
+        total: 450000,
+        paymentMethod: "Orange Money",
+        paidDate: "03/10/2026",
+        isCommercial: false
+      },
+      {
+        receiptNo: "KG-2026-0047",
+        propertyId: 6,
+        tenant: "Ousmane Fall",
+        tenantPhone: "+221 77 678 90 12",
+        unitName: "Appartement 1B",
+        building: "Immeuble Almadies",
+        neighborhood: "Almadies",
+        periodKey: "2026-10",
+        periodFrench: "Octobre 2026",
+        total: 380000,
+        paymentMethod: "Wave",
+        paidDate: "06/10/2026",
+        isCommercial: false
+      },
+      {
+        receiptNo: "FACT-2026-0018",
+        propertyId: 7,
+        tenant: "Cabinet Juridique Sarr",
+        tenantPhone: "+221 33 820 11 22",
+        unitName: "Plateau Bureau 201",
+        building: "Centre d'Affaires Dakar",
+        neighborhood: "Plateau",
+        periodKey: "2026-10",
+        periodFrench: "Octobre 2026",
+        total: 767000,
+        paymentMethod: "Virement Bancaire (CBAO)",
+        paidDate: "02/10/2026",
+        isCommercial: true
+      },
+      // Périodes antérieures (ex: il y a 1 mois, 2 mois, 1 an, 2 ans pour répondre précisément au cas d'usage)
+      {
+        receiptNo: "KG-2026-0036",
+        propertyId: 1,
+        tenant: "Mamadou Diallo",
+        tenantPhone: "+221 77 123 45 67",
+        unitName: "Appartement 3B",
+        building: "Résidence Teranga",
+        neighborhood: "Mermoz",
+        periodKey: "2026-09",
+        periodFrench: "Septembre 2026",
+        total: 250000,
+        paymentMethod: "Wave",
+        paidDate: "04/09/2026",
+        isCommercial: false
+      },
+      {
+        receiptNo: "KG-2026-0030",
+        propertyId: 1,
+        tenant: "Mamadou Diallo",
+        tenantPhone: "+221 77 123 45 67",
+        unitName: "Appartement 3B",
+        building: "Résidence Teranga",
+        neighborhood: "Mermoz",
+        periodKey: "2026-08",
+        periodFrench: "Août 2026",
+        total: 250000,
+        paymentMethod: "Wave",
+        paidDate: "05/08/2026",
+        isCommercial: false
+      },
+      {
+        receiptNo: "KG-2025-0042",
+        propertyId: 1,
+        tenant: "Mamadou Diallo",
+        tenantPhone: "+221 77 123 45 67",
+        unitName: "Appartement 3B",
+        building: "Résidence Teranga",
+        neighborhood: "Mermoz",
+        periodKey: "2025-10",
+        periodFrench: "Octobre 2025",
+        total: 240000,
+        paymentMethod: "Wave",
+        paidDate: "05/10/2025",
+        isCommercial: false
+      },
+      {
+        receiptNo: "KG-2024-0043",
+        propertyId: 2,
+        tenant: "Aïssatou Ba",
+        tenantPhone: "+221 78 234 56 78",
+        unitName: "Studio 1A",
+        building: "Résidence Teranga",
+        neighborhood: "Mermoz",
+        periodKey: "2024-11",
+        periodFrench: "Novembre 2024",
+        total: 210000,
+        paymentMethod: "Wave",
+        paidDate: "03/11/2024",
+        isCommercial: false
+      }
+    ];
+    saveReceiptsHistory(history);
+  }
+  updateReceiptsHistoryBadge();
+}
+
+function registerReceiptInHistory(prop, pKey = getPeriodKey()) {
+  const pData = getPropertyPeriodData(prop, pKey);
+  if (pData.status !== 'paid') return;
+
+  const history = getReceiptsHistory();
+  const receiptNo = pData.receiptNo || prop.receiptNo || `KG-${pKey.split('-')[0]}-${String(prop.id).padStart(4, '0')}`;
+  
+  const parts = pKey.split('-');
+  const y = parseInt(parts[0], 10);
+  const m = parseInt(parts[1], 10);
+  const monthsFr = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+  const periodFrench = `${monthsFr[m - 1]} ${y}`;
+
+  let total = prop.rent + prop.charges;
+  if (prop.isCommercial) {
+    const tva = Math.round(total * 0.18);
+    total = total + tva;
+  }
+
+  const existingIdx = history.findIndex(r => r.propertyId === prop.id && r.periodKey === pKey);
+  const record = {
+    receiptNo: receiptNo,
+    propertyId: prop.id,
+    tenant: prop.tenant,
+    tenantPhone: prop.phone,
+    unitName: prop.unitName,
+    building: prop.building,
+    neighborhood: prop.neighborhood,
+    periodKey: pKey,
+    periodFrench: periodFrench,
+    total: total,
+    paymentMethod: pData.paymentMethod || prop.paymentMethod || 'Wave',
+    paidDate: pData.paidDate || getTodayFormatted(),
+    isCommercial: !!prop.isCommercial
+  };
+
+  if (existingIdx >= 0) {
+    history[existingIdx] = record;
+  } else {
+    history.unshift(record);
+  }
+
+  saveReceiptsHistory(history);
+}
+
+function updateReceiptsHistoryBadge() {
+  const badge = document.getElementById('historyCountBadge');
+  if (badge) {
+    const history = getReceiptsHistory();
+    badge.textContent = history.length;
+  }
+}
+
+function openReceiptsHistoryModal() {
+  const modal = document.getElementById('receiptsHistoryModalOverlay');
+  if (!modal) return;
+
+  populateHistoryBuildingFilter();
+  filterReceiptsHistory();
+  modal.classList.add('active');
+}
+
+function closeReceiptsHistoryModal() {
+  const modal = document.getElementById('receiptsHistoryModalOverlay');
+  if (modal) modal.classList.remove('active');
+}
+
+function closeReceiptsHistoryOnOverlay(e) {
+  if (e.target.id === 'receiptsHistoryModalOverlay') {
+    closeReceiptsHistoryModal();
+  }
+}
+
+function populateHistoryBuildingFilter() {
+  const select = document.getElementById('historyBuildingFilter');
+  if (!select) return;
+
+  const history = getReceiptsHistory();
+  const buildings = Array.from(new Set(history.map(r => r.building).filter(Boolean)));
+
+  select.innerHTML = '<option value="all">Tous les biens / immeubles</option>' +
+    buildings.map(b => `<option value="${escapeHtml(b)}">${escapeHtml(b)}</option>`).join('');
+}
+
+function filterReceiptsHistory() {
+  const searchInput = document.getElementById('historySearchInput');
+  const yearSelect = document.getElementById('historyYearFilter');
+  const buildingSelect = document.getElementById('historyBuildingFilter');
+
+  const query = (searchInput ? searchInput.value : '').toLowerCase().trim();
+  const year = yearSelect ? yearSelect.value : 'all';
+  const building = buildingSelect ? buildingSelect.value : 'all';
+
+  renderReceiptsHistoryList(query, year, building);
+}
+
+function renderReceiptsHistoryList(query = '', year = 'all', building = 'all') {
+  const container = document.getElementById('historyListContainer');
+  const summary = document.getElementById('historySummaryText');
+  if (!container) return;
+
+  let history = getReceiptsHistory();
+
+  // Filtre par texte
+  if (query) {
+    history = history.filter(r => 
+      (r.tenant && r.tenant.toLowerCase().includes(query)) ||
+      (r.receiptNo && r.receiptNo.toLowerCase().includes(query)) ||
+      (r.building && r.building.toLowerCase().includes(query)) ||
+      (r.unitName && r.unitName.toLowerCase().includes(query)) ||
+      (r.neighborhood && r.neighborhood.toLowerCase().includes(query)) ||
+      (r.periodFrench && r.periodFrench.toLowerCase().includes(query))
+    );
+  }
+
+  // Filtre par année
+  if (year !== 'all') {
+    history = history.filter(r => r.periodKey && r.periodKey.startsWith(year));
+  }
+
+  // Filtre par immeuble
+  if (building !== 'all') {
+    history = history.filter(r => r.building === building);
+  }
+
+  if (summary) {
+    summary.innerHTML = `Affichage de <strong>${history.length}</strong> quittance(s)`;
+  }
+
+  if (history.length === 0) {
+    container.innerHTML = `
+      <div class="history-empty-state">
+        <div class="empty-icon">🔍</div>
+        <h4 style="font-weight:700; color:var(--dark);">Aucune quittance trouvée</h4>
+        <p style="font-size:12px; margin-top:4px;">Essayez d'ajuster vos critères de recherche ou sélectionnez une autre année.</p>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = history.map(r => {
+    return `
+      <div class="history-item-row">
+        <div class="history-item-main">
+          <div class="history-item-header">
+            <span class="history-badge-ref">${escapeHtml(r.receiptNo)}</span>
+            <span class="history-badge-period">📅 ${escapeHtml(r.periodFrench)}</span>
+            <span class="history-badge-method">Règlement : ${escapeHtml(r.paymentMethod || 'Wave')} (le ${escapeHtml(r.paidDate || '05')})</span>
+          </div>
+          <div class="history-item-tenant">
+            <strong>${escapeHtml(r.tenant)}</strong>
+            <span class="history-tenant-phone">${escapeHtml(r.tenantPhone || '')}</span>
+          </div>
+          <div class="history-item-property">
+            📍 ${escapeHtml(r.unitName)} — ${escapeHtml(r.building)} (${escapeHtml(r.neighborhood)})
+          </div>
+        </div>
+
+        <div class="history-item-amount-side">
+          <div class="history-item-price">${formatFCFA(r.total)}</div>
+          <div class="history-item-type">${r.isCommercial ? 'Facture Commerciale' : 'Quittance Particulier'}</div>
+        </div>
+
+        <div class="history-item-actions">
+          <button class="btn-history-view" onclick="openReceiptFromHistory('${escapeHtml(r.receiptNo)}')" title="Visualiser la quittance certifiée">
+            <span>👁️</span> Voir
+          </button>
+          <button class="btn-history-pdf" onclick="downloadPdfFromHistory('${escapeHtml(r.receiptNo)}')" title="Télécharger le PDF 1 page">
+            <span>📥</span> PDF
+          </button>
+          <button class="btn-history-wa" onclick="sendWhatsAppFromHistory('${escapeHtml(r.receiptNo)}')" title="Envoyer au locataire par WhatsApp">
+            <span>💬</span> WhatsApp
+          </button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function openReceiptFromHistory(receiptNo) {
+  const history = getReceiptsHistory();
+  const item = history.find(r => r.receiptNo === receiptNo);
+  if (!item) return;
+
+  const prop = properties.find(p => p.id === item.propertyId);
+  if (!prop) {
+    showToast("Bien introuvable", "error");
+    return;
+  }
+
+  closeReceiptsHistoryModal();
+  openReceiptModal(prop.id, item.periodKey);
+}
+
+function downloadPdfFromHistory(receiptNo) {
+  const history = getReceiptsHistory();
+  const item = history.find(r => r.receiptNo === receiptNo);
+  if (!item) return;
+
+  const prop = properties.find(p => p.id === item.propertyId);
+  if (!prop) return;
+
+  openReceiptModal(prop.id, item.periodKey);
+  const element = document.getElementById('printableReceipt');
+  const cleanTenant = (item.tenant || 'Locataire').replace(/\s+/g, '_');
+  const docTypePrefix = item.isCommercial ? 'Facture_Loyer' : 'Quittance';
+  const filename = `${docTypePrefix}_${receiptNo}_${cleanTenant}_${item.periodKey}.pdf`;
+
+  showToast(`⏳ Téléchargement de la quittance ${receiptNo}...`, "info");
+  exportElementToA4Pdf(element, filename, null, null, () => {
+    showToast(`✅ Quittance ${receiptNo} téléchargée (1 page) !`, "success");
+  });
+}
+
+function sendWhatsAppFromHistory(receiptNo) {
+  const history = getReceiptsHistory();
+  const item = history.find(r => r.receiptNo === receiptNo);
+  if (!item) return;
+
+  const prop = properties.find(p => p.id === item.propertyId);
+  if (!prop) return;
+
+  closeReceiptsHistoryModal();
+  sendWhatsAppReceiptDirect(prop.id, item.periodKey);
 }
 
 // ===================================================

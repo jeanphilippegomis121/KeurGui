@@ -146,3 +146,44 @@
   - Sécurisation des liens `window.open` avec `noopener, noreferrer`.
 
 ---
+
+### 8. 🎯 Réponse Intégrale aux Retours Vocaux de Jean Philippe (Session 5)
+
+#### A. Verrou Anti-Multi-Pages Strict sur Smartphone & Écrans Mobiles
+- **Diagnostic :** Sur les smartphones (largeur < 768px), le CSS `@media (max-width: 768px)` appliquait des règles forçant la grille de quittance en une seule colonne verticale (`grid-template-columns: 1fr`). La feuille s'allongeait artificiellement à ~1300px lors de la capture html2canvas sur téléphone, générant 2 pages au téléchargement.
+- **Résolution :**
+  - Création de règles CSS prioritaires `#pdf-render-sandbox` et `#pdf-isolated-clone` avec `!important` verrouillant le gabarit strict A4 (794 px, 2 colonnes côte-à-côte, padding compact 16px 22px).
+  - Émulation de résolution desktop dans html2canvas (`windowWidth: 1024`) pour neutraliser toute règle media query mobile pendant la capture.
+  - **Résultat :** Le document généré est STRICTEMENT et TOUJOURS d'une seule page A4 sans coupure, qu'il soit généré depuis un smartphone ou un ordinateur.
+
+#### B. Simplification du Message WhatsApp Pré-rempli (Poli, Court & Droit au But)
+- **Constat de Jean Philippe :** Le message précédent était trop long, trop technique et répétitif par rapport au contenu du document PDF.
+- **Nouveau format 100% épuré :**
+  > *« Bonjour Mamadou Diallo,*
+  > 
+  > *Veuillez trouver ci-joint votre quittance de loyer de Octobre 2026 (Appartement 3B).*
+  > 
+  > *Merci et très bonne journée ! »*
+
+#### C. Partage Direct du PDF en Pièce Jointe WhatsApp (Web Share API Niveau 2)
+- Sur les smartphones (Chrome Android, Safari iOS), intégration de `navigator.share({ files: [pdfFile], text: message })` :
+  - La feuille de partage native du smartphone s'ouvre directement.
+  - L'utilisateur sélectionne WhatsApp : **le PDF est déjà joint en pièce jointe dans la conversation** avec le message pré-rempli. Plus besoin d'aller fouiller dans les dossiers de téléchargement de son téléphone !
+- Sur ordinateur / Desktop : téléchargement direct en un clic du PDF + ouverture de WhatsApp Web + guidage visuel immédiat par toast.
+
+#### D. Nouveau Module « Registre & Historique des Quittances »
+- **Réponse au besoin exprimé :** Pouvoir retrouver en 3 secondes n'importe quelle quittance passée (mois en cours, il y a 4 mois, 1 an ou 2 ans) réclamée par un locataire sans avoir à chercher manuellement dans ses fichiers.
+- **Interface & Fonctionnalités :**
+  - Bouton d'accès rapide dans la barre d'action : `📑 Historique Quittances (10)`.
+  - Modale dédiée grand format avec :
+    - Recherche instantanée multi-critères (nom du locataire, N° de quittance, nom d'immeuble, appartement).
+    - Filtre par Année (2026, 2025, 2024, Toutes).
+    - Filtre par Immeuble / Bien.
+    - Cartes individuelles avec récapitulatif complet (référence, montant, date, moyen de paiement).
+    - 3 boutons d'action rapide en 1 clic pour chaque quittance :
+      1. `👁️ Voir` : ré-ouvre la quittance certifiée dans la visionneuse officielle.
+      2. `📥 PDF` : re-télécharge instantanément le PDF 1 page de cette période passée.
+      3. `💬 WhatsApp` : réexpédie la quittance directement au locataire sur WhatsApp avec le message court personnalisé.
+- **Persistance :** Sauvegarde locale dans `localStorage` (`keurgui_receipts_history`) synchronisée en temps réel à chaque encaissement de loyer.
+
+---
