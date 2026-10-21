@@ -1,17 +1,20 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="KeurGui — La solution de gestion locative moderne pour les propriétaires et agences au Sénégal. Suivez vos loyers, générez des quittances PDF conformes et relancez vos locataires via WhatsApp.">
+  <meta name="description"
+    content="KeurGui — La solution de gestion locative moderne pour les propriétaires et agences au Sénégal. Suivez vos loyers, générez des quittances PDF conformes et relancez vos locataires via WhatsApp.">
   <link rel="icon" type="image/png" href="logo-icon.png">
   <link rel="apple-touch-icon" href="logo-icon.png">
   <meta property="og:image" content="https://keurgui-ashy.vercel.app/logo.jpg">
   <title>KeurGui — Gestion Locative Simple au Sénégal</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+
   <!-- Configuration PWA & Icônes Mobiles -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#064e3b">
@@ -24,6 +27,7 @@
 
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
   <!-- BANNIÈRE SUBTILE PWA : INSTALLATION SMARTPHONE 1-CLIC -->
@@ -57,8 +61,10 @@
         <a href="index.html" style="display: flex; align-items: center; text-decoration: none;">
           <img src="logo-banner.png" alt="KeurGui" style="height: 38px; width: auto; border-radius: 8px;">
         </a>
-        <div class="logo-sub-wrapper" style="border-left: 2px solid var(--gray-200); padding-left: 12px; margin-left: 6px;">
-          <p class="logo-sub" style="font-size: 11px; color: var(--gray-600); font-weight: 600; line-height: 1.25;">Vos loyers au pays,<br>en toute sérénité 🇸🇳</p>
+        <div class="logo-sub-wrapper"
+          style="border-left: 2px solid var(--gray-200); padding-left: 12px; margin-left: 6px;">
+          <p class="logo-sub" style="font-size: 11px; color: var(--gray-600); font-weight: 600; line-height: 1.25;">Vos
+            loyers au pays,<br>en toute sérénité 🇸🇳</p>
         </div>
       </div>
 
@@ -74,7 +80,8 @@
 
       <!-- Profil Utilisateur & Outils -->
       <div class="user-profile">
-        <a href="index.html" class="btn-link-landing" style="font-size: 12px; font-weight: 700; color: #059669; text-decoration: none; padding: 6px 12px; background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 999px; display: flex; align-items: center; gap: 4px;">
+        <a href="index.html" class="btn-link-landing"
+          style="font-size: 12px; font-weight: 700; color: #059669; text-decoration: none; padding: 6px 12px; background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 999px; display: flex; align-items: center; gap: 4px;">
           <span>🌐</span> Site Vitrine VIP
         </a>
         <div class="user-avatar" id="headerAvatar">JP</div>
@@ -94,7 +101,8 @@
         <span class="welcome-wave">👋</span>
         <div>
           <strong>Dalal ak jàmm <span id="welcomeUserName"></span> !</strong>
-          <p>Bienvenue sur votre démo interactive KeurGui. Explorez le tableau de bord, testez une quittance officielle en 1 clic ou nettoyez les exemples pour ajouter vos vrais biens.</p>
+          <p>Bienvenue sur votre démo interactive KeurGui. Explorez le tableau de bord, testez une quittance officielle
+            en 1 clic ou nettoyez les exemples pour ajouter vos vrais biens.</p>
         </div>
       </div>
       <button class="btn-welcome-dismiss" onclick="dismissWelcomeBanner()">C'est parti ! 🚀</button>
@@ -125,17 +133,22 @@
     <div class="dashboard-executive-header">
       <div class="dash-title-block">
         <h1 class="dash-main-title">Tableau de bord</h1>
-        <p class="dash-subtitle">Suivi des encaissements • <span id="activePeriodLabel" class="period-text-highlight">Octobre 2026</span></p>
+        <p class="dash-subtitle">Suivi des encaissements • <span id="activePeriodLabel"
+            class="period-text-highlight">Octobre 2026</span></p>
       </div>
 
       <!-- Sélecteur de période épuré (visible mais subtil) -->
       <div class="period-pill-subtle">
-        <button class="btn-period-arrow-subtle" onclick="changePeriod(-1)" title="Mois précédent" aria-label="Mois précédent">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        <button class="btn-period-arrow-subtle" onclick="changePeriod(-1)" title="Mois précédent"
+          aria-label="Mois précédent">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
         </button>
         <div class="period-dropdowns-group">
           <span class="period-icon-cal">📅</span>
-          <select id="periodMonthSelect" onchange="onPeriodPickerChange()" class="select-period-subtle" title="Choisir le mois">
+          <select id="periodMonthSelect" onchange="onPeriodPickerChange()" class="select-period-subtle"
+            title="Choisir le mois">
             <option value="1">Janvier</option>
             <option value="2">Février</option>
             <option value="3">Mars</option>
@@ -149,7 +162,8 @@
             <option value="11">Novembre</option>
             <option value="12">Décembre</option>
           </select>
-          <select id="periodYearSelect" onchange="onPeriodPickerChange()" class="select-period-subtle select-year-subtle" title="Choisir l'année">
+          <select id="periodYearSelect" onchange="onPeriodPickerChange()"
+            class="select-period-subtle select-year-subtle" title="Choisir l'année">
             <option value="2025">2025</option>
             <option value="2026" selected>2026</option>
             <option value="2027">2027</option>
@@ -158,10 +172,14 @@
             <option value="2030">2030</option>
           </select>
         </div>
-        <button class="btn-period-arrow-subtle" onclick="changePeriod(1)" title="Mois suivant" aria-label="Mois suivant">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        <button class="btn-period-arrow-subtle" onclick="changePeriod(1)" title="Mois suivant"
+          aria-label="Mois suivant">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
         </button>
-        <button class="btn-period-today-subtle" onclick="goToCurrentPeriod()" title="Revenir au mois en cours">Mois en cours</button>
+        <button class="btn-period-today-subtle" onclick="goToCurrentPeriod()" title="Revenir au mois en cours">Mois en
+          cours</button>
       </div>
     </div>
 
@@ -215,16 +233,20 @@
     <!-- Barre d'actions & Filtres -->
     <section class="action-bar">
       <div class="filter-tabs">
-        <button class="tab-btn active" id="tab-all" onclick="setFilter('all')">Tous les biens (<span id="countAll">6</span>)</button>
+        <button class="tab-btn active" id="tab-all" onclick="setFilter('all')">Tous les biens (<span
+            id="countAll">6</span>)</button>
         <button class="tab-btn" id="tab-paid" onclick="setFilter('paid')">Payés (<span id="countPaid">5</span>)</button>
-        <button class="tab-btn" id="tab-late" onclick="setFilter('late')">En attente / Retard (<span id="countLate">1</span>)</button>
+        <button class="tab-btn" id="tab-late" onclick="setFilter('late')">En attente / Retard (<span
+            id="countLate">1</span>)</button>
       </div>
 
       <div class="action-buttons">
-        <button class="btn btn-history-action" onclick="openReceiptsHistoryModal()" title="Consulter l'historique complet des quittances délivrées">
+        <button class="btn btn-history-action" onclick="openReceiptsHistoryModal()"
+          title="Consulter l'historique complet des quittances délivrées">
           <span>📑</span> Historique Quittances (<span id="historyCountBadge">0</span>)
         </button>
-        <input type="text" id="searchInput" placeholder="Rechercher (Mermoz, Diallo, Teranga...)" class="search-input" onkeyup="searchProperties()">
+        <input type="text" id="searchInput" placeholder="Rechercher (Mermoz, Diallo, Teranga...)" class="search-input"
+          onkeyup="searchProperties()">
         <button class="btn btn-primary" onclick="openAddPropertyModal()">
           <span>+</span> Ajouter un bien / immeuble
         </button>
@@ -246,7 +268,8 @@
       <div class="modal-header">
         <div>
           <span class="tag-live" style="background:#ecfdf5; color:#059669;">Archives Certifiées</span>
-          <h3 style="margin-top:4px; font-size:17px; font-weight:800; color:var(--dark);">📑 Registre & Historique des Quittances</h3>
+          <h3 style="margin-top:4px; font-size:17px; font-weight:800; color:var(--dark);">📑 Registre & Historique des
+            Quittances</h3>
           <p style="font-size:12px; color:var(--gray-600); margin-top:2px;">
             Retrouvez et renvoyez en 1 clic n'importe quelle quittance (mois en cours, il y a 6 mois, 1 an ou 2 ans).
           </p>
@@ -258,7 +281,9 @@
       <div class="history-controls-bar">
         <div class="history-search-wrapper">
           <span class="search-icon">🔍</span>
-          <input type="text" id="historySearchInput" placeholder="Rechercher par locataire, immeuble, réf (ex: Diallo, Teranga, KG-2026)..." class="history-search-input" oninput="filterReceiptsHistory()">
+          <input type="text" id="historySearchInput"
+            placeholder="Rechercher par locataire, immeuble, réf (ex: Diallo, Teranga, KG-2026)..."
+            class="history-search-input" oninput="filterReceiptsHistory()">
         </div>
         <div class="history-filters-group">
           <select id="historyYearFilter" class="history-select-subtle" onchange="filterReceiptsHistory()">
@@ -291,7 +316,7 @@
   <!-- ============================================== -->
   <div class="modal-overlay" id="receiptModalOverlay" onclick="closeModalOnOverlay(event)">
     <div class="modal-receipt-wrapper">
-      
+
       <!-- Barre d'outils du modal -->
       <div class="receipt-actions-bar no-print">
         <div class="receipt-modal-title">
@@ -303,12 +328,12 @@
           <button class="btn btn-download-direct-pdf" id="btnDirectPdf" onclick="downloadDirectPDF()">
             <span>📥</span> Télécharger le PDF (1 page)
           </button>
-          
+
           <!-- BOUTON 2 : PARTAGE DIRECT WHATSAPP AVEC PDF -->
           <button class="btn btn-whatsapp" onclick="sendWhatsAppReceipt()">
             <span>💬</span> Télécharger & Envoyer WhatsApp
           </button>
-          
+
           <!-- BOUTON 3 : IMPRESSION PAPIER -->
           <button class="btn btn-secondary-sm" onclick="printReceiptPaper()">
             <span>🖨️</span> Imprimer
@@ -320,7 +345,7 @@
 
       <!-- FEUILLE DE QUITTANCE OFFICIELLE (ZONE DU FICHIER PDF A4) -->
       <div class="receipt-sheet" id="printableReceipt">
-        
+
         <!-- En-tête officiel -->
         <div class="receipt-header">
           <div class="receipt-brand">
@@ -409,13 +434,15 @@
 
         <!-- Montant en lettres et mentions légales -->
         <div class="receipt-words-box">
-          <p>Le bailleur reconnaît avoir reçu la somme de :  
+          <p>Le bailleur reconnaît avoir reçu la somme de :
             <strong id="mAmountWords">Deux cent cinquante mille Francs CFA</strong>
           </p>
         </div>
 
         <div class="receipt-legal-note" id="mDocumentLegalNote">
-          <p>La présente quittance annule tout reçu antérieur pour la période susvisée. Elle ne préjuge pas des loyers postérieurs. Document généré avec certification numérique KeurGui conforme aux normes OHADA et au Code des Obligations Civiles et Commerciales du Sénégal.</p>
+          <p>La présente quittance annule tout reçu antérieur pour la période susvisée. Elle ne préjuge pas des loyers
+            postérieurs. Document généré avec certification numérique KeurGui conforme aux normes OHADA et au Code des
+            Obligations Civiles et Commerciales du Sénégal.</p>
         </div>
 
         <!-- Signatures & Date -->
@@ -451,7 +478,7 @@
   <!-- ============================================== -->
   <div class="modal-overlay" id="agencyInvoiceModalOverlay" onclick="closeAgencyInvoiceModalOnOverlay(event)">
     <div class="modal-receipt-wrapper">
-      
+
       <!-- Barre d'outils du modal Facture Agence -->
       <div class="receipt-actions-bar no-print">
         <div class="receipt-modal-title">
@@ -463,12 +490,12 @@
           <button class="btn btn-download-direct-pdf" id="btnAgencyPdf" onclick="downloadAgencyInvoicePdf()">
             <span>📥</span> Télécharger la Facture PDF
           </button>
-          
+
           <!-- BOUTON 2 : PARTAGE WHATSAPP AVEC MESSAGE D'ACCOMPAGNEMENT -->
           <button class="btn btn-whatsapp" onclick="sendWhatsAppAgencyInvoice()">
             <span>💬</span> Envoyer Décompte WhatsApp
           </button>
-          
+
           <!-- BOUTON 3 : IMPRESSION PAPIER -->
           <button class="btn btn-secondary-sm" onclick="printAgencyInvoice()">
             <span>🖨️</span> Imprimer
@@ -479,9 +506,11 @@
       </div>
 
       <!-- SÉLECTEUR DE BAILLEUR (POUR DÉCOMPTE GLOBAL OU INDIVIDUEL) -->
-      <div class="no-print" style="background: #f8fafc; padding: 12px 24px; border-bottom: 1px solid #e2e8f0; display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;">
+      <div class="no-print"
+        style="background: #f8fafc; padding: 12px 24px; border-bottom: 1px solid #e2e8f0; display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;">
         <div style="display:flex; align-items:center; gap:10px;">
-          <span style="font-size:12px; font-weight:800; color:#475569; text-transform:uppercase;">Bailleur Mandant :</span>
+          <span style="font-size:12px; font-weight:800; color:#475569; text-transform:uppercase;">Bailleur Mandant
+            :</span>
           <select id="agencyInvoiceOwnerSelect" class="owner-select-control" onchange="onAgencyOwnerFilterChange()">
             <!-- Rempli dynamiquement -->
           </select>
@@ -493,7 +522,7 @@
 
       <!-- FEUILLE DE FACTURE OFFICIELLE (ZONE DU FICHIER PDF A4) -->
       <div class="receipt-sheet agency-invoice-sheet" id="printableAgencyInvoice">
-        
+
         <!-- En-tête officiel Agence Immobilière -->
         <div class="receipt-header">
           <div class="receipt-brand">
@@ -522,7 +551,8 @@
         <!-- Titre du document -->
         <div class="receipt-document-title">
           <h1 style="color: #064e3b;">FACTURE D'HONORAIRES DE GESTION LOCATIVE</h1>
-          <p>Compte-rendu financier & Décompte de reversement — <strong id="agencyInvoicePeriod">Mois d'Octobre 2026</strong></p>
+          <p>Compte-rendu financier & Décompte de reversement — <strong id="agencyInvoicePeriod">Mois d'Octobre
+              2026</strong></p>
         </div>
 
         <!-- Coordonnées Agence Mandataire & Mandant Bailleur -->
@@ -566,12 +596,14 @@
                 <small class="text-muted">Taux contractuel de gestion et suivi des recouvrements</small>
               </td>
               <td>10% sur encaissements</td>
-              <td class="text-right font-mono" id="agencyTableCommissionHt" style="color: #064e3b; font-weight:700;">0 FCFA</td>
+              <td class="text-right font-mono" id="agencyTableCommissionHt" style="color: #064e3b; font-weight:700;">0
+                FCFA</td>
             </tr>
             <tr style="background: #f0fdf4; color: #166534; font-weight: 700;">
               <td>
                 <strong>TVA légale sur honoraires (18%)</strong><br>
-                <small class="text-muted" style="color:#15803d;">Code Général des Impôts (CGI Sénégal - Art. 355)</small>
+                <small class="text-muted" style="color:#15803d;">Code Général des Impôts (CGI Sénégal - Art.
+                  355)</small>
               </td>
               <td>18% sur HT</td>
               <td class="text-right font-mono" id="agencyTableTva">0 FCFA</td>
@@ -596,13 +628,17 @@
 
         <!-- Montant en lettres et mentions fiscales légales -->
         <div class="receipt-words-box">
-          <p>Arrêté la présente facture d'honoraires à la somme de :  
+          <p>Arrêté la présente facture d'honoraires à la somme de :
             <strong id="agencyAmountWords">Zéro Franc CFA TTC</strong>
           </p>
         </div>
 
         <div class="receipt-legal-note">
-          <p>Facture assujettie à la Taxe sur la Valeur Ajoutée (TVA) au taux de 18% conformément aux dispositions de l'article 355 et suivants du Code Général des Impôts (CGI) de la République du Sénégal. Honoraires et commissions d'agence fermes et non remboursables conformément au mandat de gestion locative. Les honoraires ont été directement imputés sur les encaissements du mois et le solde net a été crédité en faveur du mandant.</p>
+          <p>Facture assujettie à la Taxe sur la Valeur Ajoutée (TVA) au taux de 18% conformément aux dispositions de
+            l'article 355 et suivants du Code Général des Impôts (CGI) de la République du Sénégal. Honoraires et
+            commissions d'agence fermes et non remboursables conformément au mandat de gestion locative. Les honoraires
+            ont été directement imputés sur les encaissements du mois et le solde net a été crédité en faveur du
+            mandant.</p>
         </div>
 
         <!-- Signatures, Date & Cachet Officiel Agence -->
@@ -670,7 +706,8 @@
       </div>
       <div class="modal-actions">
         <button type="button" class="btn btn-secondary" onclick="closePayModal()">Annuler</button>
-        <button type="button" class="btn btn-primary" onclick="confirmPayment()">Confirmer le paiement & Générer la Quittance</button>
+        <button type="button" class="btn btn-primary" onclick="confirmPayment()">Confirmer le paiement & Générer la
+          Quittance</button>
       </div>
     </div>
   </div>
@@ -704,7 +741,7 @@
           <label>Nom ou numéro du logement <span style="color:#ef4444;">*</span></label>
           <input type="text" id="propName" placeholder="Ex: Appt 3B, Studio Mermoz, Villa Keur Mariama..." required>
         </div>
-        
+
         <div class="form-row">
           <div class="form-group">
             <label>Quartier <span style="color:#ef4444;">*</span></label>
@@ -733,8 +770,10 @@
         </div>
 
         <!-- Option TVA 18% Bail Commercial -->
-        <div class="form-group" style="background: #f8fafc; padding: 10px 14px; border-radius: 8px; border: 1px solid #e2e8f0;">
-          <label style="display:flex; align-items:center; gap:8px; cursor:pointer; margin:0; font-weight:700; color:#1e293b; font-size:13px;">
+        <div class="form-group"
+          style="background: #f8fafc; padding: 10px 14px; border-radius: 8px; border: 1px solid #e2e8f0;">
+          <label
+            style="display:flex; align-items:center; gap:8px; cursor:pointer; margin:0; font-weight:700; color:#1e293b; font-size:13px;">
             <input type="checkbox" id="propIsCommercial" style="width:16px; height:16px; accent-color:#059669;">
             <span>🏢 Bail commercial ou professionnel (Assujetti à la TVA 18%)</span>
           </label>
@@ -746,18 +785,21 @@
             <input type="number" id="propRent" placeholder="Ex: 250000" required>
           </div>
           <div class="form-group">
-            <label>Charges locatives (FCFA) <small style="color:#64748b; font-weight:normal;">(Optionnel)</small></label>
+            <label>Charges locatives (FCFA) <small
+                style="color:#64748b; font-weight:normal;">(Optionnel)</small></label>
             <input type="number" id="propCharges" placeholder="0 (si aucune)">
           </div>
         </div>
 
         <div class="form-row">
           <div class="form-group">
-            <label>Nom du Locataire <small style="color:#64748b; font-weight:normal;">(Optionnel si vacant)</small></label>
+            <label>Nom du Locataire <small style="color:#64748b; font-weight:normal;">(Optionnel si
+                vacant)</small></label>
             <input type="text" id="propTenantName" placeholder="Ex: Abdoulaye Ndiaye">
           </div>
           <div class="form-group">
-            <label>Numéro WhatsApp du Locataire <small style="color:#64748b; font-weight:normal;">(Optionnel)</small></label>
+            <label>Numéro WhatsApp du Locataire <small
+                style="color:#64748b; font-weight:normal;">(Optionnel)</small></label>
             <input type="text" id="propTenantPhone" placeholder="Ex: +221 77 123 45 67">
           </div>
         </div>
@@ -791,7 +833,8 @@
       <!-- FORMULAIRE 2 : CRÉATEUR D'IMMEUBLE ÉPURÉ ET SIMPLE -->
       <form id="formBuildingGenerator" style="display: none;" onsubmit="handleGenerateBuilding(event)">
         <div class="building-callout">
-          🏢 <strong>Gestionnaire d'Immeuble Simple :</strong> Indiquez le nom de l'immeuble, le nombre d'appartements et le loyer standard. Vous pouvez laisser les locataires vides et les renseigner plus tard.
+          🏢 <strong>Gestionnaire d'Immeuble Simple :</strong> Indiquez le nom de l'immeuble, le nombre d'appartements
+          et le loyer standard. Vous pouvez laisser les locataires vides et les renseigner plus tard.
         </div>
 
         <div class="form-row">
@@ -816,17 +859,21 @@
         <div class="form-row">
           <div class="form-group">
             <label>Nombre d'appartements <span style="color:#ef4444;">*</span></label>
-            <input type="number" id="bldUnitCount" min="1" max="24" placeholder="Ex: 4" onchange="renderBuildingUnitsSetup()" required>
+            <input type="number" id="bldUnitCount" min="1" max="24" placeholder="Ex: 4"
+              onchange="renderBuildingUnitsSetup()" required>
           </div>
           <div class="form-group">
             <label>Loyer standard par appartement (FCFA) <span style="color:#ef4444;">*</span></label>
-            <input type="number" id="bldDefaultRent" placeholder="Ex: 220000" onchange="renderBuildingUnitsSetup()" required>
+            <input type="number" id="bldDefaultRent" placeholder="Ex: 220000" onchange="renderBuildingUnitsSetup()"
+              required>
           </div>
         </div>
 
         <!-- ZONE INTERACTIVE : DÉTAIL DES LOCATAIRES (NON PRÉ-REMPLIS) -->
         <div class="form-group">
-          <label style="margin-top: 10px;">Locataires par appartement <small style="color:#64748b; font-weight:normal;">(Optionnel : laissez vide pour les appartements non loués)</small> :</label>
+          <label style="margin-top: 10px;">Locataires par appartement <small
+              style="color:#64748b; font-weight:normal;">(Optionnel : laissez vide pour les appartements non
+              loués)</small> :</label>
           <div class="building-units-setup-list" id="buildingUnitsSetupList">
             <!-- Rempli dynamiquement et sans aucun faux pré-remplissage -->
           </div>
@@ -849,7 +896,8 @@
   <!-- ============================================== -->
   <!-- BOUTON FLOTTANT D'AVIS CLIENT ($100M SERVICE CLIENT) -->
   <!-- ============================================== -->
-  <button class="btn-feedback-floating" onclick="openFeedbackModal()" title="Donner votre avis à Jean Philippe ou faire une suggestion">
+  <button class="btn-feedback-floating" onclick="openFeedbackModal()"
+    title="Donner votre avis à Jean Philippe ou faire une suggestion">
     <span class="fb-icon">💬</span>
     <span>Votre avis ?</span>
   </button>
@@ -858,17 +906,24 @@
   <div class="modal-overlay" id="feedbackModalOverlay" style="display: none;" onclick="closeModalOnBackdropFb(event)">
     <div class="modal-card feedback-modal-card">
       <button class="modal-close-btn" onclick="closeFeedbackModal()" title="Fermer">✕</button>
-      <span class="tag-live" style="background:#ecfdf5; color:#059669; border:1px solid #a7f3d0; margin-bottom:10px; display:inline-block;">🌟 Service Client Dédié</span>
-      <h3 style="font-size: 20px; font-weight: 800; color: var(--dark); margin-bottom: 6px;">Votre avis compte énormément ! 🇸🇳</h3>
+      <span class="tag-live"
+        style="background:#ecfdf5; color:#059669; border:1px solid #a7f3d0; margin-bottom:10px; display:inline-block;">🌟
+        Service Client Dédié</span>
+      <h3 style="font-size: 20px; font-weight: 800; color: var(--dark); margin-bottom: 6px;">Votre avis compte
+        énormément ! 🇸🇳</h3>
       <p style="font-size: 13px; color: var(--gray-600); line-height: 1.5; margin-bottom: 18px;">
-        Jean Philippe Gomis et l'équipe KeurGui lisent personnellement chaque suggestion pour bâtir l'outil idéal pour vos loyers.
+        Jean Philippe Gomis et l'équipe KeurGui lisent personnellement chaque suggestion pour bâtir l'outil idéal pour
+        vos loyers.
       </p>
 
       <form id="feedbackForm" onsubmit="handleFeedbackSubmit(event)">
         <div class="form-group">
-          <label style="font-size: 12px; font-weight: 700; color: var(--gray-600); margin-bottom: 6px; display:block;">Votre note globale :</label>
+          <label
+            style="font-size: 12px; font-weight: 700; color: var(--gray-600); margin-bottom: 6px; display:block;">Votre
+            note globale :</label>
           <div class="rating-stars-row" id="ratingStarsRow">
-            <button type="button" class="star-rating-pill active" onclick="selectRating(5, this)">⭐️⭐️⭐️⭐️⭐️ (Excellent)</button>
+            <button type="button" class="star-rating-pill active" onclick="selectRating(5, this)">⭐️⭐️⭐️⭐️⭐️
+              (Excellent)</button>
             <button type="button" class="star-rating-pill" onclick="selectRating(4, this)">⭐️⭐️⭐️⭐️ (Très bien)</button>
             <button type="button" class="star-rating-pill" onclick="selectRating(3, this)">⭐️⭐️⭐️ (Moyen)</button>
           </div>
@@ -876,15 +931,22 @@
         </div>
 
         <div class="form-group" style="margin-top: 14px;">
-          <label style="font-size: 12px; font-weight: 700; color: var(--gray-600); margin-bottom: 6px; display:block;">Une suggestion, un besoin ou une remarque ?</label>
-          <textarea id="feedbackComment" rows="3" class="search-input" style="width:100%; height:auto; border-radius:10px; padding:12px; font-family:inherit; font-size:13px;" placeholder="Ex: J'aimerais pouvoir ajouter des photos des compteurs Senelec/Sde, ou partager le récapitulatif par email..." required></textarea>
+          <label
+            style="font-size: 12px; font-weight: 700; color: var(--gray-600); margin-bottom: 6px; display:block;">Une
+            suggestion, un besoin ou une remarque ?</label>
+          <textarea id="feedbackComment" rows="3" class="search-input"
+            style="width:100%; height:auto; border-radius:10px; padding:12px; font-family:inherit; font-size:13px;"
+            placeholder="Ex: J'aimerais pouvoir ajouter des photos des compteurs Senelec/Sde, ou partager le récapitulatif par email..."
+            required></textarea>
         </div>
 
         <div class="modal-actions" style="margin-top: 18px; display: flex; gap: 10px; flex-wrap: wrap;">
-          <button type="submit" class="btn btn-primary" id="btnSendFeedback" style="flex: 1; justify-content: center; background: #059669;">
+          <button type="submit" class="btn btn-primary" id="btnSendFeedback"
+            style="flex: 1; justify-content: center; background: #059669;">
             <span>Envoyer mon avis à Jean Philippe 💬</span>
           </button>
-          <button type="button" class="btn" onclick="sendFeedbackWhatsAppDirect()" style="background:#25D366; color:#ffffff; font-weight:800; border-radius:12px; padding:10px 16px; border:none; display:inline-flex; align-items:center; gap:6px; cursor:pointer;">
+          <button type="button" class="btn" onclick="sendFeedbackWhatsAppDirect()"
+            style="background:#25D366; color:#ffffff; font-weight:800; border-radius:12px; padding:10px 16px; border:none; display:inline-flex; align-items:center; gap:6px; cursor:pointer;">
             <span>Écrire sur WhatsApp 📲</span>
           </button>
         </div>
@@ -900,18 +962,23 @@
     <div class="modal-quick-box" style="max-width: 400px; text-align: center;">
       <button class="modal-close-btn" onclick="closePwaIosModalDirect()">✕</button>
       <div style="font-size: 36px; margin-bottom: 6px;">📲</div>
-      <h3 style="font-size: 17px; margin-bottom: 8px; color: #0f172a; font-weight: 800;">Installer KeurGui sur votre iPhone</h3>
+      <h3 style="font-size: 17px; margin-bottom: 8px; color: #0f172a; font-weight: 800;">Installer KeurGui sur votre
+        iPhone</h3>
       <p style="font-size: 13px; color: #64748b; line-height: 1.5; margin-bottom: 16px;">
         Ajoutez l'icône officielle KeurGui sur votre écran d'accueil en 2 étapes très simples :
       </p>
-      
-      <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px; text-align: left; font-size: 13px; margin-bottom: 18px; line-height: 1.5;">
+
+      <div
+        style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px; text-align: left; font-size: 13px; margin-bottom: 18px; line-height: 1.5;">
         <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
-          <span style="background: #ecfdf5; color: #059669; font-weight: 800; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0;">1</span>
-          <span>Touchez le bouton <strong>Partager</strong> en bas de Safari (l'icône rectangle avec flèche vers le haut ⎋).</span>
+          <span
+            style="background: #ecfdf5; color: #059669; font-weight: 800; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0;">1</span>
+          <span>Touchez le bouton <strong>Partager</strong> en bas de Safari (l'icône rectangle avec flèche vers le haut
+            ⎋).</span>
         </div>
         <div style="display: flex; align-items: center; gap: 10px;">
-          <span style="background: #ecfdf5; color: #059669; font-weight: 800; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0;">2</span>
+          <span
+            style="background: #ecfdf5; color: #059669; font-weight: 800; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0;">2</span>
           <span>Faites défiler vers le bas et sélectionnez <strong>« Sur l'écran d'accueil »</strong> (➕).</span>
         </div>
       </div>
@@ -924,4 +991,5 @@
 
   <script src="app.js"></script>
 </body>
+
 </html>
