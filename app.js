@@ -1635,3 +1635,75 @@ VDN Sacré-Cœur 3, Dakar • +221 78 818 21 04`;
   window.open(url, '_blank');
 }
 
+// ===================================================
+// GESTION BANNIÈRE PWA : INSTALLATION SMARTPHONE 1-CLIC
+// ===================================================
+let deferredPwaPrompt = null;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPwaPrompt = e;
+  const dismissed = localStorage.getItem('keurgui_pwa_dismissed');
+  if (!dismissed) {
+    const banner = document.getElementById('pwaInstallBanner');
+    if (banner) banner.style.display = 'block';
+  }
+});
+
+window.addEventListener('DOMContentLoaded', () => {
+  // Détection iOS (Safari) pour proposer l'installation à l'écran d'accueil
+  const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  const isStandalone = window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
+  const dismissed = localStorage.getItem('keurgui_pwa_dismissed');
+  
+  if (isIos && !isStandalone && !dismissed) {
+    setTimeout(() => {
+      const banner = document.getElementById('pwaInstallBanner');
+      if (banner) banner.style.display = 'block';
+    }, 1500);
+  }
+});
+
+function triggerPwaInstall() {
+  if (deferredPwaPrompt) {
+    deferredPwaPrompt.prompt();
+    deferredPwaPrompt.userChoice.then((choiceResult) => {
+      if (choiceResult.outcome === 'accepted') {
+        showToast("Félicitations ! KeurGui a été ajouté à votre écran d'accueil.", "success");
+        dismissPwaBanner();
+      }
+      deferredPwaPrompt = null;
+    });
+  } else {
+    const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+    if (isIos) {
+      openPwaIosModal();
+    } else {
+      showToast("Pour installer : ouvrez le menu de votre navigateur (⋮) puis cliquez sur 'Ajouter à l'écran d'accueil'.", "info");
+    }
+  }
+}
+
+function dismissPwaBanner() {
+  const banner = document.getElementById('pwaInstallBanner');
+  if (banner) banner.style.display = 'none';
+  localStorage.setItem('keurgui_pwa_dismissed', 'true');
+}
+
+function openPwaIosModal() {
+  const modal = document.getElementById('pwaIosModal');
+  if (modal) modal.style.display = 'flex';
+}
+
+function closePwaIosModalDirect() {
+  const modal = document.getElementById('pwaIosModal');
+  if (modal) modal.style.display = 'none';
+}
+
+function closePwaIosModal(e) {
+  if (e.target.id === 'pwaIosModal') {
+    closePwaIosModalDirect();
+  }
+}
+
+
