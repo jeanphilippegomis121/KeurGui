@@ -174,82 +174,154 @@
               </div>
             </div>
 
-            <!-- Application Top Bar -->
-            <div class="app-screen-header">
-              <div class="app-brand-mini">
-                <strong>KeurGui • Résidence Teranga</strong>
-                <small>Dakar • Mermoz</small>
+            <!-- HEADER RÉEL DU DASHBOARD KEURGUI -->
+            <div class="phone-dash-header">
+              <div class="phone-dash-brand">
+                <img src="logo-banner.png" alt="KeurGui" class="phone-dash-logo">
+                <span class="phone-dash-pill">🇸🇳 Dakar</span>
               </div>
-              <div class="app-notif-btn">
-                🔔
-              </div>
-            </div>
-
-            <!-- JAUGES CIRCULAIRES DE RECOUVREMENT (COMME LA BANNIÈRE) -->
-            <div class="screen-gauges-row">
-              <div class="gauge-card">
-                <div class="gauge-svg-wrapper">
-                  <svg class="gauge-svg" viewBox="0 0 64 64">
-                    <circle class="gauge-track" cx="32" cy="32" r="26"></circle>
-                    <circle class="gauge-bar-green" cx="32" cy="32" r="26"></circle>
-                  </svg>
-                  <span class="gauge-label-inner">100%</span>
-                </div>
-                <span class="gauge-title">Loyers Teranga</span>
-                <span class="gauge-sub">Tous encaissés</span>
-              </div>
-
-              <div class="gauge-card">
-                <div class="gauge-svg-wrapper">
-                  <svg class="gauge-svg" viewBox="0 0 64 64">
-                    <circle class="gauge-track" cx="32" cy="32" r="26"></circle>
-                    <circle class="gauge-bar-emerald" cx="32" cy="32" r="26"></circle>
-                  </svg>
-                  <span class="gauge-label-inner">60%</span>
-                </div>
-                <span class="gauge-title">Mois en cours</span>
-                <span class="gauge-sub">1 850 000 F</span>
+              <div class="phone-dash-profile">
+                <span class="phone-user-chip">Jean Philippe</span>
+                <div class="phone-user-avatar">JP</div>
               </div>
             </div>
 
-            <!-- LISTE DES LOCATAIRES RÉELS AVEC BADGE VERT PAYÉ -->
-            <div class="screen-payments-list">
-              <div class="screen-section-title">
-                <span>Règlements Récents</span>
-                <span style="color:var(--emerald-bright); font-size:10px;">Octobre 2026</span>
+            <!-- DASHBOARD VIEWPORT (SCROLLABLE & ULTRA-RÉALISTE) -->
+            <div class="phone-dash-viewport">
+
+              <!-- BARRE DE PÉRIODE MENSUELLE (MOTEUR CALENDRIER KEURGUI) -->
+              <div class="phone-period-bar">
+                <div class="phone-period-ctrls">
+                  <span class="p-arrow">◀</span>
+                  <span class="p-active-month">📅 Octobre 2026</span>
+                  <span class="p-arrow">▶</span>
+                </div>
+                <span class="p-today-badge">Ce mois-ci</span>
               </div>
 
-              <div class="unit-pay-row">
-                <div class="unit-info">
-                  <span class="unit-name">🚪 Appt 3B — Moussa Diop</span>
-                  <span class="unit-meta">250 000 FCFA • Wave</span>
+              <!-- LES 3 VRAIES STAT CARDS OFFICIELLES KEURGUI -->
+              <div class="phone-stats-cards">
+                <!-- Stat 1 : Encaissé -->
+                <div class="p-stat-card p-stat-success">
+                  <div class="p-stat-top">
+                    <span class="p-stat-title">Encaissé ce mois</span>
+                    <span class="p-stat-icon">💰</span>
+                  </div>
+                  <div class="p-stat-num">1 850 000 FCFA</div>
+                  <span class="p-stat-sub">↑ 5 loyers encaissés</span>
                 </div>
-                <span class="unit-badge-paye">✓ Payé</span>
+
+                <!-- Stat 2 : Reste à Encaisser -->
+                <div class="p-stat-card p-stat-warning">
+                  <div class="p-stat-top">
+                    <span class="p-stat-title">Reste à Encaisser</span>
+                    <span class="p-stat-icon">⏳</span>
+                  </div>
+                  <div class="p-stat-num">250 000 FCFA</div>
+                  <span class="p-stat-sub">⚠️ 1 en retard</span>
+                </div>
+
+                <!-- Stat 3 : Taux de Recouvrement -->
+                <div class="p-stat-card p-stat-rate">
+                  <div class="p-stat-top">
+                    <span class="p-stat-title">Taux de Recouvrement</span>
+                    <span class="p-stat-rate-val">88%</span>
+                  </div>
+                  <div class="p-rate-track">
+                    <div class="p-rate-fill" style="width: 88%;"></div>
+                  </div>
+                </div>
               </div>
 
-              <div class="unit-pay-row">
-                <div class="unit-info">
-                  <span class="unit-name">🚪 Villa 12 — Awa Fall</span>
-                  <span class="unit-meta">450 000 FCFA • Orange Money</span>
-                </div>
-                <span class="unit-badge-paye">✓ Payé</span>
+              <!-- ONGLETS DE FILTRES OFFICIELS -->
+              <div class="phone-filter-bar">
+                <span class="p-filter-pill active">Tous (6)</span>
+                <span class="p-filter-pill">Payés (5)</span>
+                <span class="p-filter-pill">En attente (1)</span>
               </div>
 
-              <div class="unit-pay-row">
-                <div class="unit-info">
-                  <span class="unit-name">🚪 Studio 1A — Ibrahima Sow</span>
-                  <span class="unit-meta">180 000 FCFA • Wave</span>
+              <!-- VRAI IMMEUBLE 1 : RÉSIDENCE TERANGA (MERMOZ) -->
+              <div class="phone-building-box">
+                <div class="phone-bld-header">
+                  <div>
+                    <div class="p-bld-title">🏢 Résidence Teranga</div>
+                    <small class="p-bld-loc">📍 Mermoz • 4 logements</small>
+                  </div>
+                  <span class="p-bld-chip-ok">✓ Tous payés</span>
                 </div>
-                <span class="unit-badge-paye">✓ Payé</span>
+
+                <div class="phone-bld-units">
+                  <div class="phone-unit-row">
+                    <div class="p-u-info">
+                      <strong>Appt 1A • Moussa Diop</strong>
+                      <span class="p-u-rent">250 000 FCFA</span>
+                      <span class="p-u-badge-wave">🌊 Wave • 17/10</span>
+                    </div>
+                    <div class="p-u-actions">
+                      <span class="p-btn-pdf">📄 Quittance</span>
+                      <span class="p-btn-wa">💬 WhatsApp</span>
+                    </div>
+                  </div>
+
+                  <div class="phone-unit-row">
+                    <div class="p-u-info">
+                      <strong>Appt 1B • Aïssatou Ndiaye</strong>
+                      <span class="p-u-rent">240 000 FCFA</span>
+                      <span class="p-u-badge-om">🟠 OM • 16/10</span>
+                    </div>
+                    <div class="p-u-actions">
+                      <span class="p-btn-pdf">📄 Quittance</span>
+                      <span class="p-btn-wa">💬 WhatsApp</span>
+                    </div>
+                  </div>
+
+                  <div class="phone-unit-row">
+                    <div class="p-u-info">
+                      <strong>Appt 2A • Cheikh T. Sy</strong>
+                      <span class="p-u-rent">250 000 FCFA</span>
+                      <span class="p-u-badge-wave">🌊 Wave • 18/10</span>
+                    </div>
+                    <div class="p-u-actions">
+                      <span class="p-btn-pdf">📄 Quittance</span>
+                      <span class="p-btn-wa">💬 WhatsApp</span>
+                    </div>
+                  </div>
+                </div>
               </div>
+
+              <!-- VRAI IMMEUBLE 2 : IMMEUBLE HORIZON (PLATEAU) -->
+              <div class="phone-building-box">
+                <div class="phone-bld-header">
+                  <div>
+                    <div class="p-bld-title">🏢 Immeuble Horizon</div>
+                    <small class="p-bld-loc">📍 Plateau • 2 logements</small>
+                  </div>
+                  <span class="p-bld-chip-warn">⏳ 1 en attente</span>
+                </div>
+
+                <div class="phone-bld-units">
+                  <div class="phone-unit-row p-unit-late">
+                    <div class="p-u-info">
+                      <strong>Appt 4A • Mamadou Diallo</strong>
+                      <span class="p-u-rent">250 000 FCFA</span>
+                      <span class="p-u-badge-late">⏳ En attente de loyer</span>
+                    </div>
+                    <div class="p-u-actions">
+                      <span class="p-btn-collect">💰 Encaisser</span>
+                      <span class="p-btn-remind">🔔 Relance</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
             </div>
 
-            <!-- Bottom Navigation Bar -->
+            <!-- BARRE DE NAVIGATION INFÉRIEURE -->
             <div class="iphone-bottom-nav">
-              <span class="bottom-tab-active">🏠</span>
-              <span>🏢</span>
-              <span>📄</span>
-              <span>👤</span>
+              <span class="bottom-tab-active">🏠 Dashboard</span>
+              <span>🏢 Lots</span>
+              <span>📄 Quittances</span>
+              <span>👤 Agence</span>
             </div>
             <div class="home-bar"></div>
 

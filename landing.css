@@ -499,203 +499,401 @@ a {
   font-size: 10px;
 }
 
+/* ===================================================
+   VRAI DASHBOARD KEURGUI DANS L'ÉCRAN DE L'IPHONE
+   =================================================== */
+
 /* Header Application dans le Phone */
-.app-screen-header {
-  padding: 10px 16px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-.app-brand-mini {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.app-brand-mini strong {
-  font-size: 15px;
-  color: #ffffff;
-  letter-spacing: -0.3px;
-}
-
-.app-brand-mini small {
-  display: block;
-  font-size: 10px;
-  color: var(--emerald-bright);
-}
-
-.app-notif-btn {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  position: relative;
-}
-
-.app-notif-btn::after {
-  content: '';
-  position: absolute;
-  top: 4px;
-  right: 4px;
-  width: 6px;
-  height: 6px;
-  background: var(--emerald-bright);
-  border-radius: 50%;
-}
-
-/* Jauges circulaires du Phone (Inspirées de la bannière) */
-.screen-gauges-row {
-  padding: 14px 16px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  background: rgba(0, 0, 0, 0.25);
-}
-
-.gauge-card {
-  background: rgba(16, 38, 30, 0.6);
-  border: 1px solid rgba(0, 230, 118, 0.2);
-  border-radius: 14px;
-  padding: 10px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-}
-
-.gauge-svg-wrapper {
-  position: relative;
-  width: 64px;
-  height: 64px;
-  margin-bottom: 6px;
-}
-
-.gauge-svg {
-  width: 64px;
-  height: 64px;
-  transform: rotate(-90deg);
-}
-
-.gauge-track {
-  fill: none;
-  stroke: rgba(255, 255, 255, 0.08);
-  stroke-width: 6;
-}
-
-.gauge-bar-green {
-  fill: none;
-  stroke: var(--emerald-bright);
-  stroke-width: 6;
-  stroke-linecap: round;
-  stroke-dasharray: 163;
-  stroke-dashoffset: 0;
-  filter: drop-shadow(0 0 4px var(--emerald-bright));
-}
-
-.gauge-bar-emerald {
-  fill: none;
-  stroke: #10b981;
-  stroke-width: 6;
-  stroke-linecap: round;
-  stroke-dasharray: 163;
-  stroke-dashoffset: 65;
-}
-
-.gauge-label-inner {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 13px;
-  font-weight: 800;
-  color: #ffffff;
-}
-
-.gauge-title {
-  font-size: 10px;
-  color: #94a3b8;
-  font-weight: 600;
-}
-
-.gauge-sub {
-  font-size: 10px;
-  color: var(--emerald-bright);
-  font-weight: 700;
-}
-
-/* Liste des règlements dans le Phone */
-.screen-payments-list {
-  flex: 1;
-  padding: 10px 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  overflow: hidden;
-}
-
-.screen-section-title {
-  font-size: 11px;
-  font-weight: 800;
-  color: #94a3b8;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.unit-pay-row {
-  background: rgba(18, 38, 31, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 12px;
+.phone-dash-header {
   padding: 8px 12px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.35);
 }
 
-.unit-info {
+.phone-dash-brand {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.phone-dash-logo {
+  height: 20px;
+  width: auto;
+  border-radius: 4px;
+}
+
+.phone-dash-pill {
+  background: rgba(0, 230, 118, 0.15);
+  border: 1px solid rgba(0, 230, 118, 0.3);
+  color: var(--emerald-bright);
+  font-size: 8px;
+  font-weight: 800;
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+.phone-dash-profile {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.phone-user-chip {
+  font-size: 9px;
+  color: #cbd5e1;
+  font-weight: 600;
+}
+
+.phone-user-avatar {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #064e3b;
+  border: 1px solid #10b981;
+  color: #34d399;
+  font-size: 9px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Viewport défilant du Phone */
+.phone-dash-viewport {
+  flex: 1;
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(16, 185, 129, 0.3) transparent;
+}
+
+.phone-dash-viewport::-webkit-scrollbar {
+  width: 3px;
+}
+
+.phone-dash-viewport::-webkit-scrollbar-thumb {
+  background: rgba(16, 185, 129, 0.3);
+  border-radius: 4px;
+}
+
+/* Barre de Période (Moteur Calendrier) */
+.phone-period-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(6, 26, 20, 0.85);
+  border: 1px solid rgba(0, 230, 118, 0.3);
+  border-radius: 8px;
+  padding: 5px 8px;
+}
+
+.phone-period-ctrls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.p-arrow {
+  color: var(--emerald-bright);
+  font-size: 9px;
+  cursor: pointer;
+}
+
+.p-active-month {
+  color: #ffffff;
+  font-size: 9px;
+}
+
+.p-today-badge {
+  background: var(--emerald-bright);
+  color: #022c22;
+  font-size: 8px;
+  font-weight: 800;
+  padding: 2px 5px;
+  border-radius: 4px;
+}
+
+/* Cartes de Stats */
+.phone-stats-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.p-stat-card {
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 7px 8px;
   text-align: left;
 }
 
-.unit-name {
-  font-size: 11px;
-  font-weight: 700;
-  color: #ffffff;
-  display: block;
+.p-stat-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 8px;
+  color: #94a3b8;
+  font-weight: 600;
 }
 
-.unit-meta {
+.p-stat-icon {
   font-size: 10px;
+}
+
+.p-stat-num {
+  font-size: 12px;
+  font-weight: 900;
+  margin: 3px 0 1px 0;
+  letter-spacing: -0.3px;
+}
+
+.p-stat-sub {
+  font-size: 7.5px;
+  font-weight: 700;
+}
+
+.p-stat-success .p-stat-num {
+  color: #34d399;
+}
+
+.p-stat-success .p-stat-sub {
+  color: #34d399;
+}
+
+.p-stat-warning .p-stat-num {
+  color: #fbbf24;
+}
+
+.p-stat-warning .p-stat-sub {
+  color: #fbbf24;
+}
+
+.p-stat-rate {
+  grid-column: span 2;
+  background: rgba(6, 78, 59, 0.35);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+}
+
+.p-stat-rate-val {
+  font-size: 11px;
+  font-weight: 900;
+  color: #34d399;
+}
+
+.p-rate-track {
+  height: 5px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.p-rate-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981, #00e676);
+  border-radius: 999px;
+}
+
+/* Filtres */
+.phone-filter-bar {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  padding-bottom: 1px;
+}
+
+.p-filter-pill {
+  font-size: 8px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #94a3b8;
+  white-space: nowrap;
+}
+
+.p-filter-pill.active {
+  background: var(--emerald-bright);
+  color: #022c22;
+}
+
+/* Immeubles */
+.phone-building-box {
+  background: rgba(15, 23, 42, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 10px;
+  padding: 7px 8px;
+  text-align: left;
+}
+
+.phone-bld-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.p-bld-title {
+  font-size: 10px;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.p-bld-loc {
+  font-size: 8px;
   color: #94a3b8;
 }
 
-.unit-badge-paye {
-  background: rgba(0, 230, 118, 0.2);
-  border: 1px solid rgba(0, 230, 118, 0.4);
-  color: var(--emerald-bright);
-  font-size: 10px;
+.p-bld-chip-ok {
+  font-size: 7.5px;
   font-weight: 800;
-  padding: 3px 8px;
-  border-radius: 999px;
+  color: #34d399;
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+.p-bld-chip-warn {
+  font-size: 7.5px;
+  font-weight: 800;
+  color: #fbbf24;
+  background: rgba(245, 158, 11, 0.15);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+.phone-bld-units {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.phone-unit-row {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 6px;
+  padding: 5px 6px;
+}
+
+.p-u-info {
+  display: flex;
+  items-center;
+  justify-content: space-between;
+  gap: 3px;
+  flex-wrap: wrap;
+}
+
+.p-u-info strong {
+  font-size: 9px;
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.p-u-rent {
+  font-size: 8.5px;
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+.p-u-badge-wave {
+  font-size: 7.5px;
+  font-weight: 700;
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+
+.p-u-badge-om {
+  font-size: 7.5px;
+  font-weight: 700;
+  color: #fb923c;
+  background: rgba(251, 146, 60, 0.12);
+  border: 1px solid rgba(251, 146, 60, 0.3);
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+
+.p-u-badge-late {
+  font-size: 7.5px;
+  font-weight: 700;
+  color: #f87171;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+
+.p-u-actions {
+  display: flex;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.p-btn-pdf {
+  font-size: 7.5px;
+  font-weight: 700;
+  color: #ffffff;
+  background: #065f46;
+  padding: 2px 5px;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.p-btn-wa {
+  font-size: 7.5px;
+  font-weight: 700;
+  color: #ffffff;
+  background: #15803d;
+  padding: 2px 5px;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.p-btn-collect {
+  font-size: 7.5px;
+  font-weight: 700;
+  color: #ffffff;
+  background: #2563eb;
+  padding: 2px 5px;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.p-btn-remind {
+  font-size: 7.5px;
+  font-weight: 700;
+  color: #ffffff;
+  background: #d97706;
+  padding: 2px 5px;
+  border-radius: 3px;
+  cursor: pointer;
 }
 
 /* Barre de navigation basse dans le Phone */
 .iphone-bottom-nav {
-  padding: 8px 20px;
-  background: rgba(0, 0, 0, 0.6);
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 6px 14px;
+  background: rgba(0, 0, 0, 0.7);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 16px;
+  font-size: 9px;
+  font-weight: 700;
   color: #64748b;
 }
 
@@ -704,11 +902,11 @@ a {
 }
 
 .home-bar {
-  width: 100px;
+  width: 90px;
   height: 4px;
   background: rgba(255, 255, 255, 0.4);
   border-radius: 4px;
-  margin: 6px auto 2px auto;
+  margin: 4px auto 2px auto;
 }
 
 /* ===================================================

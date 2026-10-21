@@ -106,4 +106,14 @@
   - Call-to-action ultra-persuasif et engageant : *« ⚡ Réclamer mon accès gratuit à vie (12 places restantes) → »*.
   - Garanties concrètes : 0 engagement, 0 carte bancaire requise, configuration assistée par WhatsApp.
 
+### 5. 📱 Intégration du Vrai Dashboard KeurGui dans le Téléphone de la Vitrine
+- **Remplacement du mockup générique :** L'écran de l'iPhone 16 Pro intègre désormais la réplique exacte et fonctionnelle de l'application SaaS réelle KeurGui :
+  - En-tête avec logo officiel, profil de Jean Philippe et pastille Dakar.
+  - Barre de période dynamique avec sélecteur de mois (`◀ Octobre 2026 ▶ [Ce mois-ci]`).
+  - Les 3 cartes de statistiques clés réelles (Encaissé : 1 850 000 F, Reste : 250 000 F, Taux : 88%).
+  - Filtres par statut (`Tous (6)`, `Payés (5)`, `En attente (1)`).
+  - Lots réels des immeubles (*Résidence Teranga* et *Immeuble Horizon*) avec les vrais badges Wave, Orange Money, boutons de Quittance PDF et relances WhatsApp.
+  - Viewport scrollable fluide avec scrollbar discrète.
+
+
 
