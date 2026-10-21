@@ -7,16 +7,20 @@
   --primary: #10b981;
   --primary-hover: #059669;
   --primary-dark: #064e3b;
-  --dark-bg: #070d18;
-  --dark-surface: #0f172a;
-  --dark-card: #131c31;
+  --emerald-bright: #00e676;
+  --emerald-glow: rgba(0, 230, 118, 0.28);
+  --dark-bg: #030a08;
+  --dark-surface: #061511;
+  --dark-card: #092019;
+  --dark-border: rgba(16, 185, 129, 0.22);
   --gray-100: #f1f5f9;
   --gray-200: #e2e8f0;
   --gray-400: #94a3b8;
   --gray-600: #475569;
   --gray-800: #1e293b;
   --gold: #f59e0b;
-  --wave-blue: #0284c7;
+  --wave-blue: #00b2ff;
+  --orange-money: #ff7900;
   --radius-md: 14px;
   --radius-lg: 24px;
   --radius-xl: 32px;
@@ -138,82 +142,221 @@ a {
 }
 
 /* ===================================================
-   HERO SECTION
+   HERO SECTION — DARK LUXURY PROPTECH (INSPIRÉ DE LA BANNIÈRE)
    =================================================== */
 .hero-section {
   position: relative;
-  padding: 80px 0 100px 0;
+  padding: 60px 0 100px 0;
   text-align: center;
   overflow: hidden;
+  background: radial-gradient(circle at 50% 20%, #061c16 0%, #030a08 75%);
+}
+
+/* Grille & Tracés d'architecture (Blueprint subtil) */
+.hero-blueprint-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(circle at 50% 30%, rgba(0, 230, 118, 0.12) 0%, transparent 60%),
+    linear-gradient(rgba(16, 185, 129, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(16, 185, 129, 0.04) 1px, transparent 1px);
+  background-size: 100% 100%, 48px 48px, 48px 48px;
+  pointer-events: none;
+  z-index: 0;
 }
 
 .hero-glow {
   position: absolute;
-  width: 500px;
-  height: 500px;
+  width: 600px;
+  height: 600px;
   border-radius: 50%;
-  filter: blur(120px);
+  filter: blur(140px);
   pointer-events: none;
   z-index: 0;
 }
 
 .hero-glow-1 {
-  background: radial-gradient(circle, rgba(16, 185, 129, 0.2) 0%, transparent 70%);
-  top: -100px;
+  background: radial-gradient(circle, rgba(0, 230, 118, 0.18) 0%, transparent 70%);
+  top: -120px;
   left: 50%;
   transform: translateX(-50%);
 }
 
 .hero-glow-2 {
-  background: radial-gradient(circle, rgba(245, 158, 11, 0.12) 0%, transparent 70%);
-  bottom: 0;
-  right: 10%;
+  background: radial-gradient(circle, rgba(0, 178, 255, 0.12) 0%, transparent 70%);
+  bottom: 10%;
+  right: 5%;
 }
 
 .hero-content {
   position: relative;
-  z-index: 1;
+  z-index: 2;
 }
 
-.badge-pill {
+/* BARRE DE RARETÉ & URGENCE ($100M OFFERS - ALEX HORMOZI) */
+.scarcity-hero-bar {
   display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(16, 185, 129, 0.1);
-  border: 1px solid rgba(16, 185, 129, 0.3);
-  padding: 6px 16px;
-  border-radius: 999px;
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--primary);
+  flex-direction: column;
+  background: rgba(6, 28, 22, 0.85);
+  border: 1px solid rgba(0, 230, 118, 0.35);
+  box-shadow: 0 8px 30px rgba(0, 230, 118, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  padding: 10px 20px;
+  border-radius: 16px;
   margin-bottom: 24px;
+  max-width: 580px;
+  width: 100%;
+  backdrop-filter: blur(12px);
+  animation: pulseBorder 3s infinite ease-in-out;
 }
 
-.badge-vip {
-  color: var(--gold);
+@keyframes pulseBorder {
+  0%, 100% { border-color: rgba(0, 230, 118, 0.35); box-shadow: 0 8px 30px rgba(0, 230, 118, 0.15); }
+  50% { border-color: rgba(0, 230, 118, 0.7); box-shadow: 0 8px 35px rgba(0, 230, 118, 0.3); }
 }
 
+.scarcity-hero-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 13px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.scarcity-fire-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #ffffff;
+  font-weight: 800;
+  letter-spacing: -0.2px;
+}
+
+.scarcity-pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--emerald-bright);
+  box-shadow: 0 0 10px var(--emerald-bright);
+  animation: blink 1.4s infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+.scarcity-highlight {
+  color: var(--emerald-bright);
+  font-weight: 800;
+}
+
+.scarcity-remaining-pill {
+  background: rgba(245, 158, 11, 0.18);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  color: #fbbf24;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.scarcity-track {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  overflow: hidden;
+  position: relative;
+}
+
+.scarcity-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981 0%, #00e676 70%, #f59e0b 100%);
+  border-radius: 999px;
+  position: relative;
+  transition: width 1s ease-out;
+}
+
+.scarcity-light-shimmer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.6) 50%, transparent 100%);
+  animation: shimmerMove 2.5s infinite;
+}
+
+@keyframes shimmerMove {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* TITRE HERO */
 .hero-title {
-  font-size: 52px;
+  font-size: 54px;
   font-weight: 900;
-  line-height: 1.15;
-  letter-spacing: -1.5px;
-  max-width: 900px;
-  margin: 0 auto 24px auto;
+  line-height: 1.14;
+  letter-spacing: -1.8px;
+  max-width: 950px;
+  margin: 0 auto 20px auto;
+  color: #ffffff;
 }
 
 .text-gradient {
-  background: linear-gradient(135deg, #10b981 0%, #34d399 50%, #f59e0b 100%);
+  background: linear-gradient(135deg, #00e676 0%, #10b981 40%, #34d399 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  display: inline-block;
+}
+
+/* CAPSULE PILL TAGS (REPRODUCTION BANNIÈRE) */
+.banner-pill-tags {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: rgba(6, 32, 24, 0.7);
+  border: 1px solid rgba(0, 230, 118, 0.4);
+  box-shadow: 0 4px 20px rgba(0, 230, 118, 0.12);
+  padding: 8px 22px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 auto 28px auto;
+  flex-wrap: wrap;
+}
+
+.bp-tag {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.bp-tag strong {
+  color: var(--emerald-bright);
+}
+
+.bp-dot {
+  color: var(--emerald-bright);
+  font-size: 14px;
+  opacity: 0.6;
 }
 
 .hero-sub {
   font-size: 18px;
-  color: var(--gray-400);
-  max-width: 680px;
+  color: #94a3b8;
+  max-width: 720px;
   margin: 0 auto 36px auto;
-  line-height: 1.7;
+  line-height: 1.65;
 }
 
 .hero-sub strong {
@@ -226,32 +369,40 @@ a {
   justify-content: center;
   gap: 16px;
   flex-wrap: wrap;
-  margin-bottom: 40px;
+  margin-bottom: 32px;
 }
 
 .btn-hero-primary {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-  color: #ffffff;
+  background: linear-gradient(135deg, #00e676 0%, #059669 100%);
+  color: #030a08;
   font-size: 16px;
-  padding: 16px 32px;
-  box-shadow: 0 10px 25px rgba(16, 185, 129, 0.35);
+  font-weight: 800;
+  padding: 16px 34px;
+  border-radius: 999px;
+  box-shadow: 0 10px 30px rgba(0, 230, 118, 0.35);
+  transition: all 0.25s ease;
 }
 
 .btn-hero-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 14px 30px rgba(16, 185, 129, 0.5);
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 15px 40px rgba(0, 230, 118, 0.5);
+  color: #000000;
 }
 
 .btn-hero-secondary {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   color: #ffffff;
   font-size: 15px;
+  font-weight: 700;
   padding: 16px 28px;
+  border-radius: 999px;
+  transition: all 0.2s ease;
 }
 
 .btn-hero-secondary:hover {
-  background: rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(0, 230, 118, 0.4);
 }
 
 .hero-trust-bar {
@@ -261,235 +412,687 @@ a {
   gap: 28px;
   flex-wrap: wrap;
   font-size: 13px;
-  color: var(--gray-400);
-  margin-bottom: 60px;
+  color: #94a3b8;
+  margin-bottom: 50px;
 }
 
 .trust-item {
   display: flex;
   align-items: center;
   gap: 8px;
-}
-
-/* ===================================================
-   MOCKUP DU TABLEAU DE BORD DANS LE HERO
-   =================================================== */
-.hero-mockup-wrapper {
-  position: relative;
-  max-width: 960px;
-  margin: 0 auto;
-  perspective: 1000px;
-}
-
-.mockup-frame {
-  background: #0f172a;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: var(--radius-lg);
-  box-shadow: 0 30px 80px -10px rgba(0, 0, 0, 0.8), 0 0 40px rgba(16, 185, 129, 0.15);
-  overflow: hidden;
-  text-align: left;
-}
-
-.mockup-header-dots {
-  background: #1e293b;
-  padding: 12px 18px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-}
-.dot-red { background: #ef4444; }
-.dot-yellow { background: #f59e0b; }
-.dot-green { background: #10b981; }
-
-.mockup-url {
-  font-size: 11px;
-  color: var(--gray-400);
-  margin-left: 10px;
-  background: rgba(0, 0, 0, 0.3);
-  padding: 3px 12px;
-  border-radius: 6px;
-  font-family: monospace;
-}
-
-.mockup-screen-preview {
-  padding: 24px;
-  background: #f8fafc;
-  color: var(--gray-800);
-}
-
-.preview-metric-row {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-  margin-bottom: 20px;
-}
-
-.p-card {
-  background: #ffffff;
-  padding: 16px;
-  border-radius: 12px;
-  border: 1px solid var(--gray-200);
-  display: flex;
-  flex-direction: column;
-}
-
-.p-card small {
-  font-size: 11px;
-  color: var(--gray-400);
-  font-weight: 700;
-  text-transform: uppercase;
-}
-
-.p-card strong {
-  font-size: 20px;
-  font-weight: 800;
-  color: var(--dark-surface);
-  margin: 4px 0;
-}
-
-.p-tag {
-  font-size: 10px;
-  font-weight: 700;
-  color: #059669;
-  background: #ecfdf5;
-  padding: 2px 6px;
-  border-radius: 4px;
-  align-self: flex-start;
-}
-
-.p-tag-warn {
-  font-size: 10px;
-  font-weight: 700;
-  color: #b45309;
-  background: #fef3c7;
-  padding: 2px 6px;
-  border-radius: 4px;
-  align-self: flex-start;
-}
-
-.p-tag-info {
-  font-size: 10px;
-  font-weight: 700;
-  color: #0284c7;
-  background: #e0f2fe;
-  padding: 2px 6px;
-  border-radius: 4px;
-  align-self: flex-start;
-}
-
-.preview-building-box {
-  background: #ffffff;
-  border-radius: 12px;
-  border: 1px solid var(--gray-200);
-  overflow: hidden;
-}
-
-.p-bld-header {
-  padding: 12px 18px;
-  border-bottom: 1px solid var(--gray-200);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.p-bld-header h4 {
-  font-size: 14px;
-  font-weight: 800;
-  color: var(--dark-surface);
-}
-
-.p-bld-header small {
-  font-size: 11px;
-  color: var(--gray-400);
-}
-
-.badge-success-pill {
-  font-size: 10px;
-  font-weight: 700;
-  background: #ecfdf5;
-  color: #059669;
-  padding: 3px 8px;
-  border-radius: 999px;
-}
-
-.p-unit-row {
-  padding: 12px 18px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 12px;
-}
-
-.p-badge-wave {
-  background: #e0f2fe;
-  color: #0284c7;
-  padding: 3px 8px;
-  border-radius: 999px;
-  font-weight: 700;
-}
-
-.p-btn-receipt {
-  background: var(--dark-surface);
-  color: white;
-  padding: 4px 10px;
-  border-radius: 6px;
-  font-size: 11px;
-  font-weight: 700;
-}
-
-/* Badges Flottants */
-.floating-badge {
-  position: absolute;
-  background: rgba(15, 23, 42, 0.95);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 16px;
-  padding: 12px 18px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
-  text-align: left;
-  animation: float 4s ease-in-out infinite alternate;
-}
-
-.badge-receipt {
-  top: 15%;
-  left: -40px;
-}
-
-.badge-wave {
-  bottom: 10%;
-  right: -40px;
-  animation-delay: 2s;
-}
-
-.fl-icon {
-  font-size: 26px;
-}
-
-.floating-badge strong {
-  display: block;
-  font-size: 13px;
-  color: #ffffff;
-}
-
-.floating-badge small {
-  font-size: 11px;
-  color: var(--primary);
   font-weight: 600;
 }
 
-@keyframes float {
+/* ===================================================
+   MOCKUP SMARTPHONE 3D & SATELLITES FLOTTANTS (BANNIÈRE)
+   =================================================== */
+.hero-showcase-stage {
+  position: relative;
+  max-width: 900px;
+  margin: 0 auto;
+  perspective: 1200px;
+  padding: 40px 20px 20px 20px;
+}
+
+/* L'iPhone Titanium en 3D */
+.iphone-device {
+  width: 320px;
+  height: 640px;
+  margin: 0 auto;
+  background: #091210;
+  border-radius: 46px;
+  padding: 10px;
+  box-shadow: 
+    0 0 0 3px #1e3a31,
+    0 0 0 6px #0d1e18,
+    0 25px 70px rgba(0, 0, 0, 0.8),
+    0 0 60px rgba(0, 230, 118, 0.2);
+  position: relative;
+  z-index: 2;
+  transition: transform 0.4s ease;
+}
+
+.iphone-device:hover {
+  transform: translateY(-6px) rotateX(2deg);
+}
+
+.iphone-screen {
+  width: 100%;
+  height: 100%;
+  background: #06130f;
+  border-radius: 38px;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Status Bar & Dynamic Island */
+.iphone-status-bar {
+  padding: 12px 20px 6px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: #ffffff;
+  position: relative;
+}
+
+.dynamic-island {
+  position: absolute;
+  top: 9px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 90px;
+  height: 22px;
+  background: #000000;
+  border-radius: 20px;
+  z-index: 10;
+}
+
+.status-icons {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+}
+
+/* Header Application dans le Phone */
+.app-screen-header {
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.app-brand-mini {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.app-brand-mini strong {
+  font-size: 15px;
+  color: #ffffff;
+  letter-spacing: -0.3px;
+}
+
+.app-brand-mini small {
+  display: block;
+  font-size: 10px;
+  color: var(--emerald-bright);
+}
+
+.app-notif-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  position: relative;
+}
+
+.app-notif-btn::after {
+  content: '';
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 6px;
+  height: 6px;
+  background: var(--emerald-bright);
+  border-radius: 50%;
+}
+
+/* Jauges circulaires du Phone (Inspirées de la bannière) */
+.screen-gauges-row {
+  padding: 14px 16px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.gauge-card {
+  background: rgba(16, 38, 30, 0.6);
+  border: 1px solid rgba(0, 230, 118, 0.2);
+  border-radius: 14px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.gauge-svg-wrapper {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  margin-bottom: 6px;
+}
+
+.gauge-svg {
+  width: 64px;
+  height: 64px;
+  transform: rotate(-90deg);
+}
+
+.gauge-track {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.08);
+  stroke-width: 6;
+}
+
+.gauge-bar-green {
+  fill: none;
+  stroke: var(--emerald-bright);
+  stroke-width: 6;
+  stroke-linecap: round;
+  stroke-dasharray: 163;
+  stroke-dashoffset: 0;
+  filter: drop-shadow(0 0 4px var(--emerald-bright));
+}
+
+.gauge-bar-emerald {
+  fill: none;
+  stroke: #10b981;
+  stroke-width: 6;
+  stroke-linecap: round;
+  stroke-dasharray: 163;
+  stroke-dashoffset: 65;
+}
+
+.gauge-label-inner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 13px;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.gauge-title {
+  font-size: 10px;
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+.gauge-sub {
+  font-size: 10px;
+  color: var(--emerald-bright);
+  font-weight: 700;
+}
+
+/* Liste des règlements dans le Phone */
+.screen-payments-list {
+  flex: 1;
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow: hidden;
+}
+
+.screen-section-title {
+  font-size: 11px;
+  font-weight: 800;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.unit-pay-row {
+  background: rgba(18, 38, 31, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.unit-info {
+  text-align: left;
+}
+
+.unit-name {
+  font-size: 11px;
+  font-weight: 700;
+  color: #ffffff;
+  display: block;
+}
+
+.unit-meta {
+  font-size: 10px;
+  color: #94a3b8;
+}
+
+.unit-badge-paye {
+  background: rgba(0, 230, 118, 0.2);
+  border: 1px solid rgba(0, 230, 118, 0.4);
+  color: var(--emerald-bright);
+  font-size: 10px;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 999px;
+}
+
+/* Barre de navigation basse dans le Phone */
+.iphone-bottom-nav {
+  padding: 8px 20px;
+  background: rgba(0, 0, 0, 0.6);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 16px;
+  color: #64748b;
+}
+
+.bottom-tab-active {
+  color: var(--emerald-bright);
+}
+
+.home-bar {
+  width: 100px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 4px;
+  margin: 6px auto 2px auto;
+}
+
+/* ===================================================
+   SATELLITES 3D EN LÉVITATION (EXACTEMENT COMME LA BANNIÈRE)
+   =================================================== */
+
+/* Satellite 1 : Quittance PDF Générée */
+.sat-receipt-card {
+  position: absolute;
+  top: 18%;
+  left: 4%;
+  background: rgba(6, 26, 20, 0.88);
+  border: 1px solid rgba(0, 230, 118, 0.4);
+  border-radius: 18px;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  box-shadow: 
+    0 15px 40px rgba(0, 0, 0, 0.6),
+    0 0 25px rgba(0, 230, 118, 0.25);
+  backdrop-filter: blur(12px);
+  z-index: 3;
+  animation: floatSlow 5s ease-in-out infinite alternate;
+  text-align: left;
+}
+
+.sat-receipt-icon {
+  width: 44px;
+  height: 44px;
+  background: #ffffff;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+.sat-receipt-icon::after {
+  content: 'PDF';
+  font-size: 8px;
+  font-weight: 900;
+  color: #ef4444;
+  position: absolute;
+  bottom: 2px;
+}
+
+.sat-receipt-body strong {
+  display: block;
+  font-size: 13px;
+  color: #ffffff;
+  font-weight: 800;
+}
+
+.sat-receipt-body small {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--emerald-bright);
+  background: rgba(0, 230, 118, 0.15);
+  padding: 2px 8px;
+  border-radius: 4px;
+  margin-top: 3px;
+}
+
+/* Satellite 2 : Bouton WhatsApp Néon Pulsant */
+.sat-whatsapp-badge {
+  position: absolute;
+  bottom: 14%;
+  right: 6%;
+  background: rgba(6, 32, 24, 0.92);
+  border: 1px solid rgba(0, 230, 118, 0.5);
+  border-radius: 999px;
+  padding: 12px 22px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 
+    0 15px 40px rgba(0, 0, 0, 0.6),
+    0 0 30px rgba(37, 211, 102, 0.35);
+  backdrop-filter: blur(12px);
+  z-index: 3;
+  animation: floatMedium 4s ease-in-out infinite alternate 1s;
+}
+
+.sat-wa-icon {
+  width: 26px;
+  height: 26px;
+  background: #25d366;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: white;
+  box-shadow: 0 0 12px #25d366;
+}
+
+.sat-wa-text {
+  text-align: left;
+}
+
+.sat-wa-text strong {
+  display: block;
+  font-size: 13px;
+  color: #ffffff;
+  font-weight: 800;
+}
+
+.sat-wa-text small {
+  font-size: 10px;
+  color: var(--emerald-bright);
+  font-weight: 600;
+}
+
+/* Satellite 3 : Badge Wave & Orange Money */
+.sat-payment-pill {
+  position: absolute;
+  top: 10%;
+  right: 8%;
+  background: rgba(10, 30, 24, 0.85);
+  border: 1px solid rgba(0, 178, 255, 0.4);
+  border-radius: 14px;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(10px);
+  z-index: 3;
+  animation: floatFast 4.5s ease-in-out infinite alternate 0.5s;
+}
+
+.sat-pay-logo {
+  font-size: 18px;
+}
+
+.sat-pay-details {
+  text-align: left;
+}
+
+.sat-pay-details strong {
+  font-size: 12px;
+  color: #ffffff;
+  display: block;
+}
+
+.sat-pay-details small {
+  font-size: 10px;
+  color: #38bdf8;
+  font-weight: 700;
+}
+
+/* Satellite 4 : Checkmark émeraude 3D */
+.sat-check-3d {
+  position: absolute;
+  top: 48%;
+  right: 2%;
+  width: 44px;
+  height: 44px;
+  background: linear-gradient(135deg, #00e676 0%, #059669 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  color: #030a08;
+  font-weight: 900;
+  box-shadow: 0 0 25px rgba(0, 230, 118, 0.5);
+  z-index: 3;
+  animation: floatSlow 3.8s ease-in-out infinite alternate 1.5s;
+}
+
+/* Animations de lévitation */
+@keyframes floatSlow {
+  0% { transform: translateY(0) rotate(0deg); }
+  100% { transform: translateY(-14px) rotate(1deg); }
+}
+
+@keyframes floatMedium {
+  0% { transform: translateY(0) rotate(0deg); }
+  100% { transform: translateY(-18px) rotate(-1.5deg); }
+}
+
+@keyframes floatFast {
   0% { transform: translateY(0); }
-  100% { transform: translateY(-10px); }
+  100% { transform: translateY(-12px); }
+}
+
+/* ===================================================
+   SECTION VISUAL STORYTELLING (COMPRÉHENSION EN 3 SECONDES)
+   =================================================== */
+.section-visual-flow {
+  padding: 80px 0;
+  background: #020806;
+  position: relative;
+  border-top: 1px solid rgba(0, 230, 118, 0.15);
+  border-bottom: 1px solid rgba(0, 230, 118, 0.15);
+}
+
+.flow-header {
+  margin-bottom: 50px;
+}
+
+.flow-pill {
+  display: inline-block;
+  background: rgba(0, 230, 118, 0.12);
+  border: 1px solid rgba(0, 230, 118, 0.3);
+  color: var(--emerald-bright);
+  font-size: 11px;
+  font-weight: 800;
+  padding: 4px 14px;
+  border-radius: 999px;
+  margin-bottom: 12px;
+  letter-spacing: 0.5px;
+}
+
+.flow-steps-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.flow-step-card {
+  background: rgba(10, 28, 22, 0.7);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  border-radius: 20px;
+  padding: 28px 22px;
+  position: relative;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+  text-align: left;
+}
+
+.flow-step-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(0, 230, 118, 0.5);
+  box-shadow: 0 15px 35px rgba(0, 230, 118, 0.12);
+}
+
+.step-num {
+  font-size: 32px;
+  font-weight: 900;
+  color: rgba(255, 255, 255, 0.12);
+  position: absolute;
+  top: 18px;
+  right: 20px;
+}
+
+.step-visual-preview {
+  height: 110px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Step 1 Visual : Notification Wave */
+.mock-wave-alert {
+  background: #0284c7;
+  color: #ffffff;
+  padding: 12px 16px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  box-shadow: 0 8px 20px rgba(2, 132, 199, 0.35);
+  animation: pulseLight 2s infinite ease-in-out;
+}
+
+.m-wave-icon {
+  font-size: 22px;
+}
+
+.m-wave-txt strong {
+  font-size: 12px;
+  display: block;
+}
+
+.m-wave-txt small {
+  font-size: 11px;
+  opacity: 0.9;
+}
+
+/* Step 2 Visual : Quittance A4 Certifiée */
+.mock-a4-preview {
+  background: #ffffff;
+  color: #0f172a;
+  border-radius: 8px;
+  padding: 12px 14px;
+  width: 100%;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  position: relative;
+}
+
+.mock-a4-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 9px;
+  font-weight: 800;
+  color: #64748b;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 6px;
+  margin-bottom: 6px;
+}
+
+.stamp-green-mini {
+  background: #ecfdf5;
+  color: #059669;
+  border: 1px solid #10b981;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 8px;
+  font-weight: 900;
+}
+
+.mock-a4-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.a4-line {
+  height: 5px;
+  background: #e2e8f0;
+  border-radius: 3px;
+  width: 100%;
+}
+
+.a4-line.short {
+  width: 60%;
+}
+
+.a4-amount {
+  font-size: 13px;
+  font-weight: 900;
+  color: #059669;
+  margin-top: 4px;
+}
+
+/* Step 3 Visual : WhatsApp Bubble */
+.mock-wa-bubble {
+  background: #005c4b;
+  color: #ffffff;
+  border-radius: 12px 12px 2px 12px;
+  padding: 10px 14px;
+  width: 100%;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  text-align: left;
+}
+
+.wa-msg {
+  font-size: 11px;
+  line-height: 1.4;
+  margin-bottom: 6px;
+}
+
+.wa-file-pill {
+  background: rgba(0, 0, 0, 0.25);
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #a7f3d0;
+}
+
+.flow-step-card h3 {
+  font-size: 16px;
+  font-weight: 800;
+  color: #ffffff;
+  margin-bottom: 8px;
+}
+
+.flow-step-card p {
+  font-size: 13px;
+  color: #94a3b8;
+  line-height: 1.5;
 }
 
 /* ===================================================
@@ -497,7 +1100,7 @@ a {
    =================================================== */
 .section-comparison {
   padding: 100px 0;
-  background: #0a1120;
+  background: #040c0a;
 }
 
 .section-tag {
@@ -1203,4 +1806,109 @@ a {
     overflow-y: auto;
   }
 }
+
+/* ===================================================
+   WIDGETS DE RARETÉ & URGENCE VIP ($100M OFFERS)
+   =================================================== */
+.vip-scarcity-card {
+  background: rgba(6, 28, 22, 0.7);
+  border: 1px solid rgba(0, 230, 118, 0.35);
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 20px rgba(0, 230, 118, 0.1);
+}
+
+.vip-scarcity-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+
+.vip-scarcity-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.vip-scarcity-count {
+  font-weight: 800;
+  color: var(--emerald-bright);
+}
+
+.vip-scarcity-track {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.vip-scarcity-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981 0%, #00e676 70%, #f59e0b 100%);
+  border-radius: 999px;
+}
+
+.vip-scarcity-sub {
+  font-size: 11px;
+  color: #fbbf24;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.modal-scarcity-alert {
+  background: #fef3c7;
+  border: 1px solid #fde68a;
+  color: #92400e;
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+/* Responsive adjustments for 3D Phone & Showcase */
+@media (max-width: 900px) {
+  .hero-title {
+    font-size: 36px;
+    letter-spacing: -1px;
+  }
+  .flow-steps-grid {
+    grid-template-columns: 1fr;
+  }
+  .sat-receipt-card {
+    position: static;
+    margin: 0 auto 16px auto;
+    max-width: 280px;
+    animation: none;
+  }
+  .sat-whatsapp-badge {
+    position: static;
+    margin: 16px auto 0 auto;
+    max-width: 280px;
+    animation: none;
+  }
+  .sat-payment-pill, .sat-check-3d {
+    display: none;
+  }
+  .hero-showcase-stage {
+    padding: 20px 10px;
+  }
+  .iphone-device {
+    width: 290px;
+    height: 580px;
+  }
+}
+
 

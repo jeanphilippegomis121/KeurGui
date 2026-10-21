@@ -47,22 +47,44 @@
   </nav>
 
   <!-- HERO SECTION -->
+  <!-- HERO SECTION (INSPIRATION BANNIÈRE OFFICIELLE & DARK LUXURY PROPTECH) -->
   <header class="hero-section">
+    <div class="hero-blueprint-bg"></div>
     <div class="hero-glow hero-glow-1"></div>
     <div class="hero-glow hero-glow-2"></div>
     
     <div class="container hero-content">
-      <div class="badge-pill">
-        <span class="badge-flag">🇸🇳</span>
-        <span>Conçu pour Dakar & la Diaspora</span>
-        <span class="badge-dot">•</span>
-        <span class="badge-vip">50 places VIP offertes</span>
+
+      <!-- BARRE DE RARETÉ & URGENCE VIP ($100M OFFERS - ALEX HORMOZI) -->
+      <div class="scarcity-hero-bar">
+        <div class="scarcity-hero-info">
+          <span class="scarcity-fire-pill">
+            <span class="scarcity-pulse-dot"></span>
+            🔥 SPRINT PIONNIER : <span class="scarcity-highlight">38 / 50</span> PLACES VIP ATTRIBUÉES
+          </span>
+          <span class="scarcity-remaining-pill">Plus que 12 places gratuites à vie</span>
+        </div>
+        <div class="scarcity-track">
+          <div class="scarcity-fill" style="width: 76%;">
+            <span class="scarcity-light-shimmer"></span>
+          </div>
+        </div>
       </div>
 
+      <!-- TITRE OFFICIEL EXACT DE LA BANNIÈRE -->
       <h1 class="hero-title">
         La gestion de vos biens à Dakar,<br>
-        <span class="text-gradient">aussi simple qu'un message WhatsApp.</span>
+        <span class="text-gradient">aussi simple qu’un message WhatsApp.</span>
       </h1>
+
+      <!-- CAPSULE PILL TAGS OFFICIEL DE LA BANNIÈRE -->
+      <div class="banner-pill-tags">
+        <span class="bp-tag"><span class="bp-emoji">🏠</span> <strong>Suivi des loyers</strong></span>
+        <span class="bp-dot">•</span>
+        <span class="bp-tag"><span class="bp-emoji">📄</span> <strong>Quittances PDF</strong></span>
+        <span class="bp-dot">•</span>
+        <span class="bp-tag"><span class="bp-emoji">↗</span> <strong>Wave & Orange Money</strong></span>
+      </div>
 
       <p class="hero-sub">
         Fini le cahier d'écolier et les retards de loyer. Suivez vos encaissements Wave & Orange Money en direct, générez des <strong>quittances PDF officielles conformes</strong> en 1 clic et gardez une clarté totale sur vos immeubles.
@@ -71,7 +93,7 @@
       <div class="hero-cta-group">
         <button onclick="handleDemoAccessRequest()" class="btn btn-hero-primary">
           <span class="btn-icon">🚀</span>
-          <span>Essayer l'application (Démo interactive)</span>
+          <span>Tester l'application (Démo interactive)</span>
         </button>
         <a href="#vip" class="btn btn-hero-secondary">
           <span>Rejoindre les 50 testeurs VIP</span>
@@ -81,12 +103,16 @@
 
       <div class="hero-trust-bar">
         <div class="trust-item">
+          <span class="trust-icon">🇸🇳</span>
+          <span>Conçu pour Dakar & la Diaspora</span>
+        </div>
+        <div class="trust-item">
           <span class="trust-icon">⚖️</span>
           <span>Conforme Décret Loyers Sénégal</span>
         </div>
         <div class="trust-item">
           <span class="trust-icon">📄</span>
-          <span>Quittance PDF A4 en 1 seconde</span>
+          <span>Quittance PDF A4 certifiée en 1 clic</span>
         </div>
         <div class="trust-item">
           <span class="trust-icon">📱</span>
@@ -94,73 +120,214 @@
         </div>
       </div>
 
-      <!-- VISUEL HERO : MOCKUP FLOTTANT -->
-      <div class="hero-mockup-wrapper">
-        <div class="mockup-frame">
-          <div class="mockup-header-dots">
-            <span class="dot dot-red"></span>
-            <span class="dot dot-yellow"></span>
-            <span class="dot dot-green"></span>
-            <span class="mockup-url">keurgui.sn/tableau-de-bord</span>
-          </div>
+      <!-- VISUEL HERO : MOCKUP SMARTPHONE 3D & SATELLITES EN LÉVITATION -->
+      <div class="hero-showcase-stage">
 
-          <div class="mockup-screen-preview">
-            <div class="preview-metric-row">
-              <div class="p-card green">
-                <small>Total Encaissé (Mois)</small>
-                <strong>1 850 000 FCFA</strong>
-                <span class="p-tag">↑ 88% recouvré</span>
-              </div>
-              <div class="p-card orange">
-                <small>Reste à Encaisser</small>
-                <strong>250 000 FCFA</strong>
-                <span class="p-tag-warn">1 retard</span>
-              </div>
-              <div class="p-card blue">
-                <small>Commissions Agence</small>
-                <strong>185 000 FCFA</strong>
-                <span class="p-tag-info">Mode Agence actif</span>
+        <!-- Satellite 1 (Flottant à gauche) : Quittance PDF Générée -->
+        <div class="sat-receipt-card">
+          <div class="sat-receipt-icon">
+            📄
+          </div>
+          <div class="sat-receipt-body">
+            <strong>Quittance PDF générée</strong>
+            <small>✓ Format A4 Officiel</small>
+          </div>
+        </div>
+
+        <!-- Satellite 2 (Flottant à droite en bas) : WhatsApp Néon Pulsant -->
+        <div class="sat-whatsapp-badge">
+          <div class="sat-wa-icon">
+            💬
+          </div>
+          <div class="sat-wa-text">
+            <strong>WhatsApp direct</strong>
+            <small>Reçu transmis en 1 clic</small>
+          </div>
+        </div>
+
+        <!-- Satellite 3 (Flottant en haut à droite) : Paiement Wave & Orange Money -->
+        <div class="sat-payment-pill">
+          <span class="sat-pay-logo">🌊</span>
+          <div class="sat-pay-details">
+            <strong>+ 250 000 FCFA</strong>
+            <small>Reçu par Wave instantané</small>
+          </div>
+        </div>
+
+        <!-- Satellite 4 : Checkmark émeraude 3D -->
+        <div class="sat-check-3d">
+          ✓
+        </div>
+
+        <!-- SMARTPHONE TITANIUM 3D -->
+        <div class="iphone-device">
+          <div class="iphone-screen">
+
+            <!-- Status Bar & Dynamic Island -->
+            <div class="iphone-status-bar">
+              <span>9:41</span>
+              <div class="dynamic-island"></div>
+              <div class="status-icons">
+                <span>5G</span>
+                <span>📶</span>
+                <span>🔋</span>
               </div>
             </div>
 
-            <!-- Exemple de bloc Immeuble épuré -->
-            <div class="preview-building-box">
-              <div class="p-bld-header">
-                <div>
-                  <h4>🏢 Résidence Teranga • Mermoz</h4>
-                  <small>2 logements • 100% réglé ce mois</small>
+            <!-- Application Top Bar -->
+            <div class="app-screen-header">
+              <div class="app-brand-mini">
+                <strong>KeurGui • Résidence Teranga</strong>
+                <small>Dakar • Mermoz</small>
+              </div>
+              <div class="app-notif-btn">
+                🔔
+              </div>
+            </div>
+
+            <!-- JAUGES CIRCULAIRES DE RECOUVREMENT (COMME LA BANNIÈRE) -->
+            <div class="screen-gauges-row">
+              <div class="gauge-card">
+                <div class="gauge-svg-wrapper">
+                  <svg class="gauge-svg" viewBox="0 0 64 64">
+                    <circle class="gauge-track" cx="32" cy="32" r="26"></circle>
+                    <circle class="gauge-bar-green" cx="32" cy="32" r="26"></circle>
+                  </svg>
+                  <span class="gauge-label-inner">100%</span>
                 </div>
-                <span class="badge-success-pill">✓ Tous payés</span>
+                <span class="gauge-title">Loyers Teranga</span>
+                <span class="gauge-sub">Tous encaissés</span>
               </div>
-              <div class="p-unit-row">
-                <span>🚪 Appt 3B — Moussa Diop</span>
-                <span class="p-badge-wave">🌊 Wave • 250 000 FCFA</span>
-                <span class="p-btn-receipt">📄 Quittance PDF</span>
+
+              <div class="gauge-card">
+                <div class="gauge-svg-wrapper">
+                  <svg class="gauge-svg" viewBox="0 0 64 64">
+                    <circle class="gauge-track" cx="32" cy="32" r="26"></circle>
+                    <circle class="gauge-bar-emerald" cx="32" cy="32" r="26"></circle>
+                  </svg>
+                  <span class="gauge-label-inner">60%</span>
+                </div>
+                <span class="gauge-title">Mois en cours</span>
+                <span class="gauge-sub">1 850 000 F</span>
               </div>
             </div>
+
+            <!-- LISTE DES LOCATAIRES RÉELS AVEC BADGE VERT PAYÉ -->
+            <div class="screen-payments-list">
+              <div class="screen-section-title">
+                <span>Règlements Récents</span>
+                <span style="color:var(--emerald-bright); font-size:10px;">Octobre 2026</span>
+              </div>
+
+              <div class="unit-pay-row">
+                <div class="unit-info">
+                  <span class="unit-name">🚪 Appt 3B — Moussa Diop</span>
+                  <span class="unit-meta">250 000 FCFA • Wave</span>
+                </div>
+                <span class="unit-badge-paye">✓ Payé</span>
+              </div>
+
+              <div class="unit-pay-row">
+                <div class="unit-info">
+                  <span class="unit-name">🚪 Villa 12 — Awa Fall</span>
+                  <span class="unit-meta">450 000 FCFA • Orange Money</span>
+                </div>
+                <span class="unit-badge-paye">✓ Payé</span>
+              </div>
+
+              <div class="unit-pay-row">
+                <div class="unit-info">
+                  <span class="unit-name">🚪 Studio 1A — Ibrahima Sow</span>
+                  <span class="unit-meta">180 000 FCFA • Wave</span>
+                </div>
+                <span class="unit-badge-paye">✓ Payé</span>
+              </div>
+            </div>
+
+            <!-- Bottom Navigation Bar -->
+            <div class="iphone-bottom-nav">
+              <span class="bottom-tab-active">🏠</span>
+              <span>🏢</span>
+              <span>📄</span>
+              <span>👤</span>
+            </div>
+            <div class="home-bar"></div>
+
           </div>
         </div>
 
-        <!-- Badges flottants -->
-        <div class="floating-badge badge-receipt">
-          <span class="fl-icon">📄</span>
-          <div>
-            <strong>Quittance officielle</strong>
-            <small>Tampon vert "ACQUITTÉ"</small>
-          </div>
-        </div>
-
-        <div class="floating-badge badge-wave">
-          <span class="fl-icon">🌊</span>
-          <div>
-            <strong>Paiement Wave instantané</strong>
-            <small>Horodaté & sécurisé</small>
-          </div>
-        </div>
       </div>
 
     </div>
   </header>
+
+  <!-- ============================================== -->
+  <!-- SECTION VISUAL STORYTELLING (COMPRÉHENSION EN 3 SECONDES SANS LIRE) -->
+  <!-- ============================================== -->
+  <section class="section-visual-flow">
+    <div class="container">
+      <div class="flow-header text-center">
+        <span class="flow-pill">⚡ FLUIDITÉ ABSOLUE</span>
+        <h2>Comment KeurGui gère un loyer en 3 secondes chrono</h2>
+        <p>Même sans lire, tout est limpide : de la réception de l'argent jusqu'à la quittance remise à votre locataire.</p>
+      </div>
+
+      <div class="flow-steps-grid">
+        <!-- Étape 1 : Encaissement Mobile Money -->
+        <div class="flow-step-card">
+          <span class="step-num">01</span>
+          <div class="step-visual-preview">
+            <div class="mock-wave-alert">
+              <span class="m-wave-icon">🌊</span>
+              <div class="m-wave-txt">
+                <strong>Paiement reçu • Wave</strong>
+                <small>250 000 FCFA de Moussa Diop</small>
+              </div>
+              <span style="margin-left:auto; font-weight:800; font-size:14px;">✓</span>
+            </div>
+          </div>
+          <h3>1. Votre locataire règle par Wave ou Orange Money</h3>
+          <p>Dès que le loyer est versé, vous l'enregistrez d'un simple clic sur votre smartphone. Aucune saisie compliquée.</p>
+        </div>
+
+        <!-- Étape 2 : Quittance A4 Certifiée -->
+        <div class="flow-step-card">
+          <span class="step-num">02</span>
+          <div class="step-visual-preview">
+            <div class="mock-a4-preview">
+              <div class="mock-a4-top">
+                <span>RÉPUBLIQUE DU SÉNÉGAL • DAKAR</span>
+                <span class="stamp-green-mini">ACQUITTÉ</span>
+              </div>
+              <div class="mock-a4-lines">
+                <div class="a4-line"></div>
+                <div class="a4-line short"></div>
+              </div>
+              <div class="a4-amount">250 000 FCFA</div>
+            </div>
+          </div>
+          <h3>2. La quittance officielle A4 est générée immédiatement</h3>
+          <p>Montant converti automatiquement en toutes lettres en FCFA, référence légale sénégalaise et tampon vert infalsifiable.</p>
+        </div>
+
+        <!-- Étape 3 : WhatsApp Direct -->
+        <div class="flow-step-card">
+          <span class="step-num">03</span>
+          <div class="step-visual-preview">
+            <div class="mock-wa-bubble">
+              <div class="wa-msg">« Bonjour Moussa, voici votre quittance officielle du mois. Merci pour votre ponctualité ! »</div>
+              <div class="wa-file-pill">
+                <span>📑</span>
+                <span>Quittance_Moussa_Diop_Oct2026.pdf</span>
+              </div>
+            </div>
+          </div>
+          <h3>3. Vous transmettez la quittance sur WhatsApp en 1 tap</h3>
+          <p>Le message courtois est déjà rédigé. Vos relations avec vos locataires restent sereines, professionnelles et transparentes.</p>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <!-- SECTION COMPARAISON (AVANT vs APRÈS) -->
   <section class="section-comparison" id="avantages">
@@ -293,6 +460,18 @@
         </div>
 
         <div class="vip-form-box">
+          <!-- WIDGET RARETÉ & URGENCE FORMULAIRE ($100M OFFERS) -->
+          <div class="vip-scarcity-card">
+            <div class="vip-scarcity-header">
+              <span class="vip-scarcity-title">🔥 38 / 50 places VIP attribuées</span>
+              <span class="vip-scarcity-count">76% réservé</span>
+            </div>
+            <div class="vip-scarcity-track">
+              <div class="vip-scarcity-fill" style="width: 76%;"></div>
+            </div>
+            <span class="vip-scarcity-sub">⚡ Plus que 12 accès gratuits avec accompagnement du fondateur</span>
+          </div>
+
           <form id="vipEarlyAccessForm" onsubmit="handleVipSignup(event)">
             <h3>Réserver votre place VIP</h3>
             <p class="form-sub">Inscription en 20 secondes sans carte bancaire.</p>
@@ -353,6 +532,11 @@
       <span class="qa-badge">🇸🇳 Accès Démo Immédiat</span>
       <h3>Débloquez votre accès démo à KeurGui ⚡</h3>
       <p class="qa-sub">Rejoignez les 50 propriétaires privilégiés. Entrez votre prénom et votre numéro WhatsApp pour accéder à l'application interactive en direct.</p>
+
+      <div class="modal-scarcity-alert">
+        <span>🔥</span>
+        <span><strong>Places limitées :</strong> Déjà 38 / 50 accès VIP attribués. Plus que 12 places gratuites !</span>
+      </div>
 
       <form id="modalQuickForm" onsubmit="handleModalSignup(event)">
         <div class="form-field">
