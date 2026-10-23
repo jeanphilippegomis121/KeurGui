@@ -1033,13 +1033,7 @@ function exportElementToA4Pdf(sourceElement, filename, btn, originalText, callba
   iDoc.write('<!DOCTYPE html><html><head><meta charset="utf-8"></head><body style="margin:0;padding:0;background:#ffffff;"></body></html>');
   iDoc.close();
 
-  // 2. Copier les styles de l'application dans l'iframe
-  const styleNodes = document.querySelectorAll('link[rel="stylesheet"], style');
-  styleNodes.forEach(node => {
-    try {
-      iDoc.head.appendChild(node.cloneNode(true));
-    } catch (e) {}
-  });
+  // 2. L'iframe utilise son propre style A4 autonome et auto-suffisant (zéro conflit externe)
 
   // 3. Injecter les règles CSS strictes A4 pour neutraliser toute règle responsive mobile et garantir l'intégrité visuelle
   const overrideStyle = iDoc.createElement('style');
@@ -1052,57 +1046,311 @@ function exportElementToA4Pdf(sourceElement, filename, btn, originalText, callba
       min-width: 794px !important;
       max-width: 794px !important;
       background: #ffffff !important;
-      color: #1e293b !important;
+      color: #0f172a !important;
       -webkit-print-color-adjust: exact !important;
       print-color-adjust: exact !important;
-      font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
     }
     .receipt-sheet {
       width: 794px !important;
       min-width: 794px !important;
       max-width: 794px !important;
-      padding: 18px 24px !important;
+      min-height: 1040px !important;
+      padding: 34px 42px 28px 42px !important;
       box-sizing: border-box !important;
       box-shadow: none !important;
+      border: 1px solid #e2e8f0 !important;
       border-radius: 0 !important;
       background: #ffffff !important;
       page-break-inside: avoid !important;
-      transform: none !important;
+      position: relative !important;
     }
-    .receipt-parties-grid {
-      display: grid !important;
-      grid-template-columns: 1fr 1fr !important;
-      gap: 14px !important;
-      margin-bottom: 12px !important;
-      padding: 10px 14px !important;
-      background: #f8fafc !important;
-      border: 1px solid #e2e8f0 !important;
-      border-radius: 6px !important;
-    }
-    .receipt-table {
+    .receipt-sheet::before {
+      content: '' !important;
+      display: block !important;
       width: 100% !important;
-      margin-bottom: 10px !important;
-      border-collapse: collapse !important;
+      height: 5px !important;
+      background: linear-gradient(90deg, #059669 0%, #10b981 70%, #f59e0b 100%) !important;
+      border-radius: 3px !important;
+      margin-bottom: 22px !important;
+    }
+    .receipt-header {
+      display: table !important;
+      width: 100% !important;
       table-layout: fixed !important;
+      margin-bottom: 18px !important;
+    }
+    .receipt-brand {
+      display: table-cell !important;
+      vertical-align: middle !important;
+      text-align: left !important;
+      width: 60% !important;
+    }
+    .receipt-brand h2 {
+      font-size: 20px !important;
+      font-weight: 800 !important;
+      letter-spacing: 0.5px !important;
+      color: #064e3b !important;
+      margin: 0 !important;
+    }
+    .receipt-brand p {
+      font-size: 10px !important;
+      font-weight: 700 !important;
+      color: #64748b !important;
+      letter-spacing: 1.2px !important;
+      text-transform: uppercase !important;
+      margin: 4px 0 0 0 !important;
+    }
+    .receipt-stamp-box {
+      display: table-cell !important;
+      vertical-align: middle !important;
+      text-align: left !important;
+      width: 40% !important;
     }
     .receipt-badge-paid {
+      display: block !important;
+      margin-left: auto !important;
+      margin-right: 0 !important;
+      width: 195px !important;
+      text-align: center !important;
       opacity: 1 !important;
       visibility: visible !important;
       animation: none !important;
       transform: none !important;
-      display: inline-flex !important;
+      background: #ecfdf5 !important;
+      border: 2px solid #059669 !important;
+      border-radius: 8px !important;
+      padding: 8px 14px !important;
+      box-sizing: border-box !important;
     }
-    .digital-stamp {
+    .receipt-badge-paid span {
+      display: block !important;
+      font-size: 13px !important;
+      font-weight: 800 !important;
+      color: #065f46 !important;
+      letter-spacing: 0.5px !important;
+      line-height: 1.3 !important;
+      text-align: center !important;
       opacity: 1 !important;
       visibility: visible !important;
+    }
+    .receipt-badge-paid small {
+      display: block !important;
+      font-size: 10px !important;
+      font-weight: 700 !important;
+      color: #059669 !important;
+      text-transform: uppercase !important;
+      line-height: 1.3 !important;
+      margin-top: 2px !important;
+      text-align: center !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+    }
+    .receipt-divider {
+      margin: 16px 0 !important;
+      height: 1px !important;
+      background: #e2e8f0 !important;
+    }
+    .receipt-document-title {
+      margin-bottom: 20px !important;
+      text-align: center !important;
+    }
+    .receipt-document-title h1 {
+      font-size: 22px !important;
+      font-weight: 800 !important;
+      letter-spacing: 0.8px !important;
+      color: #064e3b !important;
+      margin: 0 0 6px 0 !important;
+    }
+    .receipt-parties-grid {
+      display: grid !important;
+      grid-template-columns: 1fr 1fr !important;
+      gap: 16px !important;
+      margin-bottom: 20px !important;
+      padding: 14px 18px !important;
+      background: #f8fafc !important;
+      border: 1px solid #e2e8f0 !important;
+      border-radius: 8px !important;
+    }
+    .party-label {
+      font-size: 10px !important;
+      font-weight: 800 !important;
+      letter-spacing: 1px !important;
+      color: #059669 !important;
+      text-transform: uppercase !important;
+      margin-bottom: 6px !important;
+      display: block !important;
+    }
+    .party-box h4 {
+      margin: 0 0 4px 0 !important;
+      font-size: 14px !important;
+      font-weight: 800 !important;
+      color: #0f172a !important;
+    }
+    .party-box p {
+      margin: 0 0 3px 0 !important;
+      font-size: 12px !important;
+      color: #475569 !important;
+      line-height: 1.35 !important;
+    }
+    .receipt-table {
+      width: 100% !important;
+      margin-bottom: 18px !important;
+      border-collapse: collapse !important;
+      table-layout: fixed !important;
+    }
+    .receipt-table th {
+      padding: 12px 14px !important;
+      font-size: 11.5px !important;
+      font-weight: 800 !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.5px !important;
+      background: #f1f5f9 !important;
+      color: #334155 !important;
+      border-top: 1px solid #cbd5e1 !important;
+      border-bottom: 1px solid #cbd5e1 !important;
+      text-align: left !important;
+    }
+    .receipt-table td {
+      padding: 13px 14px !important;
+      font-size: 13px !important;
+      color: #1e293b !important;
+      vertical-align: middle !important;
+      border-bottom: 1px solid #e2e8f0 !important;
+      word-wrap: break-word !important;
+    }
+    .receipt-table th:nth-child(1), .receipt-table td:nth-child(1) { width: 44% !important; }
+    .receipt-table th:nth-child(2), .receipt-table td:nth-child(2) { width: 32% !important; }
+    .receipt-table th:nth-child(3), .receipt-table td:nth-child(3) { width: 24% !important; text-align: right !important; }
+    .receipt-total-row td {
+      padding: 15px 14px !important;
+      background: #f8fafc !important;
+      border-top: 2px solid #059669 !important;
+      border-bottom: 2px solid #059669 !important;
+      font-weight: 800 !important;
+    }
+    .receipt-words-box {
+      padding: 12px 16px !important;
+      margin-bottom: 18px !important;
+      font-size: 12px !important;
+      background: #f0fdf4 !important;
+      border: 1px solid #bbf7d0 !important;
+      border-left: 5px solid #10b981 !important;
+      border-radius: 6px !important;
+    }
+    .receipt-words-box strong {
+      display: block !important;
+      font-size: 14px !important;
+      color: #064e3b !important;
+      margin-top: 4px !important;
+      font-weight: 800 !important;
+    }
+    .receipt-legal-note {
+      font-size: 9.5px !important;
+      line-height: 1.55 !important;
+      margin-bottom: 20px !important;
+      color: #64748b !important;
+      background: #fafafa !important;
+      border: 1px solid #e2e8f0 !important;
+      border-radius: 6px !important;
+      padding: 12px 16px !important;
+    }
+    .digital-stamp {
+      border: 2px dashed #059669 !important;
+      padding: 8px 18px !important;
+      border-radius: 8px !important;
+      display: block !important;
+      margin-left: auto !important;
+      margin-right: 0 !important;
+      width: 195px !important;
+      text-align: center !important;
       transform: none !important;
-      display: inline-flex !important;
+      background: #ffffff !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+      animation: none !important;
+      box-sizing: border-box !important;
+    }
+    .digital-stamp span {
+      display: block !important;
+      font-size: 10px !important;
+      font-weight: 800 !important;
+      letter-spacing: 1px !important;
+      color: #059669 !important;
+      line-height: 1.3 !important;
+      text-align: center !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+    }
+    .digital-stamp strong {
+      display: block !important;
+      font-size: 13px !important;
+      font-weight: 800 !important;
+      color: #064e3b !important;
+      line-height: 1.3 !important;
+      margin: 2px 0 !important;
+      text-align: center !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+    }
+    .digital-stamp small {
+      display: block !important;
+      font-size: 9px !important;
+      color: #64748b !important;
+      line-height: 1.2 !important;
+      text-align: center !important;
+      opacity: 1 !important;
+      visibility: visible !important;
     }
     .receipt-footer-signatures {
       display: flex !important;
       justify-content: space-between !important;
       align-items: flex-end !important;
-      padding-top: 8px !important;
+      padding-top: 14px !important;
+      border-top: 1px dashed #cbd5e1 !important;
+      margin-bottom: 12px !important;
+    }
+    .sig-col {
+      text-align: left !important;
+    }
+    .sig-col.text-right p, .sig-col:last-child p {
+      text-align: right !important;
+      margin: 0 0 6px 0 !important;
+    }
+    .signature-stamp-area {
+      display: block !important;
+      text-align: left !important;
+    }
+    .qr-box {
+      width: 52px !important;
+      height: 52px !important;
+      border-radius: 6px !important;
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: center !important;
+      justify-content: center !important;
+      padding: 3px !important;
+      box-sizing: border-box !important;
+    }
+    .qr-box span {
+      font-size: 18px !important;
+      line-height: 1 !important;
+      margin-bottom: 2px !important;
+    }
+    .qr-box small {
+      font-size: 7.5px !important;
+      line-height: 1.1 !important;
+      white-space: nowrap !important;
+      letter-spacing: -0.2px !important;
+    }
+    .receipt-official-footer-note {
+      border-top: 1px solid #f1f5f9 !important;
+      padding-top: 10px !important;
+      text-align: center !important;
+      font-size: 9px !important;
+      color: #94a3b8 !important;
+      letter-spacing: 0.5px !important;
+      text-transform: uppercase !important;
     }
     .no-print {
       display: none !important;
@@ -1114,6 +1362,13 @@ function exportElementToA4Pdf(sourceElement, filename, btn, originalText, callba
   const clone = sourceElement.cloneNode(true);
   clone.id = 'pdf-isolated-clone';
   clone.querySelectorAll('.no-print').forEach(el => el.remove());
+
+  // Ajouter la note de certification officielle en pied de page
+  const footerNote = iDoc.createElement('div');
+  footerNote.className = 'receipt-official-footer-note';
+  footerNote.textContent = 'Document officiel certifié généré par KeurGui Immobilier • République du Sénégal • Page 1/1';
+  clone.appendChild(footerNote);
+
   iDoc.body.appendChild(clone);
 
   const cleanup = () => {
@@ -1151,9 +1406,10 @@ function exportElementToA4Pdf(sourceElement, filename, btn, originalText, callba
           }
           const pageWidth = pdf.internal.pageSize.getWidth(); // 210mm
           const pageHeight = pdf.internal.pageSize.getHeight(); // 297mm
-          const margin = 6;
-          const maxW = pageWidth - (margin * 2); // 198mm
-          const maxH = pageHeight - (margin * 2); // 285mm
+          const marginX = 8;
+          const marginY = 8;
+          const maxW = pageWidth - (marginX * 2); // 194mm
+          const maxH = pageHeight - (marginY * 2); // 281mm
 
           const ratio = canvas.width / canvas.height;
           let renderW = maxW;
@@ -1164,8 +1420,8 @@ function exportElementToA4Pdf(sourceElement, filename, btn, originalText, callba
             renderW = renderH * ratio;
           }
 
-          const posX = margin + (maxW - renderW) / 2;
-          const posY = margin;
+          const posX = marginX + (maxW - renderW) / 2;
+          const posY = marginY + (maxH - renderH) / 2;
           const imgData = canvas.toDataURL('image/jpeg', 0.98);
 
           pdf.setFillColor(255, 255, 255);
@@ -1189,7 +1445,7 @@ function exportElementToA4Pdf(sourceElement, filename, btn, originalText, callba
           }
 
           if (typeof callback === 'function') {
-            callback(blob, pdf);
+            callback(blob, pdf, imgData, canvas);
           }
         });
       }).catch(err => {
