@@ -315,3 +315,30 @@
   - `openDepositModal(1)` -> `exportElementToA4Pdf` : **`Deposit Export: OK (1 page)`**
   - Bilan de test automatisé : **`LIVE TEST RESULT: ALL_PASSED`**
 - Cache-buster asset incrémenté à `v=2.6` dans `app.html`.
+
+---
+
+## 📌 ÉTAPE 8.3 : RÉSOUCTION DU FORMAT A4 PLEIN ÉCRAN & CORRECTION DU TEXTE BADGE/TAMPON
+
+### 1. 🔍 Problèmes constatés sur le rendu mobile réel (Capture Android utilisateur) :
+1. **Écrasement vertical ("trou blanc" de 65% en bas de page) :** L'ancien dimensionnement comprimait le document sur les 35% supérieurs de la page A4, laissant un vide blanc disproportionné.
+2. **Texte invisible dans le badge de statut (Haut-Droit) :** Le contour et le fond vert du badge `CAUTION EN RÉSERVE / Par Wave` étaient dessinés, mais le texte était manquant.
+3. **Texte invisible dans le tampon numérique (Bas-Droit) :** Le contour en pointillés du tampon `KEURGUI IMMOBILIER / GOMIS J.P.` était dessiné, mais le texte était manquant.
+4. **Typographie trop petite :** Les polices du tableau et des mentions légales étaient trop condensées.
+
+### 2. 🛠️ Diagnostics & Solutions techniques appliquées :
+- **Cause de l'écrasement vertical :** Les règles CSS utilisaient des hauteurs minimales trop faibles (`min-height: auto`) et un padding réduit (`6px 10px`).
+  - *Correction :* Définition d'un gabarit **Executive A4** avec `min-height: 1040px !important`, marges aérées (`padding: 34px 42px 28px 42px !important`), typographie de certificat de standing (titres 22px, montants 15px bold, corps 12.5px/13px) et centrage vertical automatique `posY = marginY + (maxH - renderH) / 2`. Le document occupe désormais ~85% de la feuille A4 avec ~25mm de marges équilibrées en haut et en bas.
+- **Cause racine du texte manquant dans le badge et le tampon :** Bug spécifique du moteur de rendu html2canvas avec les conteneurs parents en `display: table-cell; text-align: right;` : tout élément enfant en `display: inline-block; text-align: center;` voyait ses coordonnées X de texte projetées hors champ ou tronquées.
+  - *Correction :* 
+    - Remplacement du centrage par `text-align: right` parent par un positionnement moderne sans bug html2canvas : parent en `text-align: left;`, badge et tampon en `display: block; margin-left: auto; margin-right: 0; width: 195px; text-align: center;`.
+    - Ajustement des dimensions de la boîte de certification `qr-box` (52px × 52px) pour afficher le bouclier et la mention "Dépôt Sécurisé" avec une lisibilité optimale.
+    - Application synchronisée dans `app.js` (`overrideStyle`), `style.css` (`#pdf-isolated-clone`), et bump du cache vers `v=2.7` dans `app.html`.
+
+### 3. 🧪 Validation par tests automatisés headless :
+- Tests exécutés avec Chrome Headless en viewport mobile 375×812 (`run_live_test.ps1`).
+- `live_deposit.jpg` et `live_quittance.jpg` inspectés :
+  - Hauteur occupée : 84.8% de la page A4 (246.3mm sur 297mm).
+  - 100% du texte visible et net : `CAUTION EN RÉSERVE / PAR WAVE` et `KEURGUI IMMOBILIER / GOMIS J.P. / Dakar • Sénégal`.
+  - Strictement 1 seule page A4 sans débordement.
+- Déploiement git push sur `main` validé.
