@@ -230,4 +230,13 @@
   - Recalcul en temps réel dès que l'utilisateur tape le montant du loyer.
   - Choix du mode de versement : Wave, Orange Money, Espèces ou Virement Bancaire.
 
+### 8. 🔍 Diagnostic & Correction Immédiate (Bug d'affichage des biens)
+- **Problème rencontré :** Sur l'application, les cartes supérieures s'affichaient bien mais la section des logements (`buildingsContainer`) restait vide/blanche, et le bouton « + Ajouter un bien » ne réagissait pas.
+- **Cause identifiée :** Dans `app.js` (`renderProperties`), une accolade fermante `}` manquait sur le bloc `else` du rendu des boutons d'action. La variable `depositBadge` se retrouvait dans un scope non accessible lors du traitement des logements déjà payés (`status === 'paid'`), provoquant une interruption de script (`ReferenceError`).
+- **Correction apportée :** Accolade refermée proprement, scope rétabli.
+- **Validation automatisée :**
+  - Script de test Chromium headless (`test_interactions.ps1`) validé à 100% (`Test Status: SUCCESS`).
+  - Vérification de l'ouverture du modal d'ajout (`openAddPropertyModal`), du modal de caution (`openDepositModal`), et du rendu complet de tous les immeubles et lots avec leurs badges.
+  - Déploiement immédiat sur GitHub et Vercel avec le cache buster `v2.3`.
+
 ---
