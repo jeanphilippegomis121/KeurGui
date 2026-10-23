@@ -214,6 +214,16 @@
         </div>
       </div>
 
+      <!-- Statistique Caution & Dépôt de Garantie Sécurisé -->
+      <div class="stat-card stat-deposit" id="statDepositCard">
+        <div class="stat-icon" style="background: rgba(16, 185, 129, 0.12); color: #059669;">🛡️</div>
+        <div class="stat-info">
+          <span class="stat-title">Cautions en Réserve</span>
+          <h2 class="stat-value" id="totalDeposits">0 FCFA</h2>
+          <span class="stat-tag success" id="depositsCountTag">🛡️ 0 caution en réserve</span>
+        </div>
+      </div>
+
       <!-- Statistique spéciale Agence (affichée en Mode Agence) -->
       <div class="stat-card stat-agency" id="agencyCommissionCard" style="display: none;">
         <div class="stat-icon">💼</div>
@@ -669,6 +679,158 @@
     </div>
   </div>
 
+  <!-- ============================================== -->
+  <!-- MODAL : REÇU OFFICIEL DE DÉPÔT DE GARANTIE & CAUTION -->
+  <!-- ============================================== -->
+  <div class="modal-overlay" id="depositReceiptModalOverlay" onclick="closeDepositModalOnOverlay(event)">
+    <div class="modal-receipt-wrapper">
+
+      <!-- Barre d'outils du modal Reçu Caution -->
+      <div class="receipt-actions-bar no-print">
+        <div class="receipt-modal-title">
+          <span class="tag-live" style="background:#059669; color:#fff;">Dépôt de Garantie Sécurisé</span>
+          <h3>Reçu de Caution N° <span id="mDepositReceiptNumber">DEP-2026-0042</span></h3>
+        </div>
+        <div class="receipt-cta-group">
+          <!-- BOUTON 1 : TÉLÉCHARGEMENT DIRECT PDF 1 PAGE -->
+          <button class="btn btn-download-direct-pdf" id="btnDepositPdf" onclick="downloadDirectDepositPDF()">
+            <span>📥</span> Télécharger le Reçu PDF
+          </button>
+
+          <!-- BOUTON 2 : PARTAGE DIRECT WHATSAPP AVEC PDF -->
+          <button class="btn btn-whatsapp" onclick="sendWhatsAppDepositReceipt()">
+            <span>💬</span> Télécharger & Partager WhatsApp
+          </button>
+
+          <!-- BOUTON 3 : STATUT DE LA CAUTION (RESTITUTION) -->
+          <button class="btn btn-secondary-sm" id="btnToggleDepositRefund" onclick="toggleCurrentDepositStatus()" title="Basculer le statut de restitution">
+            <span>🔄</span> <span id="btnToggleDepositRefundText">Marquer Restituée</span>
+          </button>
+
+          <!-- BOUTON 4 : IMPRESSION PAPIER -->
+          <button class="btn btn-secondary-sm" onclick="printDepositReceiptPaper()">
+            <span>🖨️</span> Imprimer
+          </button>
+
+          <button class="btn-close-modal" onclick="closeDepositReceiptModal()">✕</button>
+        </div>
+      </div>
+
+      <!-- FEUILLE DE REÇU DE CAUTION (ZONE DU FICHIER PDF A4) -->
+      <div class="receipt-sheet" id="printableDepositReceipt">
+
+        <!-- En-tête officiel -->
+        <div class="receipt-header">
+          <div class="receipt-brand">
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:4px;">
+              <img src="logo-icon.png" alt="KeurGui" style="width: 28px; height: 28px; border-radius: 6px;">
+              <h2>KEURGUI IMMOBILIER</h2>
+            </div>
+            <p>RÉPUBLIQUE DU SÉNÉGAL — GESTION LOCATIVE CONFORME</p>
+          </div>
+          <div class="receipt-stamp-box">
+            <div class="receipt-badge-paid" style="background: #ecfdf5; border-color: #059669; color: #065f46;">
+              <span id="mDepositBadgeMain">CAUTION EN RÉSERVE</span>
+              <small id="mDepositPaymentMethodBadge">Par Wave</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="receipt-divider"></div>
+
+        <!-- Titre du document -->
+        <div class="receipt-document-title">
+          <h1 id="mDepositDocumentMainTitle" style="color: #064e3b;">REÇU OFFICIEL DE DÉPÔT DE GARANTIE</h1>
+          <p>Caution Locative d'Entrée • <strong id="mDepositEquivMonths">Équivalent à 2 mois de loyer</strong></p>
+        </div>
+
+        <!-- Coordonnées Bailleur & Locataire -->
+        <div class="receipt-parties-grid">
+          <div class="party-box">
+            <span class="party-label">BAILLEUR / GESTIONNAIRE :</span>
+            <h4 id="mDepositOwnerName">Jean Philippe Gomis</h4>
+            <p id="mDepositOwnerAddress">Dakar, Sénégal</p>
+            <p>Contact : +221 78 818 21 04</p>
+          </div>
+          <div class="party-box">
+            <span class="party-label">LOCATAIRE PRENEUR :</span>
+            <h4 id="mDepositTenantName">Moussa Diop</h4>
+            <p id="mDepositPropertyAddress">Appartement 3B, Résidence Teranga — Mermoz</p>
+            <p>Téléphone : <span id="mDepositTenantPhone">+221 77 654 32 10</span></p>
+          </div>
+        </div>
+
+        <!-- Détail financier de la caution -->
+        <table class="receipt-table">
+          <thead>
+            <tr>
+              <th>Désignation de la garantie</th>
+              <th>Bien loué / Destination</th>
+              <th class="text-right">Montant (FCFA)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <strong>Dépôt de garantie contractuel (Caution)</strong><br>
+                <small class="text-muted" id="mDepositSubDetails">Garantie des obligations locatives d'entrée</small>
+              </td>
+              <td>
+                <span id="mDepositUnitDetails">Appartement 3 pièces standing</span><br>
+                <small class="text-muted">Loyer mensuel contractuel : <strong id="mDepositMonthlyRent">230 000 FCFA</strong></small>
+              </td>
+              <td class="text-right font-mono" id="mDepositTableAmount" style="font-size:15px; font-weight:800; color:#064e3b;">460 000 FCFA</td>
+            </tr>
+            <tr class="receipt-total-row">
+              <td colspan="2">
+                <strong>TOTAL DÉPÔT DE GARANTIE ENCAISSÉ</strong>
+              </td>
+              <td class="text-right font-mono-bold" id="mDepositTableTotal" style="color: #064e3b;">460 000 FCFA</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Montant en lettres et mentions légales -->
+        <div class="receipt-words-box" style="background:#f0fdf4; border-left:4px solid #10b981;">
+          <p>Le bailleur certifie avoir reçu en dépôt de garantie la somme de :<br>
+            <strong id="mDepositAmountWords" style="color:#064e3b; font-size:13.5px;">Quatre cent soixante mille Francs CFA</strong>
+          </p>
+        </div>
+
+        <!-- Cadre légal conforme au Sénégal -->
+        <div class="receipt-legal-note">
+          <p>La présente somme est conservée à titre de dépôt de garantie par le bailleur conformément aux usages et aux règles régissant les baux d'habitation et le Code des Obligations Civiles et Commerciales (COCC) de la République du Sénégal. Elle est destinée à garantir l'exécution des obligations du locataire (réparations locatives, dégradations éventuelles, arriérés de loyers, charges ou factures Sen'Eau/Senelec restant dues). Cette somme ne dispense en aucun cas du paiement des loyers mensuels. Elle sera restituée au locataire dans un délai maximum de 30 jours à compter de la remise définitive des clés et de l'état des lieux contradictoire de sortie, déduction faite des éventuelles sommes justifiées légalement dues au bailleur.</p>
+        </div>
+
+        <!-- Signatures, Date & Cachet -->
+        <div class="receipt-footer-signatures">
+          <div class="sig-col">
+            <p>Fait à Dakar, le <span id="mDepositIssueDate">01 Octobre 2026</span></p>
+            <div class="qr-placeholder">
+              <div class="qr-box" style="background:#ecfdf5; border-color:#059669;">
+                <span style="font-size: 22px;">🛡️</span>
+                <small style="color:#065f46; font-weight:800;">Dépôt Sécurisé</small>
+              </div>
+              <small class="text-muted">Réf : <span id="mDepositReceiptRef">DEP-2026-0042</span></small>
+            </div>
+            <p style="font-size: 11px; color:#64748b; margin-top:8px;">Pour accord et remise : <strong id="mDepositTenantSig">Moussa Diop</strong></p>
+          </div>
+          <div class="sig-col text-right">
+            <p>Signature et Cachet du Bailleur / Agence :</p>
+            <div class="signature-stamp-area">
+              <div class="digital-stamp" style="border-color:#059669; color:#064e3b;">
+                <span style="color:#059669;">KEURGUI IMMOBILIER</span>
+                <strong id="mDepositSignerName">GOMIS J.P.</strong>
+                <small>Dakar • Sénégal</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
 
   <!-- MODAL ENCAISSEMENT RAPIDE (WAVE / ORANGE MONEY / CASH) -->
   <div class="modal-overlay" id="payModalOverlay" onclick="closeModalOnOverlay(event)">
@@ -782,13 +944,46 @@
         <div class="form-row">
           <div class="form-group">
             <label>Loyer mensuel (FCFA) <span style="color:#ef4444;">*</span></label>
-            <input type="number" id="propRent" placeholder="Ex: 250000" required>
+            <input type="number" id="propRent" placeholder="Ex: 250000" oninput="onRentInputChange()" required>
           </div>
           <div class="form-group">
             <label>Charges locatives (FCFA) <small
                 style="color:#64748b; font-weight:normal;">(Optionnel)</small></label>
             <input type="number" id="propCharges" placeholder="0 (si aucune)">
           </div>
+        </div>
+
+        <!-- SECTION CAUTION & DÉPÔT DE GARANTIE -->
+        <div class="form-group deposit-input-card">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:6px;">
+            <label style="margin:0; font-weight:700; color:#1e293b; font-size:13px;">
+              🛡️ Caution / Dépôt de garantie (FCFA)
+              <small style="color:#64748b; font-weight:normal;">(Optionnel)</small>
+            </label>
+            <!-- Boutons de calcul rapide 1-clic -->
+            <div class="deposit-quick-buttons">
+              <button type="button" class="btn-preset-sm" id="btnPreset1" onclick="setDepositPreset(1)">1 mois</button>
+              <button type="button" class="btn-preset-sm active-preset" id="btnPreset2" onclick="setDepositPreset(2)">2 mois (standard)</button>
+              <button type="button" class="btn-preset-sm" id="btnPreset3" onclick="setDepositPreset(3)">3 mois</button>
+              <button type="button" class="btn-preset-sm" id="btnPreset0" onclick="setDepositPreset(0)">0 (Aucune)</button>
+            </div>
+          </div>
+          <div class="form-row" style="margin-bottom:0;">
+            <div class="form-group" style="margin-bottom:0; flex: 1.8;">
+              <input type="number" id="propDeposit" placeholder="Ex: 500000 (calculé ou personnalisé)">
+            </div>
+            <div class="form-group" style="margin-bottom:0; flex: 1.2;">
+              <select id="propDepositMethod" title="Moyen de versement de la caution">
+                <option value="Wave" selected>🌊 Par Wave</option>
+                <option value="Orange Money">🟠 Par Orange Money</option>
+                <option value="Espèces">💵 En Espèces</option>
+                <option value="Virement Bancaire">🏦 Virement</option>
+              </select>
+            </div>
+          </div>
+          <small style="color:#64748b; font-size:11px; margin-top:5px; display:block;">
+            💡 Au Sénégal, l'usage standard est de 2 mois de loyer. KeurGui génère le reçu A4 certifié prêt pour WhatsApp.
+          </small>
         </div>
 
         <div class="form-row">
@@ -864,9 +1059,25 @@
           </div>
           <div class="form-group">
             <label>Loyer standard par appartement (FCFA) <span style="color:#ef4444;">*</span></label>
-            <input type="number" id="bldDefaultRent" placeholder="Ex: 220000" onchange="renderBuildingUnitsSetup()"
+            <input type="number" id="bldDefaultRent" placeholder="Ex: 220000" oninput="onBldRentInputChange()" onchange="renderBuildingUnitsSetup()"
               required>
           </div>
+        </div>
+
+        <!-- SECTION CAUTION IMMEUBLE -->
+        <div class="form-group deposit-input-card">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:6px;">
+            <label style="margin:0; font-weight:700; color:#1e293b; font-size:13px;">
+              🛡️ Caution standard par appartement (FCFA)
+            </label>
+            <div class="deposit-quick-buttons">
+              <button type="button" class="btn-preset-sm" id="btnBldPreset1" onclick="setBldDepositPreset(1)">1 mois</button>
+              <button type="button" class="btn-preset-sm active-preset" id="btnBldPreset2" onclick="setBldDepositPreset(2)">2 mois (standard)</button>
+              <button type="button" class="btn-preset-sm" id="btnBldPreset3" onclick="setBldDepositPreset(3)">3 mois</button>
+              <button type="button" class="btn-preset-sm" id="btnBldPreset0" onclick="setBldDepositPreset(0)">0 (Aucune)</button>
+            </div>
+          </div>
+          <input type="number" id="bldDefaultDeposit" placeholder="Ex: 440000 (calculé ou personnalisé)">
         </div>
 
         <!-- ZONE INTERACTIVE : DÉTAIL DES LOCATAIRES (NON PRÉ-REMPLIS) -->

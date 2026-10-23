@@ -12,6 +12,12 @@ const DEFAULT_PROPERTIES = [
     type: "Appartement 3 pièces standing",
     rent: 230000,
     charges: 20000,
+    deposit: 460000,
+    depositMonths: 2,
+    depositPaymentMethod: "Wave",
+    depositPaidDate: "01/10/2026",
+    depositStatus: "held",
+    depositReceiptNo: "DEP-2026-0042",
     tenant: "Moussa Diop",
     phone: "+221 77 654 32 10",
     status: "paid",
@@ -28,6 +34,12 @@ const DEFAULT_PROPERTIES = [
     type: "Appartement 2 pièces",
     rent: 200000,
     charges: 15000,
+    deposit: 400000,
+    depositMonths: 2,
+    depositPaymentMethod: "Wave",
+    depositPaidDate: "15/09/2026",
+    depositStatus: "held",
+    depositReceiptNo: "DEP-2026-0043",
     tenant: "Aminata Fall",
     phone: "+221 77 321 45 88",
     status: "paid",
@@ -44,6 +56,12 @@ const DEFAULT_PROPERTIES = [
     type: "Appartement 3 pièces",
     rent: 220000,
     charges: 15000,
+    deposit: 220000,
+    depositMonths: 1,
+    depositPaymentMethod: "Espèces",
+    depositPaidDate: "01/08/2026",
+    depositStatus: "held",
+    depositReceiptNo: "DEP-2026-0044",
     tenant: "Fatoumata Bamba",
     phone: "+221 77 888 11 22",
     status: "paid",
@@ -60,6 +78,12 @@ const DEFAULT_PROPERTIES = [
     type: "Appartement 2 pièces",
     rent: 195000,
     charges: 15000,
+    deposit: 390000,
+    depositMonths: 2,
+    depositPaymentMethod: "Orange Money",
+    depositPaidDate: "01/09/2026",
+    depositStatus: "held",
+    depositReceiptNo: "DEP-2026-0045",
     tenant: "Alioune Ndoye",
     phone: "+221 78 555 12 34",
     status: "paid",
@@ -76,6 +100,12 @@ const DEFAULT_PROPERTIES = [
     type: "Duplex vue mer",
     rent: 550000,
     charges: 30000,
+    deposit: 110000,
+    depositMonths: 2,
+    depositPaymentMethod: "Wave",
+    depositPaidDate: "01/06/2026",
+    depositStatus: "held",
+    depositReceiptNo: "DEP-2026-0046",
     tenant: "Mamadou Diallo",
     phone: "+221 77 444 77 88",
     status: "late",
@@ -92,6 +122,12 @@ const DEFAULT_PROPERTIES = [
     type: "Grande villa avec cour",
     rent: 450000,
     charges: 0,
+    deposit: 900000,
+    depositMonths: 2,
+    depositPaymentMethod: "Wave",
+    depositPaidDate: "01/07/2026",
+    depositStatus: "held",
+    depositReceiptNo: "DEP-2026-0047",
     tenant: "Cheikh Tidiane Seck",
     phone: "+221 76 555 44 33",
     status: "paid",
@@ -108,6 +144,12 @@ const DEFAULT_PROPERTIES = [
     type: "Studio indépendant climatisé",
     rent: 180000,
     charges: 15000,
+    deposit: 360000,
+    depositMonths: 2,
+    depositPaymentMethod: "Orange Money",
+    depositPaidDate: "15/05/2026",
+    depositStatus: "held",
+    depositReceiptNo: "DEP-2026-0048",
     tenant: "Aïssatou Ba",
     phone: "+221 78 123 99 88",
     status: "paid",
@@ -124,6 +166,12 @@ const DEFAULT_PROPERTIES = [
     type: "Bail Commercial & Professionnel (SARL)",
     rent: 600000,
     charges: 50000,
+    deposit: 1800000,
+    depositMonths: 3,
+    depositPaymentMethod: "Virement Bancaire (CBAO)",
+    depositPaidDate: "01/01/2026",
+    depositStatus: "held",
+    depositReceiptNo: "DEP-2026-0018",
     tenant: "Cabinet Sahel Consulting SARL",
     phone: "+221 77 912 34 56",
     status: "paid",
@@ -143,13 +191,31 @@ function loadProperties() {
     const saved = localStorage.getItem('keurgui_properties_data');
     if (saved) {
       let parsed = JSON.parse(saved);
+      // Migration automatique : S'assurer que le dépôt de garantie / caution existe pour chaque bien
+      let hasMigration = false;
+      parsed.forEach(p => {
+        if (p.deposit === undefined) {
+          p.depositMonths = p.isCommercial ? 3 : 2;
+          p.deposit = p.rent * p.depositMonths;
+          p.depositPaymentMethod = p.paymentMethod || 'Wave';
+          p.depositPaidDate = p.paidDate || '01/10/2026';
+          p.depositStatus = 'held';
+          p.depositReceiptNo = `DEP-2026-${String(p.id).padStart(4, '0')}`;
+          hasMigration = true;
+        }
+      });
+
       // S'assurer que l'exemple de bail commercial TVA 18% est présent
       if (!parsed.some(p => p.isCommercial)) {
         const comm = DEFAULT_PROPERTIES.find(p => p.isCommercial);
         if (comm) {
           parsed.push(comm);
-          localStorage.setItem('keurgui_properties_data', JSON.stringify(parsed));
+          hasMigration = true;
         }
+      }
+
+      if (hasMigration) {
+        localStorage.setItem('keurgui_properties_data', JSON.stringify(parsed));
       }
       return parsed;
     }
@@ -339,22 +405,29 @@ let currentActiveProperty = null;
 let propertyToPay = null;
 
 // Initialisation
-document.addEventListener('DOMContentLoaded', () => {
+function initApp() {
   updatePeriodDisplay();
   renderBuildingUnitsSetup();
   checkWelcomeGreeting();
   initReceiptsHistory();
+}
 
-  // Support touche Échap pour fermer les fenêtres
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') {
-      closeReceiptModal();
-      closePayModal();
-      closeAddPropertyModal();
-      closeFeedbackModal();
-      closeReceiptsHistoryModal();
-    }
-  });
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initApp);
+} else {
+  initApp();
+}
+
+// Support touche Échap pour fermer les fenêtres
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    closeReceiptModal();
+    closeDepositReceiptModal();
+    closePayModal();
+    closeAddPropertyModal();
+    closeFeedbackModal();
+    closeReceiptsHistoryModal();
+  }
 });
 
 // Normalisation du texte pour recherche insensible aux accents
@@ -473,7 +546,7 @@ function toggleAgencyMode() {
 }
 
 // Variables pour le compteur chiffré fluide (Motion Design)
-let prevStats = { collected: 0, pending: 0, rate: 0 };
+let prevStats = { collected: 0, pending: 0, rate: 0, deposits: 0 };
 
 function animateNumber(elementId, start, end, duration, isFCFA = true) {
   const el = document.getElementById(elementId);
@@ -506,6 +579,8 @@ function updateStats() {
   let totalPending = 0;
   let paidCount = 0;
   let lateCount = 0;
+  let totalDepositsHeld = 0;
+  let depositsHeldCount = 0;
   const pKey = getPeriodKey();
   const currentPeriodName = getPeriodFrench();
 
@@ -518,6 +593,11 @@ function updateStats() {
     } else {
       totalPending += totalAmount;
       lateCount++;
+    }
+
+    if (p.deposit && (p.depositStatus === 'held' || !p.depositStatus)) {
+      totalDepositsHeld += p.deposit;
+      depositsHeldCount++;
     }
   });
 
@@ -534,6 +614,13 @@ function updateStats() {
   animateNumber('totalCollected', prevStats.collected, totalCollected, 750, true);
   animateNumber('totalPending', prevStats.pending, totalPending, 750, true);
   animateNumber('collectionRate', prevStats.rate, rate, 750, false);
+  animateNumber('totalDeposits', prevStats.deposits || 0, totalDepositsHeld, 750, true);
+
+  const depositsTag = document.getElementById('depositsCountTag');
+  if (depositsTag) {
+    depositsTag.textContent = `🛡️ ${depositsHeldCount} caution${depositsHeldCount > 1 ? 's' : ''} en réserve`;
+  }
+
   document.getElementById('collectionFill').style.width = rate + '%';
   document.getElementById('agencyCommission').textContent = formatFCFA(agencyCommissionHt);
   
@@ -542,7 +629,7 @@ function updateStats() {
     payoutTag.textContent = `Reversé aux bailleurs : ${formatFCFA(agencyNet)}`;
   }
 
-  prevStats = { collected: totalCollected, pending: totalPending, rate: rate };
+  prevStats = { collected: totalCollected, pending: totalPending, rate: rate, deposits: totalDepositsHeld };
 
   // Gestion dynamique de l'alerte pulsation danger pour les retards
   const pendingCard = document.querySelector('.stat-card.stat-warning');
@@ -745,6 +832,21 @@ function renderProperties() {
                   <span>🔔</span> Relance WhatsApp
                 </button>
               `;
+            let depositBadge = '';
+            if (u.deposit && u.deposit > 0) {
+              const monthsText = u.depositMonths ? ` (${u.depositMonths} mois)` : '';
+              const isHeld = (u.depositStatus === 'held' || !u.depositStatus);
+              const statusPillClass = isHeld ? 'deposit-held' : 'deposit-refunded';
+              const statusPillText = isHeld ? 'En réserve' : 'Restituée';
+              depositBadge = `
+                <div class="unit-deposit-tag">
+                  <span>🛡️</span> Caution : <strong>${formatFCFA(u.deposit)}</strong>${monthsText}
+                  <span class="deposit-pill ${statusPillClass}">${statusPillText}</span>
+                  <button class="btn-deposit-link" onclick="openDepositModal(${u.id})" title="Voir le reçu officiel de caution">
+                    📄 Reçu
+                  </button>
+                </div>
+              `;
             }
 
             return `
@@ -755,6 +857,7 @@ function renderProperties() {
                     Locataire : <strong>${escapeHtml(u.tenant)}</strong>
                     <span class="unit-phone">(${escapeHtml(u.phone)})</span>
                   </div>
+                  ${depositBadge}
                 </div>
 
                 <div class="unit-financial-col">
@@ -1681,6 +1784,71 @@ function renderBuildingUnitsSetup() {
   listContainer.innerHTML = html;
 }
 
+// ===================================================
+// GESTION DES PRÉSÉLECTIONS DE CAUTION (FORMULAIRES)
+// ===================================================
+let currentDepositPresetMonths = 2;
+
+function setDepositPreset(months) {
+  currentDepositPresetMonths = months;
+  [0, 1, 2, 3].forEach(m => {
+    const btn = document.getElementById(`btnPreset${m}`);
+    if (btn) {
+      if (m === months) btn.classList.add('active-preset');
+      else btn.classList.remove('active-preset');
+    }
+  });
+
+  const rentInput = document.getElementById('propRent');
+  const rent = parseInt(rentInput ? rentInput.value : 0, 10) || 0;
+  const depositInput = document.getElementById('propDeposit');
+  if (depositInput) {
+    depositInput.value = months > 0 ? (rent * months) : 0;
+  }
+}
+
+function onRentInputChange() {
+  if (currentDepositPresetMonths > 0) {
+    const rentInput = document.getElementById('propRent');
+    const rent = parseInt(rentInput ? rentInput.value : 0, 10) || 0;
+    const depositInput = document.getElementById('propDeposit');
+    if (depositInput) {
+      depositInput.value = rent * currentDepositPresetMonths;
+    }
+  }
+}
+
+let currentBldDepositPresetMonths = 2;
+
+function setBldDepositPreset(months) {
+  currentBldDepositPresetMonths = months;
+  [0, 1, 2, 3].forEach(m => {
+    const btn = document.getElementById(`btnBldPreset${m}`);
+    if (btn) {
+      if (m === months) btn.classList.add('active-preset');
+      else btn.classList.remove('active-preset');
+    }
+  });
+
+  const rentInput = document.getElementById('bldDefaultRent');
+  const rent = parseInt(rentInput ? rentInput.value : 0, 10) || 0;
+  const depositInput = document.getElementById('bldDefaultDeposit');
+  if (depositInput) {
+    depositInput.value = months > 0 ? (rent * months) : 0;
+  }
+}
+
+function onBldRentInputChange() {
+  if (currentBldDepositPresetMonths > 0) {
+    const rentInput = document.getElementById('bldDefaultRent');
+    const rent = parseInt(rentInput ? rentInput.value : 0, 10) || 0;
+    const depositInput = document.getElementById('bldDefaultDeposit');
+    if (depositInput) {
+      depositInput.value = rent * currentBldDepositPresetMonths;
+    }
+  }
+}
+
 // Ajout d'un logement individuel
 function handleAddNewProperty(e) {
   e.preventDefault();
@@ -1698,12 +1866,19 @@ function handleAddNewProperty(e) {
     ? document.getElementById('propIsCommercial').checked 
     : (type === 'Commercial' || type === 'Bureaux');
 
+  // Gestion de la caution
+  const depositInput = document.getElementById('propDeposit');
+  const deposit = depositInput && depositInput.value !== '' ? (parseInt(depositInput.value, 10) || 0) : (rent * 2);
+  const depositMethod = (document.getElementById('propDepositMethod') && document.getElementById('propDepositMethod').value) || 'Wave';
+  const depositMonths = (rent > 0 && deposit > 0) ? Math.round(deposit / rent) : 0;
+
   const pKey = getPeriodKey();
   const today = getTodayFormatted();
   const newId = Date.now();
   const newReceiptNo = isCommercial 
     ? `FACT-${selectedPeriod.year}-${String(newId).slice(-6)}`
     : `KG-${selectedPeriod.year}-${String(newId).slice(-6)}`;
+  const newDepositReceiptNo = `DEP-${selectedPeriod.year}-${String(newId).slice(-6)}`;
 
   const newProp = {
     id: newId,
@@ -1713,6 +1888,12 @@ function handleAddNewProperty(e) {
     type: type,
     rent: rent,
     charges: charges,
+    deposit: deposit,
+    depositMonths: depositMonths,
+    depositPaymentMethod: depositMethod,
+    depositPaidDate: today,
+    depositStatus: 'held',
+    depositReceiptNo: newDepositReceiptNo,
     tenant: tenant || "Non assigné",
     phone: phone || "Non renseigné",
     status: initialStatus,
@@ -1750,8 +1931,14 @@ function handleGenerateBuilding(e) {
   const defaultRent = parseInt(document.getElementById('bldDefaultRent').value, 10) || 220000;
   const owner = (document.getElementById('bldOwnerName') && document.getElementById('bldOwnerName').value) || 'Jean Philippe Gomis';
 
+  // Caution par défaut pour l'immeuble
+  const bldDepositInput = document.getElementById('bldDefaultDeposit');
+  const defaultDeposit = bldDepositInput && bldDepositInput.value !== '' ? (parseInt(bldDepositInput.value, 10) || 0) : (defaultRent * 2);
+  const depositMonths = (defaultRent > 0 && defaultDeposit > 0) ? Math.round(defaultDeposit / defaultRent) : 2;
+
   const letters = ['A', 'B', 'C', 'D'];
   const pKey = getPeriodKey();
+  const today = getTodayFormatted();
 
   for (let i = 1; i <= unitCount; i++) {
     const floor = Math.ceil(i / 2);
@@ -1766,6 +1953,7 @@ function handleGenerateBuilding(e) {
 
     const newId = properties.length + 1;
     const newReceiptNo = `KG-${selectedPeriod.year}-00${50 + newId}`;
+    const newDepositReceiptNo = `DEP-${selectedPeriod.year}-00${50 + newId}`;
 
     properties.push({
       id: newId,
@@ -1775,6 +1963,12 @@ function handleGenerateBuilding(e) {
       type: "Appartement conventionné",
       rent: defaultRent,
       charges: 15000,
+      deposit: defaultDeposit,
+      depositMonths: depositMonths,
+      depositPaymentMethod: "Wave",
+      depositPaidDate: today,
+      depositStatus: "held",
+      depositReceiptNo: newDepositReceiptNo,
       tenant: tenantName,
       phone: tenantPhone,
       status: "late", // En attente par défaut pour la période
@@ -1805,6 +1999,188 @@ function closeModalOnOverlay(e) {
   if (e.target.classList.contains('modal-overlay')) {
     e.target.classList.remove('active');
   }
+}
+
+// ===================================================
+// GESTION ET MODAL DU REÇU OFFICIEL DE CAUTION (DÉPÔT DE GARANTIE)
+// ===================================================
+let currentActiveDepositProperty = null;
+
+function openDepositModal(id) {
+  const p = properties.find(item => item.id === id);
+  if (!p) return;
+  currentActiveDepositProperty = p;
+
+  const depositReceiptNo = p.depositReceiptNo || `DEP-${selectedPeriod.year}-${String(p.id).padStart(4, '0')}`;
+  const depositAmount = (p.deposit !== undefined && p.deposit !== null) ? p.deposit : (p.rent * 2);
+  const equivMonths = p.depositMonths || (p.rent > 0 ? Math.round(depositAmount / p.rent) : 2);
+  const equivMonthsText = equivMonths > 0 ? `Équivalent à ${equivMonths} mois de loyer contractuel` : 'Caution forfaitaire contractuelle';
+
+  const numEl = document.getElementById('mDepositReceiptNumber');
+  if (numEl) numEl.textContent = depositReceiptNo;
+
+  const refEl = document.getElementById('mDepositReceiptRef');
+  if (refEl) refEl.textContent = depositReceiptNo;
+
+  const methodEl = document.getElementById('mDepositPaymentMethodBadge');
+  if (methodEl) methodEl.textContent = 'Par ' + (p.depositPaymentMethod || p.paymentMethod || 'Wave');
+
+  const equivEl = document.getElementById('mDepositEquivMonths');
+  if (equivEl) equivEl.textContent = equivMonthsText;
+
+  // Bailleur
+  const ownerEl = document.getElementById('mDepositOwnerName');
+  const signerEl = document.getElementById('mDepositSignerName');
+  if (isAgencyMode && p.owner) {
+    if (ownerEl) ownerEl.textContent = p.owner + ' (Géré par Agence KeurGui)';
+    if (signerEl) signerEl.textContent = 'AGENCE KEURGUI';
+  } else {
+    if (ownerEl) ownerEl.textContent = 'Jean Philippe Gomis';
+    if (signerEl) signerEl.textContent = 'GOMIS J.P.';
+  }
+
+  // Preneur / Locataire
+  const tenantEl = document.getElementById('mDepositTenantName');
+  if (tenantEl) tenantEl.textContent = p.tenant;
+
+  const tenantSigEl = document.getElementById('mDepositTenantSig');
+  if (tenantSigEl) tenantSigEl.textContent = p.tenant;
+
+  const tenantPhoneEl = document.getElementById('mDepositTenantPhone');
+  if (tenantPhoneEl) tenantPhoneEl.textContent = p.phone;
+
+  const propAddrEl = document.getElementById('mDepositPropertyAddress');
+  if (propAddrEl) propAddrEl.textContent = `${p.unitName}, ${p.building} — ${p.neighborhood}, Dakar`;
+
+  const unitDetailsEl = document.getElementById('mDepositUnitDetails');
+  if (unitDetailsEl) unitDetailsEl.textContent = p.type || 'Logement conventionné';
+
+  const monthlyRentEl = document.getElementById('mDepositMonthlyRent');
+  if (monthlyRentEl) monthlyRentEl.textContent = formatFCFA(p.rent);
+
+  // Montants
+  const tableAmountEl = document.getElementById('mDepositTableAmount');
+  if (tableAmountEl) tableAmountEl.textContent = formatFCFA(depositAmount);
+
+  const tableTotalEl = document.getElementById('mDepositTableTotal');
+  if (tableTotalEl) tableTotalEl.textContent = formatFCFA(depositAmount);
+
+  const wordsEl = document.getElementById('mDepositAmountWords');
+  if (wordsEl) wordsEl.textContent = numberToWordsFR(depositAmount);
+
+  const issueDateEl = document.getElementById('mDepositIssueDate');
+  if (issueDateEl) issueDateEl.textContent = p.depositPaidDate ? p.depositPaidDate : getTodayFormatted();
+
+  // Statut de la caution
+  const isHeld = (p.depositStatus === 'held' || !p.depositStatus);
+  const badgeMain = document.getElementById('mDepositBadgeMain');
+  const toggleBtnText = document.getElementById('btnToggleDepositRefundText');
+  if (badgeMain) {
+    badgeMain.textContent = isHeld ? 'CAUTION EN RÉSERVE' : 'CAUTION RESTITUÉE';
+  }
+  if (toggleBtnText) {
+    toggleBtnText.textContent = isHeld ? 'Marquer Restituée' : 'Remettre en Réserve';
+  }
+
+  const modal = document.getElementById('depositReceiptModalOverlay');
+  if (modal) modal.classList.add('active');
+}
+
+function closeDepositReceiptModal() {
+  const modal = document.getElementById('depositReceiptModalOverlay');
+  if (modal) modal.classList.remove('active');
+}
+
+function closeDepositModalOnOverlay(e) {
+  if (e.target.id === 'depositReceiptModalOverlay') {
+    closeDepositReceiptModal();
+  }
+}
+
+function toggleCurrentDepositStatus() {
+  if (!currentActiveDepositProperty) return;
+  const p = currentActiveDepositProperty;
+  const wasHeld = (p.depositStatus === 'held' || !p.depositStatus);
+  p.depositStatus = wasHeld ? 'refunded' : 'held';
+
+  saveProperties();
+  renderProperties();
+  updateStats();
+
+  // Mettre à jour l'affichage de la modale ouverte
+  openDepositModal(p.id);
+
+  if (p.depositStatus === 'refunded') {
+    showToast(`Caution de ${p.tenant} marquée comme restituée.`, "info");
+  } else {
+    showToast(`Caution de ${p.tenant} remise en réserve sécurisée.`, "success");
+  }
+}
+
+function downloadDirectDepositPDF() {
+  if (!currentActiveDepositProperty) return;
+  const p = currentActiveDepositProperty;
+  const element = document.getElementById('printableDepositReceipt');
+  const cleanTenant = (p.tenant || 'Locataire').replace(/\s+/g, '_');
+  const receiptNo = p.depositReceiptNo || `DEP-2026-${String(p.id).padStart(4, '0')}`;
+  const filename = `Recu_Caution_${receiptNo}_${cleanTenant}.pdf`;
+
+  showToast("⏳ Préparation du Reçu de Caution A4 (1 page)...", "info");
+  exportElementToA4Pdf(element, filename, null, null, () => {
+    showToast(`✅ Reçu de caution ${receiptNo} téléchargé avec succès !`, "success");
+  });
+}
+
+function sendWhatsAppDepositReceipt() {
+  if (!currentActiveDepositProperty) return;
+  const p = currentActiveDepositProperty;
+  const receiptNo = p.depositReceiptNo || `DEP-2026-${String(p.id).padStart(4, '0')}`;
+  const cleanTenant = (p.tenant || 'Locataire').replace(/\s+/g, '_');
+  const filename = `Recu_Caution_${receiptNo}_${cleanTenant}.pdf`;
+  const amountStr = formatFCFA(p.deposit || (p.rent * 2));
+
+  // Message ultra-court et chaleureux
+  const message = `Bonjour ${p.tenant},
+
+Veuillez trouver ci-joint votre reçu officiel de caution pour votre emménagement à ${p.unitName} (${amountStr}).
+
+Document certifié KeurGui. Bienvenue et très bonne installation !`;
+
+  const element = document.getElementById('printableDepositReceipt');
+  showToast("⏳ Préparation du reçu de caution PDF (1 page)...", "info");
+
+  exportElementToA4Pdf(element, filename, null, null, async (blob) => {
+    // Smartphone : Partage direct avec pièce jointe
+    if (blob && navigator.canShare) {
+      try {
+        const file = new File([blob], filename, { type: 'application/pdf' });
+        if (navigator.canShare({ files: [file] })) {
+          showToast("📲 Ouverture de WhatsApp avec le reçu de caution joint...", "success");
+          await navigator.share({
+            files: [file],
+            title: filename,
+            text: message
+          });
+          return;
+        }
+      } catch (err) {
+        if (err.name === 'AbortError') return;
+        console.log("Web Share fallback:", err);
+      }
+    }
+
+    // Fallback Ordinateur / WhatsApp Web
+    const cleanPhone = sanitizeWhatsAppPhone(p.phone);
+    const url = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`;
+    showToast("✅ Reçu PDF téléchargé ! Sur WhatsApp, cliquez sur 📎 pour joindre le reçu.", "success");
+    setTimeout(() => {
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }, 600);
+  }, true);
+}
+
+function printDepositReceiptPaper() {
+  window.print();
 }
 
 // ===================================================

@@ -606,6 +606,24 @@ input:checked + .slider:before {
   transition: width 0.5s ease;
 }
 
+/* Statistique Caution en Réserve */
+.stat-card.stat-deposit {
+  background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+  border: 1.5px solid #a7f3d0;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.08);
+}
+
+.stat-card.stat-deposit:hover {
+  border-color: #10b981;
+  box-shadow: 0 8px 25px rgba(16, 185, 129, 0.16);
+}
+
+.stat-card.stat-deposit .stat-icon {
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+  font-size: 24px;
+}
+
 /* ===================================================
    BARRE D'ACTIONS & FILTRES
    =================================================== */
@@ -842,6 +860,107 @@ input:checked + .slider:before {
   font-size: 12px;
   color: var(--gray-400);
   margin-left: 6px;
+}
+
+/* Badge & Reçu Caution dans la rangée du logement */
+.unit-deposit-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 5px;
+  padding: 3px 8px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 11px;
+  color: #334155;
+  width: fit-content;
+}
+
+.unit-deposit-tag strong {
+  color: #064e3b;
+  font-weight: 700;
+}
+
+.deposit-pill {
+  font-size: 10px;
+  font-weight: 800;
+  padding: 1px 6px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.deposit-pill.deposit-held {
+  background: #ecfdf5;
+  color: #059669;
+  border: 1px solid #a7f3d0;
+}
+
+.deposit-pill.deposit-refunded {
+  background: #f1f5f9;
+  color: #64748b;
+  border: 1px solid #cbd5e1;
+}
+
+.btn-deposit-link {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #065f46;
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 4px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  transition: all 0.15s ease;
+  margin-left: 2px;
+}
+
+.btn-deposit-link:hover {
+  background: #059669;
+  color: #ffffff;
+  border-color: #059669;
+}
+
+/* Formulaire d'ajout : Section et Présélections de Caution */
+.deposit-input-card {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  margin-bottom: 16px;
+}
+
+.deposit-quick-buttons {
+  display: flex;
+  gap: 4px;
+}
+
+.btn-preset-sm {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+  padding: 3px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-preset-sm:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.btn-preset-sm.active-preset {
+  background: #059669;
+  color: #ffffff;
+  border-color: #059669;
+  box-shadow: 0 2px 6px rgba(5, 150, 105, 0.25);
 }
 
 .unit-financial-col {

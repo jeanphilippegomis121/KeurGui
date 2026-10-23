@@ -187,3 +187,47 @@
 - **Persistance :** Sauvegarde locale dans `localStorage` (`keurgui_receipts_history`) synchronisée en temps réel à chaque encaissement de loyer.
 
 ---
+
+## 🛡️ Séance du 23 Octobre 2026 (Session 6) — Module « Gestion de la Caution & Reçu Officiel A4 »
+
+### 1. 💡 Diagnostic & Contexte Sénégalais
+- Au Sénégal, la pratique et la loi sur les baux fixent couramment la caution à **1 à 2 mois de loyer** en garantie à l'entrée.
+- **Problématique résolue :** 90% des litiges locataires/bailleurs à Dakar surviennent à la restitution de la caution lors du départ (montant contesté, papier d'entrée introuvable).
+- Les propriétaires n'avaient aucun aperçu du montant total des cautions qu'ils détiennent en réserve et doivent restituer un jour.
+
+### 2. 📊 Nouvelle Statistique Clé « Cautions en Réserve »
+- Ajout de la 4ème carte maîtresse sur le tableau de bord :
+  - **Indicateur :** `Cautions en Réserve : X FCFA` (ex: 5 620 000 FCFA).
+  - **Badge dynamique :** `🛡️ X cautions en réserve`.
+  - Rappel comptable pour les bailleurs : cette réserve de trésorerie est sécurisée pour les locataires.
+
+### 3. 🏷️ Badges & Accès 1-Clic sur Chaque Logement
+- Dans chaque ligne de logement (`.unit-row`) :
+  - Pastille élégante : `🛡️ Caution : 460 000 FCFA (2 mois) [En réserve]`.
+  - Bouton d'action directe : `[ 📄 Reçu ]` pour ouvrir instantanément le document officiel.
+
+### 4. 📄 Reçu Officiel de Caution & Dépôt de Garantie (1 page A4 Conforme COCC)
+- Modale grand format dédiée avec feuille certifiée :
+  - Titre : **« REÇU OFFICIEL DE DÉPÔT DE GARANTIE »**.
+  - Mention : *« Caution Locative d'Entrée • Équivalent à 2 mois de loyer »*.
+  - Références complètes : N° de reçu (`DEP-2026-XXXX`), bailleur/mandataire, locataire preneur, adresse et type de bien.
+  - Montant en chiffres et en toutes lettres (*Deux cent cinquante mille Francs CFA*).
+  - **Clause légale stricte sénégalaise (COCC - Code des Obligations Civiles et Commerciales) :** délai légal de restitution de 30 jours après remise des clés et état des lieux contradictoire, interdiction d'imputer sur le dernier mois de loyer.
+  - Tampon officiel numérique KeurGui et bloc signatures bailleur & preneur.
+
+### 5. 💬 Partage WhatsApp & Téléchargement PDF
+- **Téléchargement PDF :** Calibré dans la sandbox A4 isolée (garantie 1 seule page sans débordement).
+- **Partage WhatsApp :** Pièce jointe directe sur smartphone (Web Share API) ou redirection WhatsApp Web avec message chaleureux personnalisé :
+  > *« Bonjour [Nom], veuillez trouver ci-joint votre reçu officiel de caution pour votre emménagement à [Logement] ([Montant] FCFA). Document certifié KeurGui. Bienvenue et très bonne installation ! »*
+
+### 6. 🔄 Gestion du Statut & Restitution de Caution
+- Bouton rapide dans la modale : `[ 🔄 Marquer Restituée ]` / `[ Remettre en Réserve ]`.
+- Met à jour immédiatement le compteur de réserves et bascule le badge sur `[ Restituée ]` pour un suivi rigoureux en fin de bail.
+
+### 7. ⚡ Formulaires Simplifiés avec Présélections 1-Clic
+- Dans l'ajout de logement unique et d'immeuble :
+  - 4 boutons de calcul automatique : `[ 1 mois ]`, `[ 2 mois (standard) ]`, `[ 3 mois ]`, `[ 0 (Aucune) ]`.
+  - Recalcul en temps réel dès que l'utilisateur tape le montant du loyer.
+  - Choix du mode de versement : Wave, Orange Money, Espèces ou Virement Bancaire.
+
+---
