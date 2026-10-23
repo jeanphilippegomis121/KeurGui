@@ -832,6 +832,8 @@ function renderProperties() {
                   <span>🔔</span> Relance WhatsApp
                 </button>
               `;
+            }
+
             let depositBadge = '';
             if (u.deposit && u.deposit > 0) {
               const monthsText = u.depositMonths ? ` (${u.depositMonths} mois)` : '';
