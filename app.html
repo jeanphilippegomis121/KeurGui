@@ -25,7 +25,7 @@
   <!-- Bibliothèque de génération PDF directe (téléchargement instantané du fichier .pdf) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
-  <link rel="stylesheet" href="style.css?v=2.3">
+  <link rel="stylesheet" href="style.css?v=2.5">
 </head>
 
 <body>
@@ -764,9 +764,9 @@
         <table class="receipt-table">
           <thead>
             <tr>
-              <th>Désignation de la garantie</th>
-              <th>Bien loué / Destination</th>
-              <th class="text-right">Montant (FCFA)</th>
+              <th style="width: 44%;">Désignation de la garantie</th>
+              <th style="width: 32%;">Bien loué / Destination</th>
+              <th style="width: 24%;" class="text-right">Montant (FCFA)</th>
             </tr>
           </thead>
           <tbody>
@@ -906,18 +906,8 @@
 
         <div class="form-row">
           <div class="form-group">
-            <label>Quartier <span style="color:#ef4444;">*</span></label>
-            <select id="propNeighborhood" required>
-              <option value="Mermoz">Mermoz</option>
-              <option value="Almadies">Almadies</option>
-              <option value="Ngor">Ngor</option>
-              <option value="Ouakam">Ouakam</option>
-              <option value="Fann Résidence">Fann Résidence</option>
-              <option value="Maristes">Maristes</option>
-              <option value="Plateau">Dakar Plateau</option>
-              <option value="Keur Massar">Keur Massar</option>
-              <option value="Saly / Mbour">Saly / Mbour</option>
-            </select>
+            <label>Quartier / Emplacement <span style="color:#ef4444;">*</span></label>
+            <input type="text" id="propNeighborhood" list="neighborhoodSuggestions" placeholder="Ex: Yeumbeul, Comico, Mermoz, Almadies..." required autocomplete="off">
           </div>
           <div class="form-group">
             <label>Type de bien</label>
@@ -1038,18 +1028,104 @@
             <input type="text" id="bldName" placeholder="Ex: Résidence Teranga, Immeuble Horizon..." required>
           </div>
           <div class="form-group">
-            <label>Quartier <span style="color:#ef4444;">*</span></label>
-            <select id="bldNeighborhood" required>
-              <option value="Mermoz">Mermoz</option>
-              <option value="Almadies">Almadies</option>
-              <option value="Ngor">Ngor</option>
-              <option value="Ouakam">Ouakam</option>
-              <option value="Maristes">Maristes</option>
-              <option value="Plateau">Dakar Plateau</option>
-              <option value="Fann Résidence">Fann Résidence</option>
-            </select>
+            <label>Quartier / Emplacement <span style="color:#ef4444;">*</span></label>
+            <input type="text" id="bldNeighborhood" list="neighborhoodSuggestions" placeholder="Ex: Yeumbeul, Comico, Mermoz, Almadies..." required autocomplete="off">
           </div>
         </div>
+
+        <!-- LISTE DE SUGGESTIONS DE QUARTIERS AU SÉNÉGAL (LIBRE & AUTO-COMPLÉTÉE) -->
+        <datalist id="neighborhoodSuggestions">
+          <!-- Dakar Villes & Quartiers Résidentiels -->
+          <option value="Mermoz"></option>
+          <option value="Almadies"></option>
+          <option value="Ngor"></option>
+          <option value="Ouakam"></option>
+          <option value="Mamelles"></option>
+          <option value="Fann Résidence"></option>
+          <option value="Point E"></option>
+          <option value="Fann Hock"></option>
+          <option value="Dakar Plateau"></option>
+          <option value="Maristes (Hann Maristes)"></option>
+          <option value="Bel-Air"></option>
+          <option value="Hann Bel-Air"></option>
+          <option value="Zone de Captage"></option>
+          <option value="Castors"></option>
+          <option value="Dieuppeul"></option>
+          <option value="Derklé"></option>
+          <option value="Sacré-Cœur 1"></option>
+          <option value="Sacré-Cœur 2"></option>
+          <option value="Sacré-Cœur 3"></option>
+          <option value="VDN"></option>
+          <option value="Liberté 1"></option>
+          <option value="Liberté 2"></option>
+          <option value="Liberté 3"></option>
+          <option value="Liberté 4"></option>
+          <option value="Liberté 5"></option>
+          <option value="Liberté 6"></option>
+          <option value="Liberté 6 Extension"></option>
+          <option value="Médina"></option>
+          <option value="Gueule Tapée"></option>
+          <option value="Fass"></option>
+          <option value="Colobane"></option>
+          <option value="Grand Dakar"></option>
+          <option value="HLM"></option>
+          <option value="Yoff"></option>
+          <option value="Yoff Tonghor"></option>
+          <option value="Nord Foire"></option>
+          <option value="Ouest Foire"></option>
+          <option value="Cité Mixta"></option>
+          <option value="Cité Keur Gorgui"></option>
+          <option value="Cité Aliou Sow"></option>
+          <option value="Cité Biagui"></option>
+          <option value="Cité Touba Ouakam"></option>
+
+          <!-- Banlieue de Dakar -->
+          <option value="Parcelles Assainies"></option>
+          <option value="Grand Yoff"></option>
+          <option value="Patte d'Oie"></option>
+          <option value="Pikine"></option>
+          <option value="Pikine Tally Boubess"></option>
+          <option value="Pikine Icotaf"></option>
+          <option value="Pikine Guinaw Rails"></option>
+          <option value="Guédiawaye"></option>
+          <option value="Guédiawaye Golf Sud"></option>
+          <option value="Guédiawaye Hamo"></option>
+          <option value="Guédiawaye Wakhinane"></option>
+          <option value="Yeumbeul"></option>
+          <option value="Yeumbeul Nord"></option>
+          <option value="Yeumbeul Sud"></option>
+          <option value="Comico"></option>
+          <option value="Keur Massar"></option>
+          <option value="Malika"></option>
+          <option value="Thiaroye"></option>
+          <option value="Thiaroye Azur"></option>
+          <option value="Mbao"></option>
+          <option value="Diamaguène"></option>
+          <option value="Rufisque"></option>
+          <option value="Rufisque Est"></option>
+          <option value="Rufisque Ouest"></option>
+          <option value="Rufisque Nord"></option>
+          <option value="Bargny"></option>
+          <option value="Diamniadio"></option>
+          <option value="Sébikotane"></option>
+          <option value="Sangalkam"></option>
+          <option value="Bambilor"></option>
+          <option value="Lac Rose"></option>
+
+          <!-- Petite Côte & Régions du Sénégal -->
+          <option value="Saly Portudal"></option>
+          <option value="Saly Niakh Niakhal"></option>
+          <option value="Mbour"></option>
+          <option value="Somone"></option>
+          <option value="Ngaparou"></option>
+          <option value="Popenguine"></option>
+          <option value="Thiès"></option>
+          <option value="Saint-Louis"></option>
+          <option value="Touba"></option>
+          <option value="Mbacké"></option>
+          <option value="Ziguinchor"></option>
+          <option value="Kaolack"></option>
+        </datalist>
 
         <div class="form-row">
           <div class="form-group">
@@ -1200,7 +1276,7 @@
     </div>
   </div>
 
-  <script src="app.js?v=2.3"></script>
+  <script src="app.js?v=2.5"></script>
 </body>
 
 </html>

@@ -2857,7 +2857,9 @@ input:checked + .slider:before {
 #pdf-render-sandbox .receipt-sheet,
 #pdf-isolated-clone.receipt-sheet,
 #pdf-render-sandbox .agency-invoice-sheet,
-#pdf-isolated-clone.agency-invoice-sheet {
+#pdf-isolated-clone.agency-invoice-sheet,
+#pdf-render-sandbox #printableDepositReceipt,
+#pdf-isolated-clone#printableDepositReceipt {
   width: 794px !important;
   min-width: 794px !important;
   max-width: 794px !important;
@@ -2869,6 +2871,15 @@ input:checked + .slider:before {
   border-radius: 0 !important;
   background: #ffffff !important;
   color: #1e293b !important;
+  page-break-inside: avoid !important;
+  break-inside: avoid !important;
+}
+
+#pdf-render-sandbox .receipt-badge-paid,
+#pdf-isolated-clone .receipt-badge-paid {
+  opacity: 1 !important;
+  animation: none !important;
+  transform: none !important; /* Neutralise la rotation pour éviter tout rognage de bordure */
 }
 
 #pdf-render-sandbox .receipt-parties-grid,
@@ -2882,6 +2893,8 @@ input:checked + .slider:before {
   padding: 8px 12px !important;
   background: #f8fafc !important;
   border: 1px solid #e2e8f0 !important;
+  border-radius: 6px !important;
+  page-break-inside: avoid !important;
 }
 
 #pdf-render-sandbox .receipt-divider,
@@ -2909,6 +2922,8 @@ input:checked + .slider:before {
   width: 100% !important;
   margin-bottom: 8px !important;
   border-collapse: collapse !important;
+  table-layout: fixed !important;
+  page-break-inside: avoid !important;
 }
 
 #pdf-render-sandbox .receipt-table th,
@@ -2917,6 +2932,37 @@ input:checked + .slider:before {
 #pdf-isolated-clone .receipt-table td {
   padding: 5px 8px !important;
   font-size: 10.5px !important;
+  vertical-align: middle !important;
+  word-wrap: break-word !important;
+}
+
+#pdf-render-sandbox .receipt-table th:nth-child(1),
+#pdf-isolated-clone .receipt-table th:nth-child(1),
+#pdf-render-sandbox .receipt-table td:nth-child(1),
+#pdf-isolated-clone .receipt-table td:nth-child(1) {
+  width: 44% !important;
+}
+
+#pdf-render-sandbox .receipt-table th:nth-child(2),
+#pdf-isolated-clone .receipt-table th:nth-child(2),
+#pdf-render-sandbox .receipt-table td:nth-child(2),
+#pdf-isolated-clone .receipt-table td:nth-child(2) {
+  width: 32% !important;
+}
+
+#pdf-render-sandbox .receipt-table th:nth-child(3),
+#pdf-isolated-clone .receipt-table th:nth-child(3),
+#pdf-render-sandbox .receipt-table td:nth-child(3),
+#pdf-isolated-clone .receipt-table td:nth-child(3) {
+  width: 24% !important;
+  text-align: right !important;
+}
+
+#pdf-render-sandbox .receipt-total-row td,
+#pdf-isolated-clone .receipt-total-row td {
+  padding: 7px 8px !important;
+  background: #f8fafc !important;
+  font-weight: 700 !important;
 }
 
 #pdf-render-sandbox .receipt-words-box,
@@ -2926,6 +2972,8 @@ input:checked + .slider:before {
   font-size: 10px !important;
   background: #f8fafc !important;
   border: 1px solid #e2e8f0 !important;
+  border-radius: 4px !important;
+  page-break-inside: avoid !important;
 }
 
 #pdf-render-sandbox .receipt-legal-note,
@@ -2934,6 +2982,7 @@ input:checked + .slider:before {
   line-height: 1.3 !important;
   margin-bottom: 8px !important;
   color: #64748b !important;
+  page-break-inside: avoid !important;
 }
 
 #pdf-render-sandbox .receipt-footer-signatures,
@@ -2941,7 +2990,31 @@ input:checked + .slider:before {
   display: flex !important;
   justify-content: space-between !important;
   align-items: flex-end !important;
-  padding-top: 4px !important;
+  padding-top: 6px !important;
+  page-break-inside: avoid !important;
+}
+
+#pdf-render-sandbox .digital-stamp,
+#pdf-isolated-clone .digital-stamp {
+  border: 2px dashed #059669 !important;
+  padding: 5px 12px !important;
+  border-radius: 8px !important;
+  display: inline-flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  transform: none !important;
+  background: #ffffff !important;
+}
+
+#pdf-render-sandbox .qr-box,
+#pdf-isolated-clone .qr-box {
+  width: 44px !important;
+  height: 44px !important;
+  border-radius: 6px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
 
 /* ===================================================

@@ -440,6 +440,17 @@ function formatFCFA(amount) {
   return new Intl.NumberFormat('fr-FR').format(amount) + ' FCFA';
 }
 
+// Formatage élégant du quartier/ville pour quittances et reçus de caution
+function formatPropertyLocation(neighborhood) {
+  if (!neighborhood) return "Dakar, Sénégal";
+  const trimmed = neighborhood.trim();
+  const lower = trimmed.toLowerCase();
+  if (lower.includes("dakar") || lower.includes("thiès") || lower.includes("thies") || lower.includes("mbour") || lower.includes("saly") || lower.includes("saint-louis") || lower.includes("ziguinchor") || lower.includes("rufisque") || lower.includes("touba")) {
+    return trimmed;
+  }
+  return `${trimmed}, Dakar`;
+}
+
 // Convertisseur parfait de nombres en lettres français pour quittances officielles
 function numberToWordsFR(n) {
   if (n === 0) return 'Zéro Francs CFA';
@@ -914,7 +925,7 @@ function openReceiptModal(id, targetPeriodKey = null) {
   document.getElementById('mPaymentMethodBadge').textContent = 'Par ' + (pData.paymentMethod || p.paymentMethod || 'Wave');
   document.getElementById('mTenantName').textContent = p.tenant;
   document.getElementById('mTenantPhone').textContent = p.phone;
-  document.getElementById('mPropertyAddress').textContent = `${p.unitName}, ${p.building} — ${p.neighborhood}, Dakar`;
+  document.getElementById('mPropertyAddress').textContent = `${p.unitName}, ${p.building} — ${formatPropertyLocation(p.neighborhood)}`;
   document.getElementById('mTablePropertyDetails').textContent = p.type;
   document.getElementById('mTableBaseRent').textContent = formatFCFA(p.rent);
   document.getElementById('mTableCharges').textContent = formatFCFA(p.charges);
@@ -1037,7 +1048,7 @@ function exportElementToA4Pdf(sourceElement, filename, btn, originalText, callba
   badges.forEach(b => {
     b.style.opacity = '1';
     b.style.animation = 'none';
-    b.style.transform = 'rotate(-3deg)';
+    b.style.transform = 'none'; // Pas de rotation pour éviter tout rognage de bordure
   });
 
   // Nettoyer les éléments no-print qui auraient été accidentellement clonés
@@ -1053,7 +1064,7 @@ function exportElementToA4Pdf(sourceElement, filename, btn, originalText, callba
   };
 
   const opt = {
-    margin: [4, 4, 4, 4], // Marges fines pour optimiser l'espace A4
+    margin: [6, 6, 6, 6], // Marges fines pour optimiser l'espace A4
     filename: filename,
     image: { type: 'jpeg', quality: 0.98 },
     html2canvas: {
@@ -1065,40 +1076,66 @@ function exportElementToA4Pdf(sourceElement, filename, btn, originalText, callba
       width: 794,
       windowWidth: 1024 // Neutralise les media queries mobiles (max-width: 768px)
     },
-    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-    pagebreak: { mode: 'avoid-all' }
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
   };
 
   if (window.html2pdf) {
-    html2pdf().set(opt).from(clone).toPdf().get('pdf').then(pdf => {
-      // 🔒 GARANTIE MATHÉMATIQUE STRICTE : 1 SEULE PAGE
-      // Si un micro-débordement créait une 2e page, on supprime impérativement les pages excédentaires
-      const totalPages = pdf.internal.getNumberOfPages();
-      if (totalPages > 1) {
-        for (let i = totalPages; i > 1; i--) {
-          pdf.deletePage(i);
+    const worker = html2pdf().set(opt).from(clone);
+    worker.toCanvas().get('canvas').then(canvas => {
+      return worker.toPdf().get('pdf').then(pdf => {
+        // 🔒 GARANTIE MATHÉMATIQUE STRICTE : 1 SEULE PAGE SANS AUCUNE COUPURE NI PERTE DE CONTENU
+        // Si la hauteur dépassait légèrement l'espace disponible d'une page A4,
+        // on ne supprime PAS la 2e page à l'aveugle (ce qui tronquerait les signatures ou les mentions).
+        // À la place, on redimensionne proportionnellement l'intégralité du canvas pour rentrer à 100% sur la page 1 !
+        if (pdf.internal.getNumberOfPages() > 1) {
+          const totalPages = pdf.internal.getNumberOfPages();
+          for (let i = totalPages; i > 1; i--) {
+            pdf.deletePage(i);
+          }
+          const pageWidth = pdf.internal.pageSize.getWidth();
+          const pageHeight = pdf.internal.pageSize.getHeight();
+          const margin = 6;
+          const maxW = pageWidth - (margin * 2);
+          const maxH = pageHeight - (margin * 2);
+
+          const ratio = canvas.width / canvas.height;
+          let renderW = maxW;
+          let renderH = renderW / ratio;
+
+          if (renderH > maxH) {
+            renderH = maxH;
+            renderW = renderH * ratio;
+          }
+
+          const posX = margin + (maxW - renderW) / 2;
+          const posY = margin;
+          const imgData = canvas.toDataURL('image/jpeg', 0.98);
+
+          pdf.setFillColor(255, 255, 255);
+          pdf.rect(0, 0, pageWidth, pageHeight, 'F');
+          pdf.addImage(imgData, 'JPEG', posX, posY, renderW, renderH);
         }
-      }
 
-      const blob = pdf.output('blob');
+        const blob = pdf.output('blob');
 
-      if (autoSave) {
-        pdf.save(filename);
-      }
+        if (autoSave) {
+          pdf.save(filename);
+        }
 
-      cleanup();
+        cleanup();
 
-      if (btn) {
-        btn.innerHTML = '<span>✅</span> Téléchargé (1 page) !';
-        setTimeout(() => {
-          btn.innerHTML = originalText;
-          btn.classList.remove('loading');
-        }, 2500);
-      }
+        if (btn) {
+          btn.innerHTML = '<span>✅</span> Téléchargé (1 page) !';
+          setTimeout(() => {
+            btn.innerHTML = originalText;
+            btn.classList.remove('loading');
+          }, 2500);
+        }
 
-      if (typeof callback === 'function') {
-        callback(blob, pdf);
-      }
+        if (typeof callback === 'function') {
+          callback(blob, pdf);
+        }
+      });
     }).catch(err => {
       cleanup();
       console.error('Erreur PDF direct:', err);
@@ -1856,7 +1893,7 @@ function handleAddNewProperty(e) {
   e.preventDefault();
 
   const name = document.getElementById('propName').value.trim();
-  const neighborhood = document.getElementById('propNeighborhood').value;
+  const neighborhood = (document.getElementById('propNeighborhood').value || '').trim() || 'Mermoz';
   const type = document.getElementById('propType').value;
   const rent = parseInt(document.getElementById('propRent').value, 10);
   const charges = parseInt(document.getElementById('propCharges').value, 10) || 0;
@@ -1928,7 +1965,7 @@ function handleGenerateBuilding(e) {
   e.preventDefault();
 
   const bldName = document.getElementById('bldName').value.trim();
-  const neighborhood = document.getElementById('bldNeighborhood').value;
+  const neighborhood = (document.getElementById('bldNeighborhood').value || '').trim() || 'Mermoz';
   const unitCount = parseInt(document.getElementById('bldUnitCount').value, 10) || 4;
   const defaultRent = parseInt(document.getElementById('bldDefaultRent').value, 10) || 220000;
   const owner = (document.getElementById('bldOwnerName') && document.getElementById('bldOwnerName').value) || 'Jean Philippe Gomis';
@@ -1941,6 +1978,7 @@ function handleGenerateBuilding(e) {
   const letters = ['A', 'B', 'C', 'D'];
   const pKey = getPeriodKey();
   const today = getTodayFormatted();
+  const timestampBase = Date.now();
 
   for (let i = 1; i <= unitCount; i++) {
     const floor = Math.ceil(i / 2);
@@ -1953,9 +1991,9 @@ function handleGenerateBuilding(e) {
     const tenantName = (tenantInput && tenantInput.value.trim()) || unitLabel;
     const tenantPhone = (phoneInput && phoneInput.value.trim()) || 'Non renseigné';
 
-    const newId = properties.length + 1;
-    const newReceiptNo = `KG-${selectedPeriod.year}-00${50 + newId}`;
-    const newDepositReceiptNo = `DEP-${selectedPeriod.year}-00${50 + newId}`;
+    const newId = timestampBase + i;
+    const newReceiptNo = `KG-${selectedPeriod.year}-00${50 + (i % 99)}`;
+    const newDepositReceiptNo = `DEP-${selectedPeriod.year}-00${50 + (i % 99)}`;
 
     properties.push({
       id: newId,
@@ -2052,7 +2090,7 @@ function openDepositModal(id) {
   if (tenantPhoneEl) tenantPhoneEl.textContent = p.phone;
 
   const propAddrEl = document.getElementById('mDepositPropertyAddress');
-  if (propAddrEl) propAddrEl.textContent = `${p.unitName}, ${p.building} — ${p.neighborhood}, Dakar`;
+  if (propAddrEl) propAddrEl.textContent = `${p.unitName}, ${p.building} — ${formatPropertyLocation(p.neighborhood)}`;
 
   const unitDetailsEl = document.getElementById('mDepositUnitDetails');
   if (unitDetailsEl) unitDetailsEl.textContent = p.type || 'Logement conventionné';
@@ -2122,13 +2160,20 @@ function toggleCurrentDepositStatus() {
 function downloadDirectDepositPDF() {
   if (!currentActiveDepositProperty) return;
   const p = currentActiveDepositProperty;
+  const btn = document.getElementById('btnDepositPdf');
+  const originalText = btn ? btn.innerHTML : '';
+  if (btn) {
+    btn.innerHTML = '<span>⏳</span> Création du PDF...';
+    btn.classList.add('loading');
+  }
+
   const element = document.getElementById('printableDepositReceipt');
   const cleanTenant = (p.tenant || 'Locataire').replace(/\s+/g, '_');
   const receiptNo = p.depositReceiptNo || `DEP-2026-${String(p.id).padStart(4, '0')}`;
   const filename = `Recu_Caution_${receiptNo}_${cleanTenant}.pdf`;
 
   showToast("⏳ Préparation du Reçu de Caution A4 (1 page)...", "info");
-  exportElementToA4Pdf(element, filename, null, null, () => {
+  exportElementToA4Pdf(element, filename, btn, originalText, () => {
     showToast(`✅ Reçu de caution ${receiptNo} téléchargé avec succès !`, "success");
   });
 }
