@@ -1009,94 +1009,151 @@ function closeReceiptModal() {
 // Compatible Desktop (1080p/4K), Tablettes et Mobiles (Garantie Stricte 1 Seule Page A4)
 // ===================================================
 function exportElementToA4Pdf(sourceElement, filename, btn, originalText, callback, autoSave = true) {
-  // 1. Cloner l'élément source pour ne pas altérer l'affichage visuel de l'utilisateur
-  const clone = sourceElement.cloneNode(true);
-  clone.id = 'pdf-isolated-clone';
+  if (btn) {
+    btn.innerHTML = '<span>⏳</span> Création du PDF...';
+    btn.classList.add('loading');
+  }
 
-  // 2. Créer une sandbox d'exportation temporaire ancrée exactement à (0, 0)
-  // Largeur standard A4 : 794px (soit 210mm à 96DPI)
-  const container = document.createElement('div');
-  container.id = 'pdf-render-sandbox';
-  container.style.position = 'fixed';
-  container.style.top = '0px';
-  container.style.left = '0px';
-  container.style.width = '794px';
-  container.style.minWidth = '794px';
-  container.style.maxWidth = '794px';
-  container.style.background = '#ffffff';
-  container.style.zIndex = '999999';
-  container.style.overflow = 'hidden';
-  container.style.boxSizing = 'border-box';
-  container.style.margin = '0';
-  container.style.padding = '0';
-  container.style.pointerEvents = 'none';
+  // 1. Créer une iframe isolée indépendante de la taille d'écran physique de l'appareil (Desktop, Tablette, Mobile)
+  // L'iframe force un viewport dédié de 794px (largeur standard A4) sans être rognée par window.innerWidth sur mobile
+  const iframe = document.createElement('iframe');
+  iframe.id = 'pdf-render-isolated-iframe';
+  iframe.style.position = 'fixed';
+  iframe.style.top = '-10000px';
+  iframe.style.left = '-10000px';
+  iframe.style.width = '794px';
+  iframe.style.height = '1123px';
+  iframe.style.border = 'none';
+  iframe.style.background = '#ffffff';
+  iframe.style.zIndex = '-99999';
+  document.body.appendChild(iframe);
 
-  // 3. Forcer le gabarit strict A4 compact sur le clone pour garantir 1 SEULE PAGE
-  clone.style.width = '794px';
-  clone.style.minWidth = '794px';
-  clone.style.maxWidth = '794px';
-  clone.style.margin = '0';
-  clone.style.boxShadow = 'none';
-  clone.style.borderRadius = '0';
-  clone.style.transform = 'none';
-  clone.style.boxSizing = 'border-box';
-  clone.style.background = '#ffffff';
-  clone.style.padding = '16px 22px';
+  const iDoc = iframe.contentDocument || iframe.contentWindow.document;
+  iDoc.open();
+  iDoc.write('<!DOCTYPE html><html><head><meta charset="utf-8"></head><body style="margin:0;padding:0;background:#ffffff;"></body></html>');
+  iDoc.close();
 
-  // Neutraliser les animations et fixer les tampons dans le clone
-  const badges = clone.querySelectorAll('.receipt-badge-paid');
-  badges.forEach(b => {
-    b.style.opacity = '1';
-    b.style.animation = 'none';
-    b.style.transform = 'none'; // Pas de rotation pour éviter tout rognage de bordure
+  // 2. Copier les styles de l'application dans l'iframe
+  const styleNodes = document.querySelectorAll('link[rel="stylesheet"], style');
+  styleNodes.forEach(node => {
+    try {
+      iDoc.head.appendChild(node.cloneNode(true));
+    } catch (e) {}
   });
 
-  // Nettoyer les éléments no-print qui auraient été accidentellement clonés
-  clone.querySelectorAll('.no-print').forEach(el => el.remove());
+  // 3. Injecter les règles CSS strictes A4 pour neutraliser toute règle responsive mobile et garantir l'intégrité visuelle
+  const overrideStyle = iDoc.createElement('style');
+  overrideStyle.textContent = `
+    * { box-sizing: border-box !important; }
+    html, body {
+      margin: 0 !important;
+      padding: 0 !important;
+      width: 794px !important;
+      min-width: 794px !important;
+      max-width: 794px !important;
+      background: #ffffff !important;
+      color: #1e293b !important;
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+      font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+    }
+    .receipt-sheet {
+      width: 794px !important;
+      min-width: 794px !important;
+      max-width: 794px !important;
+      padding: 18px 24px !important;
+      box-sizing: border-box !important;
+      box-shadow: none !important;
+      border-radius: 0 !important;
+      background: #ffffff !important;
+      page-break-inside: avoid !important;
+      transform: none !important;
+    }
+    .receipt-parties-grid {
+      display: grid !important;
+      grid-template-columns: 1fr 1fr !important;
+      gap: 14px !important;
+      margin-bottom: 12px !important;
+      padding: 10px 14px !important;
+      background: #f8fafc !important;
+      border: 1px solid #e2e8f0 !important;
+      border-radius: 6px !important;
+    }
+    .receipt-table {
+      width: 100% !important;
+      margin-bottom: 10px !important;
+      border-collapse: collapse !important;
+      table-layout: fixed !important;
+    }
+    .receipt-badge-paid {
+      opacity: 1 !important;
+      visibility: visible !important;
+      animation: none !important;
+      transform: none !important;
+      display: inline-flex !important;
+    }
+    .digital-stamp {
+      opacity: 1 !important;
+      visibility: visible !important;
+      transform: none !important;
+      display: inline-flex !important;
+    }
+    .receipt-footer-signatures {
+      display: flex !important;
+      justify-content: space-between !important;
+      align-items: flex-end !important;
+      padding-top: 8px !important;
+    }
+    .no-print {
+      display: none !important;
+    }
+  `;
+  iDoc.head.appendChild(overrideStyle);
 
-  container.appendChild(clone);
-  document.body.appendChild(container);
+  // 4. Cloner l'élément source dans le body de l'iframe
+  const clone = sourceElement.cloneNode(true);
+  clone.id = 'pdf-isolated-clone';
+  clone.querySelectorAll('.no-print').forEach(el => el.remove());
+  iDoc.body.appendChild(clone);
 
   const cleanup = () => {
-    if (document.body.contains(container)) {
-      document.body.removeChild(container);
+    if (document.body.contains(iframe)) {
+      document.body.removeChild(iframe);
     }
   };
 
-  const opt = {
-    margin: [6, 6, 6, 6], // Marges fines pour optimiser l'espace A4
-    filename: filename,
-    image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: {
-      scale: 2,
-      useCORS: true,
-      logging: false,
-      scrollY: 0,
-      scrollX: 0,
-      width: 794,
-      windowWidth: 1024 // Neutralise les media queries mobiles (max-width: 768px)
-    },
-    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-  };
-
   if (window.html2pdf) {
-    const worker = html2pdf().set(opt).from(clone);
-    worker.toCanvas().get('canvas').then(canvas => {
-      return worker.toPdf().get('pdf').then(pdf => {
-        // 🔒 GARANTIE MATHÉMATIQUE STRICTE : 1 SEULE PAGE SANS AUCUNE COUPURE NI PERTE DE CONTENU
-        // Si la hauteur dépassait légèrement l'espace disponible d'une page A4,
-        // on ne supprime PAS la 2e page à l'aveugle (ce qui tronquerait les signatures ou les mentions).
-        // À la place, on redimensionne proportionnellement l'intégralité du canvas pour rentrer à 100% sur la page 1 !
-        if (pdf.internal.getNumberOfPages() > 1) {
+    // Laisser 250ms à l'iframe pour charger polices et styles
+    setTimeout(() => {
+      const opt = {
+        margin: 0,
+        filename: filename,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: {
+          scale: 2,
+          useCORS: true,
+          logging: false,
+          scrollY: 0,
+          scrollX: 0,
+          width: 794,
+          windowWidth: 794
+        },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+
+      const worker = window.html2pdf().set(opt).from(clone);
+      worker.toCanvas().get('canvas').then(canvas => {
+        return worker.toPdf().get('pdf').then(pdf => {
+          // 🔒 GARANTIE MATHÉMATIQUE STRICTE : 1 SEULE PAGE A4 PARFAITEMENT CENTRÉE SANS AUCUNE COUPURE
           const totalPages = pdf.internal.getNumberOfPages();
           for (let i = totalPages; i > 1; i--) {
             pdf.deletePage(i);
           }
-          const pageWidth = pdf.internal.pageSize.getWidth();
-          const pageHeight = pdf.internal.pageSize.getHeight();
+          const pageWidth = pdf.internal.pageSize.getWidth(); // 210mm
+          const pageHeight = pdf.internal.pageSize.getHeight(); // 297mm
           const margin = 6;
-          const maxW = pageWidth - (margin * 2);
-          const maxH = pageHeight - (margin * 2);
+          const maxW = pageWidth - (margin * 2); // 198mm
+          const maxH = pageHeight - (margin * 2); // 285mm
 
           const ratio = canvas.width / canvas.height;
           let renderW = maxW;
@@ -1114,41 +1171,41 @@ function exportElementToA4Pdf(sourceElement, filename, btn, originalText, callba
           pdf.setFillColor(255, 255, 255);
           pdf.rect(0, 0, pageWidth, pageHeight, 'F');
           pdf.addImage(imgData, 'JPEG', posX, posY, renderW, renderH);
-        }
 
-        const blob = pdf.output('blob');
+          const blob = pdf.output('blob');
 
-        if (autoSave) {
-          pdf.save(filename);
-        }
+          if (autoSave) {
+            pdf.save(filename);
+          }
 
+          cleanup();
+
+          if (btn) {
+            btn.innerHTML = '<span>✅</span> Téléchargé (1 page) !';
+            setTimeout(() => {
+              btn.innerHTML = originalText;
+              btn.classList.remove('loading');
+            }, 2500);
+          }
+
+          if (typeof callback === 'function') {
+            callback(blob, pdf);
+          }
+        });
+      }).catch(err => {
         cleanup();
-
+        console.error('Erreur PDF iframe:', err);
         if (btn) {
-          btn.innerHTML = '<span>✅</span> Téléchargé (1 page) !';
-          setTimeout(() => {
-            btn.innerHTML = originalText;
-            btn.classList.remove('loading');
-          }, 2500);
+          btn.innerHTML = originalText;
+          btn.classList.remove('loading');
         }
-
+        showToast("Génération du document en cours...", "info");
+        window.print();
         if (typeof callback === 'function') {
-          callback(blob, pdf);
+          callback(null, null);
         }
       });
-    }).catch(err => {
-      cleanup();
-      console.error('Erreur PDF direct:', err);
-      if (btn) {
-        btn.innerHTML = originalText;
-        btn.classList.remove('loading');
-      }
-      showToast("Génération de la quittance en cours...", "info");
-      window.print();
-      if (typeof callback === 'function') {
-        callback(null, null);
-      }
-    });
+    }, 250);
   } else {
     cleanup();
     if (btn) {

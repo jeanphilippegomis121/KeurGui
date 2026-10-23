@@ -283,3 +283,35 @@
 - Incrémentation du cache-buster asset à `v=2.5`.
 
 ---
+
+## 🚀 Séance du 23 Octobre 2026 (Session 8) — Résolution Définitive du Rognage PDF Mobile (Architecture Iframe Isolée 794px A4)
+
+### 1. 🔍 Analyse Approfondie du Problème & Découverte de la Cause Racine
+- **Constat utilisateur :** Sur smartphone / mobile (iPhone, Android) ou petit viewport, le PDF téléchargé (aussi bien la quittance de loyer que le reçu de caution) présentait un rognage latéral important (la moitié droite du tableau des montants en FCFA, les coordonnées du locataire et les tampons numériques étaient tronqués).
+- **Cause racine identifiée :**
+  - Dans l'ancienne implémentation, le clonage de la quittance s'effectuait dans un conteneur `#pdf-render-sandbox` injecté directement dans le `document.body` de la page principale.
+  - Sur mobile, `window.innerWidth` vaut 375px à 390px. Même avec `style="width: 794px"`, le moteur de rendu `html2canvas` s'appuyant sur la fenêtre parente applique le clipping aux coordonnées `x > window.innerWidth`. Tout ce qui dépasse du viewport physique du téléphone est purement ignoré ou rogné.
+  - De plus, les media queries `@media (max-width: 768px)` s'appliquaient à l'élément cloné, forçant des règles responsive inadaptées à une feuille A4.
+
+### 2. 🛠️ Architecture Technique Mise en Place : Iframe Isolée Dédiée
+- **Création dynamique d'un contexte de navigation indépendant :**
+  - Insertion d'une `<iframe>` invisible (`width: 794px; height: 1123px; position: fixed; top: -10000px; left: -10000px; border: none; background: #ffffff;`).
+  - Au sein de cette iframe, `iframe.contentWindow.innerWidth` vaut **strictement 794px**, indépendamment de la taille physique de l'écran du smartphone.
+  - Les media queries mobiles ne se déclenchent pas dans ce contexte.
+- **Injection des feuilles de style et règles d'isolation A4 :**
+  - Réplication automatique de toutes les balises `<link>` et `<style>`.
+  - Application de styles prioritaires d'impression : `* { box-sizing: border-box !important; }`, `.receipt-parties-grid { display: grid !important; grid-template-columns: 1fr 1fr !important; }`, `.receipt-table { width: 100% !important; table-layout: fixed !important; }`.
+  - Forçage de visibilité immédiate sur les badges et tampons (`opacity: 1 !important; visibility: visible !important; transform: none !important; animation: none !important;`).
+- **Garantie mathématique d'1 seule page A4 sans débordement :**
+  - Capture du canvas haute définition (retina x2, 1588px de large).
+  - Calcul du ratio hauteur/largeur et redimensionnement proportionnel automatique pour s'inscrire dans le rectangle A4 imprimable (198mm × 285mm).
+  - Centrage horizontal parfait et zéro coupure de signature ou de pied de page.
+  - Destruction propre de l'iframe après export (`cleanup()`).
+
+### 3. 🧪 Validation Automatisée Locale & Tests Headless
+- **Vérification visuelle :** Export et inspection de `quittance.png` et `deposit.png` confirmant l'intégrité à 100% du contenu (colonnes FCFA, bailleur et locataire côte à côte, signatures et cachet officiel complets).
+- **Test de bout en bout Headless Chromium avec émulation viewport mobile iPhone (`--window-size=375,812`) :**
+  - `openReceiptModal(1)` -> `exportElementToA4Pdf` : **`Quittance Export: OK (1 page)`**
+  - `openDepositModal(1)` -> `exportElementToA4Pdf` : **`Deposit Export: OK (1 page)`**
+  - Bilan de test automatisé : **`LIVE TEST RESULT: ALL_PASSED`**
+- Cache-buster asset incrémenté à `v=2.6` dans `app.html`.
