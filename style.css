@@ -283,36 +283,108 @@ input:checked + .slider:before {
   justify-content: space-between;
 }
 
-/* Bannière de Démo Interactive Ultra-Visible */
-.demo-banner-highlight {
+/* Bannière Démo Fusionnée Accueil (Compacte avec bouton fermer) */
+.home-merged-demo-card {
   background: linear-gradient(90deg, #064e3b 0%, #0f172a 100%);
   border-bottom: 2px solid #10b981;
-  padding: 12px 0;
+  padding: 10px 0;
   color: #ffffff;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
-.demo-banner-left {
+.demo-card-inner {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 12px;
+  flex-wrap: wrap;
+}
+
+.demo-card-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 240px;
+}
+
+.demo-card-text strong {
+  display: block;
+  font-size: 13px;
+  color: #ffffff;
+}
+
+.demo-card-text .demo-sub {
+  font-size: 11.5px;
+  color: #94a3b8;
+}
+
+.demo-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-dismiss-demo-card {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #cbd5e1;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  transition: all 0.15s ease;
+}
+
+.btn-dismiss-demo-card:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+}
+
+/* Fine barre d'une seule ligne pour les autres onglets */
+.other-views-demo-strip {
+  background: #0f172a;
+  color: #e2e8f0;
+  border-bottom: 1px solid #1e293b;
+  padding: 6px 0;
+  font-size: 11px;
+}
+
+.demo-strip-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-demo-strip-clean {
+  background: none;
+  border: none;
+  color: #34d399;
+  font-weight: 700;
+  font-size: 11px;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+}
+
+.btn-demo-strip-clean:hover {
+  color: #10b981;
 }
 
 .demo-chip-live {
   background: rgba(16, 185, 129, 0.2);
   color: #34d399;
   border: 1px solid #10b981;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 800;
-  padding: 3px 10px;
+  padding: 2px 8px;
   border-radius: 999px;
   letter-spacing: 0.5px;
-}
-
-.demo-text-desc {
-  font-size: 13px;
-  color: #e2e8f0;
-  font-weight: 500;
+  white-space: nowrap;
 }
 
 /* LE BOUTON ULTRA-VISIBLE — ANIMATION PULSANTE + GLOW DORÉ */
@@ -1359,6 +1431,8 @@ input:checked + .slider:before {
   max-width: 800px;
   width: 100%;
   margin: auto;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .receipt-actions-bar {
@@ -1461,16 +1535,19 @@ input:checked + .slider:before {
   background: var(--gray-200);
 }
 
-/* FEUILLE BLANCHE A4 COMPACTE & ÉLÉGANTE (GARANTIE STRICTE 1 SEULE PAGE) */
+/* FEUILLE BLANCHE A4 FIXE 794PX ULTRA-SIMPLE (GARANTIE STRICTE 1 SEULE PAGE SANS COUPURE) */
 .receipt-sheet {
-  background: #ffffff;
-  padding: 20px 26px;
+  width: 794px !important;
+  min-width: 794px !important;
+  max-width: 794px !important;
+  margin: 0 auto !important;
+  background: #ffffff !important;
+  padding: 40px !important;
+  box-sizing: border-box !important;
+  font-family: sans-serif !important;
+  color: #111827 !important;
   border-radius: 0 0 var(--radius-lg) var(--radius-lg);
   box-shadow: var(--shadow-lg);
-  color: #1e293b;
-  font-size: 11.5px;
-  line-height: 1.35;
-  box-sizing: border-box;
 }
 
 .receipt-sheet .receipt-divider {
@@ -2168,14 +2245,7 @@ input:checked + .slider:before {
     overflow-y: auto;
   }
 
-  .receipt-sheet {
-    padding: 20px 14px;
-  }
-
-  .receipt-parties-grid {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
+  /* .receipt-sheet reste strictement fixe à 794px pour garantir la conformité A4 */
 
   .form-row,
   .add-mode-tabs,
@@ -4079,10 +4149,14 @@ input:checked + .slider:before {
     display: none !important;
   }
 
-  /* Ajuster le conteneur principal */
+  /* Ajuster le conteneur principal avec marge de sécurité stricte 96px */
   .app-main-layout {
     width: 100% !important;
-    padding-bottom: 95px !important; /* Laisse la place pour la bottom bar */
+    padding-bottom: 96px !important; /* Marge stricte pour ne jamais cacher la dernière carte */
+  }
+
+  .app-views-wrapper {
+    padding-bottom: 96px !important;
   }
 
   /* Afficher le Top Bar Mobile */
@@ -4195,9 +4269,9 @@ input:checked + .slider:before {
     transform: scale(1.1) !important;
   }
 
-  /* Bouton Magique Mobile Flottant (FAB) */
+  /* Bouton Magique Mobile Flottant (FAB) - Supprimé */
   .mobile-fab-container {
-    display: block;
+    display: none !important;
   }
 
   .btn-mobile-fab {

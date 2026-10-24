@@ -454,34 +454,39 @@ function switchView(viewName) {
     renderDashboardWidgets();
   }
 
+  // 6. Gestion des bannières démo (Accueil : carte compacte ; Autres vues : fine bande 1-ligne)
+  updateDemoBannersVisibility(viewName);
+
   // Scroll doux vers le haut
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// Menu popup du bouton magique mobile (FAB)
-function toggleFabActionMenu() {
-  const sheet = document.getElementById('fabActionSheet');
-  const backdrop = document.getElementById('fabBackdrop');
-  const fab = document.getElementById('btnMobileFab');
-  if (!sheet) return;
+function updateDemoBannersVisibility(viewName = activeView) {
+  const homeDemo = document.getElementById('homeMergedDemoCard');
+  const otherDemo = document.getElementById('otherViewsDemoStrip');
+  const isDemoCleaned = localStorage.getItem('keurgui_cleaned') === 'true';
+  const isHomeDismissed = sessionStorage.getItem('keurgui_home_demo_dismissed') === 'true';
 
-  const isOpen = sheet.classList.contains('active');
-  if (isOpen) {
-    closeFabActionMenu();
+  if (!isDemoCleaned) {
+    if (viewName === 'dashboard') {
+      if (homeDemo) homeDemo.style.display = isHomeDismissed ? 'none' : 'block';
+      if (otherDemo) otherDemo.style.display = 'none';
+    } else {
+      if (homeDemo) homeDemo.style.display = 'none';
+      if (otherDemo) otherDemo.style.display = 'block';
+    }
   } else {
-    sheet.classList.add('active');
-    if (backdrop) backdrop.classList.add('active');
-    if (fab) fab.classList.add('open');
+    if (homeDemo) homeDemo.style.display = 'none';
+    if (otherDemo) otherDemo.style.display = 'none';
   }
 }
 
-function closeFabActionMenu() {
-  const sheet = document.getElementById('fabActionSheet');
-  const backdrop = document.getElementById('fabBackdrop');
-  const fab = document.getElementById('btnMobileFab');
-  if (sheet) sheet.classList.remove('active');
-  if (backdrop) backdrop.classList.remove('active');
-  if (fab) fab.classList.remove('open');
+function dismissHomeDemoCard() {
+  const card = document.getElementById('homeMergedDemoCard');
+  if (card) card.style.display = 'none';
+  try {
+    sessionStorage.setItem('keurgui_home_demo_dismissed', 'true');
+  } catch (e) {}
 }
 
 // Initialisation
@@ -493,6 +498,7 @@ function initApp() {
   renderDashboardWidgets();
   renderTenantsList();
   renderInPageReceipts();
+  updateDemoBannersVisibility('dashboard');
 }
 
 if (document.readyState === 'loading') {
@@ -716,6 +722,16 @@ function updateStats() {
     depositsTag.textContent = `🛡️ ${depositsHeldCount} caution${depositsHeldCount > 1 ? 's' : ''} en réserve`;
   }
 
+  const collectedTag = document.getElementById('collectedLoyerCountTag');
+  if (collectedTag) {
+    collectedTag.textContent = `↑ ${paidCount} loyer${paidCount > 1 ? 's' : ''} payé${paidCount > 1 ? 's' : ''}`;
+  }
+
+  const pendingTag = document.getElementById('pendingLoyerCountTag');
+  if (pendingTag) {
+    pendingTag.textContent = `${lateCount} locataire${lateCount > 1 ? 's' : ''} en attente`;
+  }
+
   document.getElementById('collectionFill').style.width = rate + '%';
   document.getElementById('agencyCommission').textContent = formatFCFA(agencyCommissionHt);
   
@@ -863,7 +879,7 @@ function renderProperties() {
   });
 
   // 3. Générer les cartes d'immeubles propres et aérées pour la période affichée
-  container.innerHTML = Object.keys(groups).map(bldName => {
+  container.innerHTML = Object.keys(groups).map((bldName, bldIdx) => {
     const units = groups[bldName];
     const firstUnit = units[0];
     const neighborhood = firstUnit.neighborhood;
@@ -885,8 +901,8 @@ function renderProperties() {
 
     return `
       <div class="building-card">
-        <!-- En-tête épuré de l'immeuble -->
-        <div class="building-header">
+        <!-- En-tête épuré de l'immeuble avec Accordéon Réduire / Déplier -->
+        <div class="building-header" style="cursor: pointer;" onclick="toggleBuildingAccordion('bld-${bldIdx}')">
           <div class="building-title-area">
             <div class="building-icon">${icon}</div>
             <div>
@@ -894,14 +910,17 @@ function renderProperties() {
               <div class="building-meta">📍 ${escapeHtml(neighborhood)} • ${units.length} logement${units.length > 1 ? 's' : ''}</div>
             </div>
           </div>
-          <div class="building-summary-chips">
+          <div class="building-summary-chips" style="display: flex; align-items: center; gap: 8px;">
             <span class="bld-chip">${formatFCFA(bldTotal)}</span>
             <span class="${chipClass}">${chipText}</span>
+            <button class="btn-accordion-toggle" id="btn-toggle-bld-${bldIdx}" onclick="event.stopPropagation(); toggleBuildingAccordion('bld-${bldIdx}')" style="background:#f1f5f9; border:1px solid #cbd5e1; border-radius:6px; padding:3px 8px; font-size:11px; font-weight:700; color:#334155; cursor:pointer;">
+              <span>▾</span> Réduire
+            </button>
           </div>
         </div>
 
-        <!-- Liste des appartements de l'immeuble -->
-        <div class="building-units-list">
+        <!-- Liste des appartements de l'immeuble (dépliable/repliable) -->
+        <div class="building-units-list" id="bld-${bldIdx}-units">
           ${units.map(u => {
             const total = u.rent + u.charges;
             const uData = getPropertyPeriodData(u, pKey);
@@ -977,10 +996,15 @@ function renderProperties() {
                   ${depositBadge}
                 </div>
 
+                <!-- Encadré financier sur 2 lignes (Ligne 1: Montant + Badge, Ligne 2: Détail loyer/charges) -->
                 <div class="unit-financial-col">
-                  <div class="unit-amount">${formatFCFA(total)}</div>
-                  <div class="unit-breakdown">Loyer : ${formatFCFA(u.rent)} | Ch : ${formatFCFA(u.charges)}</div>
-                  <div>${statusBadge}</div>
+                  <div class="unit-financial-row1" style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+                    <span class="unit-amount" style="white-space: nowrap; font-weight: 800; font-size: 15px; color: #0f172a;">${formatFCFA(total)}</span>
+                    <span class="unit-status-wrap" style="white-space: nowrap; font-size: 11px;">${statusBadge}</span>
+                  </div>
+                  <div class="unit-financial-row2" style="font-size: 11px; color: #64748b; margin-top: 2px;">
+                    Loyer : ${formatFCFA(u.rent)} • Charges : ${formatFCFA(u.charges)}
+                  </div>
                 </div>
 
                 <div class="unit-actions-col">
@@ -993,6 +1017,20 @@ function renderProperties() {
       </div>
     `;
   }).join('');
+}
+
+function toggleBuildingAccordion(bldId) {
+  const list = document.getElementById(`${bldId}-units`);
+  const btn = document.getElementById(`btn-toggle-${bldId}`);
+  if (!list) return;
+  const isHidden = list.style.display === 'none';
+  if (isHidden) {
+    list.style.display = 'block';
+    if (btn) btn.innerHTML = '<span>▾</span> Réduire';
+  } else {
+    list.style.display = 'none';
+    if (btn) btn.innerHTML = '<span>▸</span> Déplier';
+  }
 }
 
 // ===================================================
@@ -1012,17 +1050,21 @@ function renderDashboardWidgets() {
     });
 
     if (lateProps.length > 0) {
+      const firstLate = lateProps[0];
+      const lateTotal = firstLate.rent + firstLate.charges;
+      const buttonLabel = `💬 Relancer ${escapeHtml(firstLate.tenant)} (${formatFCFA(lateTotal)}) →`;
+
       alertsContainer.innerHTML = `
         <div class="dash-alert-card alert-danger">
           <div class="dash-alert-left">
             <span class="dash-alert-icon">⚠️</span>
             <div>
               <div class="dash-alert-title">${lateProps.length} loyer${lateProps.length > 1 ? 's' : ''} en attente ou retard en ${periodText}</div>
-              <div class="dash-alert-desc">Les locataires suivants n'ont pas encore réglé : <strong>${lateProps.map(p => escapeHtml(p.tenant)).join(', ')}</strong>.</div>
+              <div class="dash-alert-desc">Locataire en attente de paiement : <strong>${lateProps.map(p => escapeHtml(p.tenant)).join(', ')}</strong>.</div>
             </div>
           </div>
-          <button class="btn btn-secondary-sm" style="background:#fee2e2; color:#991b1b; border-color:#fca5a5;" onclick="switchView('properties'); setFilter('late');">
-            <span>🔔</span> Voir les ${lateProps.length} relance${lateProps.length > 1 ? 's' : ''} →
+          <button class="btn btn-secondary-sm" style="background:#fee2e2; color:#991b1b; border-color:#fca5a5; font-weight:700;" onclick="sendWhatsAppReminder(${firstLate.id})">
+            ${buttonLabel}
           </button>
         </div>
       `;
@@ -1310,9 +1352,22 @@ function openReceiptModal(id, targetPeriodKey = null) {
   document.getElementById('mTableBaseRent').textContent = formatFCFA(p.rent);
   document.getElementById('mTableCharges').textContent = formatFCFA(p.charges);
 
-  // Mise à jour de la période dynamique sur la quittance
+  const rowCharges = document.getElementById('mTableRowCharges');
+  if (rowCharges) {
+    rowCharges.style.display = (p.charges > 0) ? 'table-row' : 'none';
+  }
+
+  // Période sobre (ex: "Octobre 2026")
   const mPeriod = document.getElementById('mPeriod');
-  if (mPeriod) mPeriod.textContent = `Mois de ${periodText}`;
+  if (mPeriod) mPeriod.textContent = periodText;
+
+  // Ligne de confirmation de règlement sous le tableau
+  const payMethod = pData.paymentMethod || p.paymentMethod || 'Wave';
+  const payDate = pData.paidDate ? pData.paidDate : `05/${String(m).padStart(2, '0')}/${y}`;
+  const confTextEl = document.getElementById('mPaymentConfirmationText');
+  if (confTextEl) {
+    confTextEl.textContent = `Règlement reçu le ${payDate} via ${payMethod}.`;
+  }
 
   const mTablePeriod = document.getElementById('mTablePeriod');
   if (mTablePeriod) {
@@ -1332,8 +1387,8 @@ function openReceiptModal(id, targetPeriodKey = null) {
   }
 
   if (isComm) {
-    if (docTitle) docTitle.textContent = "FACTURE DE LOYER & CHARGES LOCATIVES";
-    if (rentLabel) rentLabel.textContent = "Loyer commercial / professionnel (HT)";
+    if (docTitle) docTitle.textContent = "FACTURE";
+    if (rentLabel) rentLabel.textContent = "Loyer commercial (HT)";
     
     const ht = p.rent + p.charges;
     const tva = Math.round(ht * 0.18);
@@ -1341,29 +1396,33 @@ function openReceiptModal(id, targetPeriodKey = null) {
 
     if (rowSubtotal) {
       rowSubtotal.style.display = 'table-row';
-      document.getElementById('mTableSubtotalHt').textContent = formatFCFA(ht);
+      const subtotalEl = document.getElementById('mTableSubtotalHt');
+      if (subtotalEl) subtotalEl.textContent = formatFCFA(ht);
     }
     if (rowTva) {
       rowTva.style.display = 'table-row';
-      document.getElementById('mTableTva').textContent = formatFCFA(tva);
+      const tvaEl = document.getElementById('mTableTva');
+      if (tvaEl) tvaEl.textContent = formatFCFA(tva);
     }
-    if (totalLabel) totalLabel.textContent = "TOTAL GÉNÉRAL TTC RÉGLÉ";
+    if (totalLabel) totalLabel.textContent = "TOTAL PAYÉ";
     document.getElementById('mTableTotal').textContent = formatFCFA(ttc);
-    document.getElementById('mAmountWords').textContent = numberToWordsFR(ttc);
+    const wordsEl = document.getElementById('mAmountWords');
+    if (wordsEl) wordsEl.textContent = numberToWordsFR(ttc);
     
     if (legalNote) {
       legalNote.innerHTML = "<p>Facture de loyer commercial assujettie à la TVA au taux légal de 18% conformément à l'article 355 et suivants du Code Général des Impôts (CGI) de la République du Sénégal. TVA déductible. Le présent document certifié vaut quittance libératoire de loyer pour la période susmentionnée.</p>";
     }
   } else {
-    if (docTitle) docTitle.textContent = "QUITTANCE DE LOYER OFFICIELLE";
-    if (rentLabel) rentLabel.textContent = "Loyer principal d'habitation";
+    if (docTitle) docTitle.textContent = "QUITTANCE DE LOYER";
+    if (rentLabel) rentLabel.textContent = "Loyer mensuel";
     if (rowSubtotal) rowSubtotal.style.display = 'none';
     if (rowTva) rowTva.style.display = 'none';
-    if (totalLabel) totalLabel.textContent = "TOTAL NET ENCAISSÉ ET RÉGLÉ";
+    if (totalLabel) totalLabel.textContent = "TOTAL PAYÉ";
     
     const total = p.rent + p.charges;
     document.getElementById('mTableTotal').textContent = formatFCFA(total);
-    document.getElementById('mAmountWords').textContent = numberToWordsFR(total);
+    const wordsEl = document.getElementById('mAmountWords');
+    if (wordsEl) wordsEl.textContent = numberToWordsFR(total);
 
     if (legalNote) {
       legalNote.innerHTML = "<p>La présente quittance annule tout reçu antérieur pour la période susvisée. Elle ne préjuge pas des loyers postérieurs. Exonéré de TVA en vertu de l'article 361 du Code Général des Impôts (CGI) du Sénégal. Document généré avec certification numérique KeurGui conforme aux normes OHADA.</p>";
@@ -1371,9 +1430,9 @@ function openReceiptModal(id, targetPeriodKey = null) {
   }
 
   if (isAgencyMode && p.owner) {
-    document.getElementById('mOwnerName').textContent = p.owner + ' (Géré par Agence KeurGui)';
+    document.getElementById('mOwnerName').textContent = p.owner;
   } else {
-    document.getElementById('mOwnerName').textContent = 'Jean Philippe Gomis';
+    document.getElementById('mOwnerName').textContent = 'KEURGUI';
   }
 
   const modal = document.getElementById('receiptModalOverlay');
@@ -1415,7 +1474,7 @@ function exportElementToA4Pdf(sourceElement, filename, btn, originalText, callba
 
   // 2. L'iframe utilise son propre style A4 autonome et auto-suffisant (zéro conflit externe)
 
-  // 3. Injecter les règles CSS strictes A4 pour neutraliser toute règle responsive mobile et garantir l'intégrité visuelle
+  // 3. Injecter les règles CSS strictes A4 (largeur fixe 794px, zéro superflu, zéro classe responsive)
   const overrideStyle = iDoc.createElement('style');
   overrideStyle.textContent = `
     * { box-sizing: border-box !important; }
@@ -1426,311 +1485,23 @@ function exportElementToA4Pdf(sourceElement, filename, btn, originalText, callba
       min-width: 794px !important;
       max-width: 794px !important;
       background: #ffffff !important;
-      color: #0f172a !important;
+      color: #111827 !important;
       -webkit-print-color-adjust: exact !important;
       print-color-adjust: exact !important;
-      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+      font-family: sans-serif !important;
     }
     .receipt-sheet {
       width: 794px !important;
       min-width: 794px !important;
       max-width: 794px !important;
-      min-height: 1040px !important;
-      padding: 34px 42px 28px 42px !important;
+      margin: 0 auto !important;
+      background: #ffffff !important;
+      padding: 40px !important;
       box-sizing: border-box !important;
+      font-family: sans-serif !important;
+      color: #111827 !important;
+      border: none !important;
       box-shadow: none !important;
-      border: 1px solid #e2e8f0 !important;
-      border-radius: 0 !important;
-      background: #ffffff !important;
-      page-break-inside: avoid !important;
-      position: relative !important;
-    }
-    .receipt-sheet::before {
-      content: '' !important;
-      display: block !important;
-      width: 100% !important;
-      height: 5px !important;
-      background: linear-gradient(90deg, #059669 0%, #10b981 70%, #f59e0b 100%) !important;
-      border-radius: 3px !important;
-      margin-bottom: 22px !important;
-    }
-    .receipt-header {
-      display: table !important;
-      width: 100% !important;
-      table-layout: fixed !important;
-      margin-bottom: 18px !important;
-    }
-    .receipt-brand {
-      display: table-cell !important;
-      vertical-align: middle !important;
-      text-align: left !important;
-      width: 60% !important;
-    }
-    .receipt-brand h2 {
-      font-size: 20px !important;
-      font-weight: 800 !important;
-      letter-spacing: 0.5px !important;
-      color: #064e3b !important;
-      margin: 0 !important;
-    }
-    .receipt-brand p {
-      font-size: 10px !important;
-      font-weight: 700 !important;
-      color: #64748b !important;
-      letter-spacing: 1.2px !important;
-      text-transform: uppercase !important;
-      margin: 4px 0 0 0 !important;
-    }
-    .receipt-stamp-box {
-      display: table-cell !important;
-      vertical-align: middle !important;
-      text-align: left !important;
-      width: 40% !important;
-    }
-    .receipt-badge-paid {
-      display: block !important;
-      margin-left: auto !important;
-      margin-right: 0 !important;
-      width: 195px !important;
-      text-align: center !important;
-      opacity: 1 !important;
-      visibility: visible !important;
-      animation: none !important;
-      transform: none !important;
-      background: #ecfdf5 !important;
-      border: 2px solid #059669 !important;
-      border-radius: 8px !important;
-      padding: 8px 14px !important;
-      box-sizing: border-box !important;
-    }
-    .receipt-badge-paid span {
-      display: block !important;
-      font-size: 13px !important;
-      font-weight: 800 !important;
-      color: #065f46 !important;
-      letter-spacing: 0.5px !important;
-      line-height: 1.3 !important;
-      text-align: center !important;
-      opacity: 1 !important;
-      visibility: visible !important;
-    }
-    .receipt-badge-paid small {
-      display: block !important;
-      font-size: 10px !important;
-      font-weight: 700 !important;
-      color: #059669 !important;
-      text-transform: uppercase !important;
-      line-height: 1.3 !important;
-      margin-top: 2px !important;
-      text-align: center !important;
-      opacity: 1 !important;
-      visibility: visible !important;
-    }
-    .receipt-divider {
-      margin: 16px 0 !important;
-      height: 1px !important;
-      background: #e2e8f0 !important;
-    }
-    .receipt-document-title {
-      margin-bottom: 20px !important;
-      text-align: center !important;
-    }
-    .receipt-document-title h1 {
-      font-size: 22px !important;
-      font-weight: 800 !important;
-      letter-spacing: 0.8px !important;
-      color: #064e3b !important;
-      margin: 0 0 6px 0 !important;
-    }
-    .receipt-parties-grid {
-      display: grid !important;
-      grid-template-columns: 1fr 1fr !important;
-      gap: 16px !important;
-      margin-bottom: 20px !important;
-      padding: 14px 18px !important;
-      background: #f8fafc !important;
-      border: 1px solid #e2e8f0 !important;
-      border-radius: 8px !important;
-    }
-    .party-label {
-      font-size: 10px !important;
-      font-weight: 800 !important;
-      letter-spacing: 1px !important;
-      color: #059669 !important;
-      text-transform: uppercase !important;
-      margin-bottom: 6px !important;
-      display: block !important;
-    }
-    .party-box h4 {
-      margin: 0 0 4px 0 !important;
-      font-size: 14px !important;
-      font-weight: 800 !important;
-      color: #0f172a !important;
-    }
-    .party-box p {
-      margin: 0 0 3px 0 !important;
-      font-size: 12px !important;
-      color: #475569 !important;
-      line-height: 1.35 !important;
-    }
-    .receipt-table {
-      width: 100% !important;
-      margin-bottom: 18px !important;
-      border-collapse: collapse !important;
-      table-layout: fixed !important;
-    }
-    .receipt-table th {
-      padding: 12px 14px !important;
-      font-size: 11.5px !important;
-      font-weight: 800 !important;
-      text-transform: uppercase !important;
-      letter-spacing: 0.5px !important;
-      background: #f1f5f9 !important;
-      color: #334155 !important;
-      border-top: 1px solid #cbd5e1 !important;
-      border-bottom: 1px solid #cbd5e1 !important;
-      text-align: left !important;
-    }
-    .receipt-table td {
-      padding: 13px 14px !important;
-      font-size: 13px !important;
-      color: #1e293b !important;
-      vertical-align: middle !important;
-      border-bottom: 1px solid #e2e8f0 !important;
-      word-wrap: break-word !important;
-    }
-    .receipt-table th:nth-child(1), .receipt-table td:nth-child(1) { width: 44% !important; }
-    .receipt-table th:nth-child(2), .receipt-table td:nth-child(2) { width: 32% !important; }
-    .receipt-table th:nth-child(3), .receipt-table td:nth-child(3) { width: 24% !important; text-align: right !important; }
-    .receipt-total-row td {
-      padding: 15px 14px !important;
-      background: #f8fafc !important;
-      border-top: 2px solid #059669 !important;
-      border-bottom: 2px solid #059669 !important;
-      font-weight: 800 !important;
-    }
-    .receipt-words-box {
-      padding: 12px 16px !important;
-      margin-bottom: 18px !important;
-      font-size: 12px !important;
-      background: #f0fdf4 !important;
-      border: 1px solid #bbf7d0 !important;
-      border-left: 5px solid #10b981 !important;
-      border-radius: 6px !important;
-    }
-    .receipt-words-box strong {
-      display: block !important;
-      font-size: 14px !important;
-      color: #064e3b !important;
-      margin-top: 4px !important;
-      font-weight: 800 !important;
-    }
-    .receipt-legal-note {
-      font-size: 9.5px !important;
-      line-height: 1.55 !important;
-      margin-bottom: 20px !important;
-      color: #64748b !important;
-      background: #fafafa !important;
-      border: 1px solid #e2e8f0 !important;
-      border-radius: 6px !important;
-      padding: 12px 16px !important;
-    }
-    .digital-stamp {
-      border: 2px dashed #059669 !important;
-      padding: 8px 18px !important;
-      border-radius: 8px !important;
-      display: block !important;
-      margin-left: auto !important;
-      margin-right: 0 !important;
-      width: 195px !important;
-      text-align: center !important;
-      transform: none !important;
-      background: #ffffff !important;
-      opacity: 1 !important;
-      visibility: visible !important;
-      animation: none !important;
-      box-sizing: border-box !important;
-    }
-    .digital-stamp span {
-      display: block !important;
-      font-size: 10px !important;
-      font-weight: 800 !important;
-      letter-spacing: 1px !important;
-      color: #059669 !important;
-      line-height: 1.3 !important;
-      text-align: center !important;
-      opacity: 1 !important;
-      visibility: visible !important;
-    }
-    .digital-stamp strong {
-      display: block !important;
-      font-size: 13px !important;
-      font-weight: 800 !important;
-      color: #064e3b !important;
-      line-height: 1.3 !important;
-      margin: 2px 0 !important;
-      text-align: center !important;
-      opacity: 1 !important;
-      visibility: visible !important;
-    }
-    .digital-stamp small {
-      display: block !important;
-      font-size: 9px !important;
-      color: #64748b !important;
-      line-height: 1.2 !important;
-      text-align: center !important;
-      opacity: 1 !important;
-      visibility: visible !important;
-    }
-    .receipt-footer-signatures {
-      display: flex !important;
-      justify-content: space-between !important;
-      align-items: flex-end !important;
-      padding-top: 14px !important;
-      border-top: 1px dashed #cbd5e1 !important;
-      margin-bottom: 12px !important;
-    }
-    .sig-col {
-      text-align: left !important;
-    }
-    .sig-col.text-right p, .sig-col:last-child p {
-      text-align: right !important;
-      margin: 0 0 6px 0 !important;
-    }
-    .signature-stamp-area {
-      display: block !important;
-      text-align: left !important;
-    }
-    .qr-box {
-      width: 52px !important;
-      height: 52px !important;
-      border-radius: 6px !important;
-      display: flex !important;
-      flex-direction: column !important;
-      align-items: center !important;
-      justify-content: center !important;
-      padding: 3px !important;
-      box-sizing: border-box !important;
-    }
-    .qr-box span {
-      font-size: 18px !important;
-      line-height: 1 !important;
-      margin-bottom: 2px !important;
-    }
-    .qr-box small {
-      font-size: 7.5px !important;
-      line-height: 1.1 !important;
-      white-space: nowrap !important;
-      letter-spacing: -0.2px !important;
-    }
-    .receipt-official-footer-note {
-      border-top: 1px solid #f1f5f9 !important;
-      padding-top: 10px !important;
-      text-align: center !important;
-      font-size: 9px !important;
-      color: #94a3b8 !important;
-      letter-spacing: 0.5px !important;
-      text-transform: uppercase !important;
     }
     .no-print {
       display: none !important;
@@ -1742,13 +1513,6 @@ function exportElementToA4Pdf(sourceElement, filename, btn, originalText, callba
   const clone = sourceElement.cloneNode(true);
   clone.id = 'pdf-isolated-clone';
   clone.querySelectorAll('.no-print').forEach(el => el.remove());
-
-  // Ajouter la note de certification officielle en pied de page
-  const footerNote = iDoc.createElement('div');
-  footerNote.className = 'receipt-official-footer-note';
-  footerNote.textContent = 'Document officiel certifié généré par KeurGui Immobilier • République du Sénégal • Page 1/1';
-  clone.appendChild(footerNote);
-
   iDoc.body.appendChild(clone);
 
   const cleanup = () => {
@@ -1758,7 +1522,7 @@ function exportElementToA4Pdf(sourceElement, filename, btn, originalText, callba
   };
 
   if (window.html2pdf) {
-    // Laisser 250ms à l'iframe pour charger polices et styles
+    // Laisser 200ms à l'iframe pour appliquer polices et styles
     setTimeout(() => {
       const opt = {
         margin: 0,
@@ -1779,7 +1543,7 @@ function exportElementToA4Pdf(sourceElement, filename, btn, originalText, callba
       const worker = window.html2pdf().set(opt).from(clone);
       worker.toCanvas().get('canvas').then(canvas => {
         return worker.toPdf().get('pdf').then(pdf => {
-          // 🔒 GARANTIE MATHÉMATIQUE STRICTE : 1 SEULE PAGE A4 PARFAITEMENT CENTRÉE SANS AUCUNE COUPURE
+          // 🔒 GARANTIE MATHÉMATIQUE STRICTE : 1 SEULE PAGE A4 PARFAITEMENT POSITIONNÉE SANS AUCUNE COUPURE
           const totalPages = pdf.internal.getNumberOfPages();
           for (let i = totalPages; i > 1; i--) {
             pdf.deletePage(i);
@@ -1801,7 +1565,8 @@ function exportElementToA4Pdf(sourceElement, filename, btn, originalText, callba
           }
 
           const posX = marginX + (maxW - renderW) / 2;
-          const posY = marginY + (maxH - renderH) / 2;
+          // Document sur une demi-page A4 très aérée : positionné élégamment dans la moitié supérieure
+          const posY = (renderH < maxH * 0.7) ? 20 : (marginY + (maxH - renderH) / 2);
           const imgData = canvas.toDataURL('image/jpeg', 0.98);
 
           pdf.setFillColor(255, 255, 255);
@@ -2056,7 +1821,21 @@ const RECEIPTS_HISTORY_STORAGE_KEY = 'keurgui_receipts_history';
 function getReceiptsHistory() {
   try {
     const raw = localStorage.getItem(RECEIPTS_HISTORY_STORAGE_KEY);
-    if (raw) return JSON.parse(raw);
+    if (raw) {
+      let parsed = JSON.parse(raw);
+      let changed = false;
+      parsed.forEach(r => {
+        if ((r.receiptNo === 'KG-2026-0042' || r.propertyId === 1) && r.tenant !== 'Moussa Diop') {
+          r.tenant = 'Moussa Diop';
+          r.tenantPhone = '+221 77 654 32 10';
+          changed = true;
+        }
+      });
+      if (changed) {
+        localStorage.setItem(RECEIPTS_HISTORY_STORAGE_KEY, JSON.stringify(parsed));
+      }
+      return parsed;
+    }
   } catch (e) {}
   return [];
 }
@@ -2076,8 +1855,8 @@ function initReceiptsHistory() {
       {
         receiptNo: "KG-2026-0042",
         propertyId: 1,
-        tenant: "Mamadou Diallo",
-        tenantPhone: "+221 77 123 45 67",
+        tenant: "Moussa Diop",
+        tenantPhone: "+221 77 654 32 10",
         unitName: "Appartement 3B",
         building: "Résidence Teranga",
         neighborhood: "Mermoz",
@@ -2167,8 +1946,8 @@ function initReceiptsHistory() {
       {
         receiptNo: "KG-2026-0036",
         propertyId: 1,
-        tenant: "Mamadou Diallo",
-        tenantPhone: "+221 77 123 45 67",
+        tenant: "Moussa Diop",
+        tenantPhone: "+221 77 654 32 10",
         unitName: "Appartement 3B",
         building: "Résidence Teranga",
         neighborhood: "Mermoz",
@@ -2182,8 +1961,8 @@ function initReceiptsHistory() {
       {
         receiptNo: "KG-2026-0030",
         propertyId: 1,
-        tenant: "Mamadou Diallo",
-        tenantPhone: "+221 77 123 45 67",
+        tenant: "Moussa Diop",
+        tenantPhone: "+221 77 654 32 10",
         unitName: "Appartement 3B",
         building: "Résidence Teranga",
         neighborhood: "Mermoz",
@@ -2197,8 +1976,8 @@ function initReceiptsHistory() {
       {
         receiptNo: "KG-2025-0042",
         propertyId: 1,
-        tenant: "Mamadou Diallo",
-        tenantPhone: "+221 77 123 45 67",
+        tenant: "Moussa Diop",
+        tenantPhone: "+221 77 654 32 10",
         unitName: "Appartement 3B",
         building: "Résidence Teranga",
         neighborhood: "Mermoz",
@@ -2765,10 +2544,10 @@ function openDepositModal(id) {
   const ownerEl = document.getElementById('mDepositOwnerName');
   const signerEl = document.getElementById('mDepositSignerName');
   if (isAgencyMode && p.owner) {
-    if (ownerEl) ownerEl.textContent = p.owner + ' (Géré par Agence KeurGui)';
+    if (ownerEl) ownerEl.textContent = p.owner;
     if (signerEl) signerEl.textContent = 'AGENCE KEURGUI';
   } else {
-    if (ownerEl) ownerEl.textContent = 'Jean Philippe Gomis';
+    if (ownerEl) ownerEl.textContent = 'KEURGUI';
     if (signerEl) signerEl.textContent = 'GOMIS J.P.';
   }
 
@@ -2804,12 +2583,20 @@ function openDepositModal(id) {
   const issueDateEl = document.getElementById('mDepositIssueDate');
   if (issueDateEl) issueDateEl.textContent = p.depositPaidDate ? p.depositPaidDate : getTodayFormatted();
 
+  // Confirmation de règlement
+  const depMethod = p.depositPaymentMethod || p.paymentMethod || 'Wave';
+  const depDate = p.depositPaidDate ? p.depositPaidDate : (`01/${String(selectedPeriod.month).padStart(2, '0')}/${selectedPeriod.year}`);
+  const depConfirmEl = document.getElementById('mDepositConfirmationText');
+  if (depConfirmEl) {
+    depConfirmEl.textContent = `Dépôt de garantie reçu le ${depDate} via ${depMethod}.`;
+  }
+
   // Statut de la caution
   const isHeld = (p.depositStatus === 'held' || !p.depositStatus);
   const badgeMain = document.getElementById('mDepositBadgeMain');
   const toggleBtnText = document.getElementById('btnToggleDepositRefundText');
   if (badgeMain) {
-    badgeMain.textContent = isHeld ? 'CAUTION EN RÉSERVE' : 'CAUTION RESTITUÉE';
+    badgeMain.textContent = isHeld ? '✓ CAUTION EN RÉSERVE' : 'RESTITUÉE';
   }
   if (toggleBtnText) {
     toggleBtnText.textContent = isHeld ? 'Marquer Restituée' : 'Remettre en Réserve';
@@ -3151,7 +2938,7 @@ function updateAgencyInvoiceView() {
   if (invRefEl) invRefEl.textContent = invoiceRef;
 
   const invPeriodEl = document.getElementById('agencyInvoicePeriod');
-  if (invPeriodEl) invPeriodEl.textContent = `Mois de ${periodText}`;
+  if (invPeriodEl) invPeriodEl.textContent = periodText;
 
   const invPayDateEl = document.getElementById('agencyInvoicePaymentDate');
   if (invPayDateEl) invPayDateEl.textContent = periodText;

@@ -142,35 +142,38 @@
         </div>
       </header>
 
-      <!-- Bannière d'Accueil Personnalisée Subtile & Chaleureuse -->
-      <div id="welcomeBanner" class="welcome-banner" style="display: none;">
-        <div class="container welcome-banner-content">
-          <div class="welcome-text">
-            <span class="welcome-wave">👋</span>
-            <div>
-              <strong>Dalal ak jàmm <span id="welcomeUserName"></span> !</strong>
-              <p>Bienvenue sur votre démo interactive KeurGui. Explorez le tableau de bord, testez une quittance officielle
-                en 1 clic ou nettoyez les exemples pour ajouter vos vrais biens.</p>
+      <!-- CARTE DÉMO COMPACTE POUR L'ACCUEIL UNIQUEMENT -->
+      <div id="homeMergedDemoCard" class="home-merged-demo-card">
+        <div class="container">
+          <div class="demo-card-inner">
+            <div class="demo-card-left">
+              <span class="demo-chip-live">⚡ DÉMO INTERACTIVE</span>
+              <div class="demo-card-text">
+                <strong>Dalal ak jàmm sur KeurGui !</strong>
+                <span class="demo-sub">Vous testez des exemples fictifs à Dakar.</span>
+              </div>
+            </div>
+            <div class="demo-card-actions">
+              <button class="btn-clean-start-prominent" onclick="clearToMyProperties()">
+                <span>✨</span>
+                <strong>Nettoyer pour mettre mes vrais biens</strong>
+                <span class="btn-arrow-subtle">→</span>
+              </button>
+              <button class="btn-dismiss-demo-card" onclick="dismissHomeDemoCard()" title="Fermer cette bannière">✕</button>
             </div>
           </div>
-          <button class="btn-welcome-dismiss" onclick="dismissWelcomeBanner()">C'est parti ! 🚀</button>
         </div>
       </div>
 
-      <!-- Bannière d'accueil Démo Interactive Ultra-Visible -->
-      <div class="notification-bar demo-banner-highlight">
-        <div class="container notif-content">
-          <div class="demo-banner-left">
-            <span class="demo-chip-live">⚡ DÉMO INTERACTIVE</span>
-            <span class="demo-text-desc">Vous testez actuellement des exemples fictifs à Dakar.</span>
+      <!-- FINE BARRE D'UNE SEULE LIGNE POUR LES AUTRES ONGLETS (BIENS, LOCATAIRES, REÇUS) -->
+      <div id="otherViewsDemoStrip" class="other-views-demo-strip" style="display: none;">
+        <div class="container demo-strip-inner">
+          <div class="demo-strip-text">
+            <span>⚡ <strong>Mode Démo</strong> • Données d'exemples</span>
           </div>
-          <div class="demo-banner-actions">
-            <button class="btn-clean-start-prominent" onclick="clearToMyProperties()">
-              <span>✨</span>
-              <strong>Nettoyer pour mettre mes vrais biens</strong>
-              <span class="btn-arrow-subtle">→</span>
-            </button>
-          </div>
+          <button class="btn-demo-strip-clean" onclick="clearToMyProperties()">
+            Nettoyer mes biens →
+          </button>
         </div>
       </div>
 
@@ -233,16 +236,25 @@
               <button class="btn-period-today-subtle" onclick="goToCurrentPeriod()" title="Revenir au mois en cours">Mois en
                 cours</button>
             </div>
+            <button class="btn btn-primary" onclick="openAddPropertyModal()" style="padding: 7px 14px; font-size: 13px; font-weight: 700; border-radius: 999px; display: inline-flex; align-items: center; gap: 6px;">
+              <span>+</span> Ajouter un bien
+            </button>
           </div>
 
-          <!-- Statistiques Clés -->
+          <!-- Statistiques Clés (Taux de recouvrement fusionné dans Total Encaissé) -->
           <section class="stats-grid">
             <div class="stat-card stat-success">
               <div class="stat-icon">💰</div>
-              <div class="stat-info">
+              <div class="stat-info" style="width: 100%;">
                 <span class="stat-title">Total Encaissé (Mois)</span>
                 <h2 class="stat-value" id="totalCollected">1 850 000 FCFA</h2>
-                <span class="stat-tag success">↑ 5 loyers payés</span>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+                  <span class="stat-tag success" id="collectedLoyerCountTag">↑ 5 loyers payés</span>
+                  <span style="font-size:12px; font-weight:700; color:#059669;">Taux : <span id="collectionRate">88%</span></span>
+                </div>
+                <div class="progress-bar-bg" style="margin-top:6px; height:6px;">
+                  <div class="progress-bar-fill" id="collectionFill" style="width: 88%;"></div>
+                </div>
               </div>
             </div>
 
@@ -251,18 +263,7 @@
               <div class="stat-info">
                 <span class="stat-title">Reste à Encaisser</span>
                 <h2 class="stat-value" id="totalPending">250 000 FCFA</h2>
-                <span class="stat-tag warning">1 locataire en attente</span>
-              </div>
-            </div>
-
-            <div class="stat-card">
-              <div class="stat-icon">📊</div>
-              <div class="stat-info">
-                <span class="stat-title">Taux de Recouvrement</span>
-                <h2 class="stat-value" id="collectionRate">88%</h2>
-                <div class="progress-bar-bg">
-                  <div class="progress-bar-fill" id="collectionFill" style="width: 88%;"></div>
-                </div>
+                <span class="stat-tag warning" id="pendingLoyerCountTag">1 locataire en attente</span>
               </div>
             </div>
 
@@ -298,24 +299,7 @@
           </div>
 
           <!-- RACCOURCIS RAPIDES & DERNIÈRES QUITTANCES -->
-          <div class="dash-quick-links-grid">
-            <div class="dash-quick-box">
-              <div class="dash-box-header">
-                <span class="dash-box-title">⚡ Actions Fréquentes</span>
-              </div>
-              <div style="display:flex; flex-direction:column; gap:10px;">
-                <button class="btn btn-primary" style="justify-content:flex-start;" onclick="openAddPropertyModal()">
-                  <span>+</span> Ajouter un nouveau bien / immeuble
-                </button>
-                <button class="btn btn-secondary" style="justify-content:flex-start;" onclick="switchView('properties')">
-                  <span>🏢</span> Voir la liste de tous mes biens →
-                </button>
-                <button class="btn btn-secondary" style="justify-content:flex-start;" onclick="switchView('receipts')">
-                  <span>🧾</span> Accéder au registre des quittances →
-                </button>
-              </div>
-            </div>
-
+          <div class="dash-quick-links-grid" style="grid-template-columns: 1fr;">
             <div class="dash-quick-box">
               <div class="dash-box-header">
                 <span class="dash-box-title">📑 Dernières Quittances Émises</span>
@@ -367,14 +351,14 @@
         <!-- VUE 3 : ANNUAIRE DES LOCATAIRES                -->
         <!-- ============================================== -->
         <section id="view-tenants" class="app-view">
-          <div class="tenants-view-header">
+          <div class="tenants-view-header" style="flex-direction: column; align-items: stretch; gap: 12px;">
             <div>
               <h1 class="dash-main-title">Annuaire des Locataires</h1>
               <p class="dash-subtitle">Coordonnées directes, contacts WhatsApp et suivi des cautions</p>
             </div>
-            <div style="display:flex; gap:10px; align-items:center;">
+            <div style="width: 100%;">
               <input type="text" id="tenantSearchInput" placeholder="Rechercher un locataire..." class="search-input"
-                style="max-width:240px;" oninput="renderTenantsList()">
+                style="width: 100%; max-width: 100%;" oninput="renderTenantsList()">
             </div>
           </div>
 
@@ -402,14 +386,14 @@
                 placeholder="Rechercher par locataire, référence, immeuble..."
                 class="history-search-input" oninput="renderInPageReceipts()">
             </div>
-            <div class="history-filters-group">
-              <select id="inPageReceiptYearFilter" class="history-select-subtle" onchange="renderInPageReceipts()">
+            <div class="history-filters-group" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%;">
+              <select id="inPageReceiptYearFilter" class="history-select-subtle" style="width: 100%;" onchange="renderInPageReceipts()">
                 <option value="all">Toutes les années</option>
                 <option value="2026" selected>2026</option>
                 <option value="2025">2025</option>
                 <option value="2024">2024</option>
               </select>
-              <select id="inPageReceiptBuildingFilter" class="history-select-subtle" onchange="renderInPageReceipts()">
+              <select id="inPageReceiptBuildingFilter" class="history-select-subtle" style="width: 100%;" onchange="renderInPageReceipts()">
                 <option value="all">Tous les biens / immeubles</option>
               </select>
             </div>
@@ -448,46 +432,6 @@
         <span class="bnav-label">Reçus</span>
       </button>
     </nav>
-
-    <!-- 4. BOUTON MAGIQUE FLOTTANT MOBILE (FAB + MENU POPUP) -->
-    <div class="mobile-fab-container">
-      <button class="btn-mobile-fab" id="btnMobileFab" onclick="toggleFabActionMenu()" title="Actions rapides" aria-label="Menu actions rapides">
-        <span id="fabIcon">+</span>
-      </button>
-      <div class="fab-sheet-backdrop" id="fabBackdrop" onclick="closeFabActionMenu()"></div>
-      <div class="fab-action-sheet" id="fabActionSheet">
-        <div class="fab-sheet-title">Actions rapides ⚡</div>
-        <button class="fab-sheet-item" onclick="closeFabActionMenu(); openAddPropertyModal();">
-          <span class="fab-item-icon">🏢</span>
-          <div class="fab-item-text">
-            <strong>Ajouter un bien ou immeuble</strong>
-            <small>Nouveau logement, villa, studio ou lots</small>
-          </div>
-        </button>
-        <button class="fab-sheet-item" onclick="closeFabActionMenu(); switchView('properties');">
-          <span class="fab-item-icon">💰</span>
-          <div class="fab-item-text">
-            <strong>Encaisser un loyer</strong>
-            <small>Enregistrer Wave, Orange Money ou Espèces</small>
-          </div>
-        </button>
-        <button class="fab-sheet-item" onclick="closeFabActionMenu(); switchView('receipts');">
-          <span class="fab-item-icon">🧾</span>
-          <div class="fab-item-text">
-            <strong>Consulter les quittances</strong>
-            <small>Historique certifié & partage WhatsApp</small>
-          </div>
-        </button>
-        <button class="fab-sheet-item" onclick="closeFabActionMenu(); openFeedbackModal();">
-          <span class="fab-item-icon">💬</span>
-          <div class="fab-item-text">
-            <strong>Votre avis &amp; Suggestions</strong>
-            <small>Écrire directement à Jean Philippe Gomis</small>
-          </div>
-        </button>
-      </div>
-    </div>
-
   </div> <!-- FIN APP-LAYOUT -->
 
 
@@ -574,132 +518,82 @@
         </div>
       </div>
 
-      <!-- FEUILLE DE QUITTANCE OFFICIELLE (ZONE DU FICHIER PDF A4) -->
-      <div class="receipt-sheet" id="printableReceipt">
+      <!-- FEUILLE DE QUITTANCE OFFICIELLE (ZONE DU FICHIER PDF A4 FIXE 794PX) -->
+      <div class="receipt-sheet" id="printableReceipt" style="width: 794px; min-width: 794px; max-width: 794px; margin: 0 auto; background: #ffffff; padding: 40px; box-sizing: border-box; font-family: sans-serif; color: #111827;">
 
-        <!-- En-tête officiel -->
-        <div class="receipt-header">
-          <div class="receipt-brand">
-            <div style="display:flex; align-items:center; gap:10px; margin-bottom:4px;">
-              <img src="logo-icon.png" alt="KeurGui" style="width: 28px; height: 28px; border-radius: 6px;">
-              <h2>KEURGUI IMMOBILIER</h2>
-            </div>
-            <p>RÉPUBLIQUE DU SÉNÉGAL — GESTION LOCATIVE CONFORME</p>
+        <!-- 1. En-tête (sur 1 ligne, display: flex; justify-content: space-between; border-bottom: 2px solid #e5e7eb; padding-bottom: 16px;) -->
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #e5e7eb; padding-bottom: 16px;">
+          <div>
+            <div style="font-size: 20px; font-weight: 800; color: #111827; letter-spacing: -0.5px;" id="mOwnerName">KEURGUI</div>
+            <div style="font-size: 13px; color: #4b5563; font-weight: 600; margin-top: 4px; text-transform: uppercase;" id="mDocumentMainTitle">QUITTANCE DE LOYER</div>
           </div>
-          <div class="receipt-stamp-box">
-            <div class="receipt-badge-paid">
-              <span>ACQUITTÉ / PAYÉ</span>
-              <small id="mPaymentMethodBadge">Par Wave</small>
-            </div>
+          <div style="text-align: right; font-size: 13px; color: #4b5563;">
+            <div>Réf : <strong style="color: #111827;" id="mReceiptNumber">KG-2026-0042</strong></div>
+            <div style="margin-top: 4px;">Période : <strong style="color: #111827;" id="mPeriod">Octobre 2026</strong></div>
           </div>
         </div>
 
-        <div class="receipt-divider"></div>
-
-        <!-- Titre du document -->
-        <div class="receipt-document-title">
-          <h1 id="mDocumentMainTitle">QUITTANCE DE LOYER OFFICIELLE</h1>
-          <p>Période couverte : <strong id="mPeriod">Mois d'Octobre 2026</strong></p>
-        </div>
-
-        <!-- Coordonnées Bailleur & Locataire -->
-        <div class="receipt-parties-grid">
-          <div class="party-box">
-            <span class="party-label">BAILLEUR / GESTIONNAIRE :</span>
-            <h4 id="mOwnerName">Jean Philippe Gomis</h4>
-            <p id="mOwnerAddress">Dakar, Sénégal</p>
-            <p>Contact : +221 77 000 00 00</p>
+        <!-- 2. Informations Locataire & Bien (encadré simple background: #f9fafb; padding: 16px; border-radius: 8px; margin: 20px 0;) -->
+        <div style="background: #f9fafb; padding: 16px; border-radius: 8px; margin: 20px 0; border: 1px solid #f3f4f6;">
+          <div style="font-size: 14px; color: #374151; margin-bottom: 8px;">
+            <span style="font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Locataire : </span>
+            <strong style="color: #111827;" id="mTenantName">Moussa Diop</strong> • <span id="mTenantPhone">+221 77 654 32 10</span>
           </div>
-          <div class="party-box">
-            <span class="party-label">LOCATAIRE :</span>
-            <h4 id="mTenantName">Moussa Diop</h4>
-            <p id="mPropertyAddress">Appartement 2B, 2ème étage — Mermoz</p>
-            <p>Téléphone : <span id="mTenantPhone">+221 77 654 32 10</span></p>
+          <div style="font-size: 14px; color: #374151;">
+            <span style="font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Bien loué : </span>
+            <span id="mPropertyAddress" style="color: #111827;">Appartement 3B — Résidence Teranga (Mermoz)</span>
           </div>
         </div>
 
-        <!-- Détail financier du loyer -->
-        <table class="receipt-table">
-          <thead>
-            <tr>
-              <th>Désignation des sommes</th>
-              <th>Période couverte</th>
-              <th class="text-right">Montant (FCFA)</th>
-            </tr>
-          </thead>
+        <!-- 3. Tableau récapitulatif ultra-simple (3 lignes maximum) -->
+        <table style="width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 14px;">
           <tbody>
             <tr>
-              <td>
-                <strong id="mTableRentLabel">Loyer principal d'habitation</strong><br>
-                <small class="text-muted" id="mTablePropertyDetails">Logement conventionné</small>
-              </td>
-              <td id="mTablePeriod">01/10/2026 au 31/10/2026</td>
-              <td class="text-right font-mono" id="mTableBaseRent">230 000 FCFA</td>
+              <td style="padding: 10px 0; color: #374151;" id="mTableRentLabel">Loyer mensuel</td>
+              <td style="padding: 10px 0; text-align: right; font-weight: 600; color: #111827;" id="mTableBaseRent">230 000 FCFA</td>
             </tr>
-            <tr>
-              <td>
-                <strong>Charges locatives forfaitaires</strong><br>
-                <small class="text-muted">Parties communes, gardiennage & entretien</small>
-              </td>
-              <td id="mTableChargesPeriod">Octobre 2026</td>
-              <td class="text-right font-mono" id="mTableCharges">20 000 FCFA</td>
+            <tr id="mTableRowCharges">
+              <td style="padding: 10px 0; color: #374151; border-top: 1px solid #f3f4f6;">Charges locatives</td>
+              <td style="padding: 10px 0; text-align: right; font-weight: 600; color: #111827; border-top: 1px solid #f3f4f6;" id="mTableCharges">20 000 FCFA</td>
             </tr>
-            <!-- Ligne sous-total HT (visible pour commercial) -->
-            <tr id="mTableRowSubtotalHt" style="display: none; background: #f8fafc; font-weight: 600;">
-              <td colspan="2">Sous-total Hors Taxes (HT)</td>
-              <td class="text-right font-mono" id="mTableSubtotalHt">0 FCFA</td>
+            <!-- Ligne TVA (UNIQUEMENT si bail commercial avec TVA activée, sinon masquer complètement) -->
+            <tr id="mTableRowTva" style="display: none;">
+              <td style="padding: 10px 0; color: #374151; border-top: 1px solid #f3f4f6;">TVA (18%)</td>
+              <td style="padding: 10px 0; text-align: right; font-weight: 600; color: #111827; border-top: 1px solid #f3f4f6;" id="mTableTva">0 FCFA</td>
             </tr>
-            <!-- Ligne TVA 18% (visible pour commercial) -->
-            <tr id="mTableRowTva" style="display: none; background: #f0fdf4; color: #166534; font-weight: 700;">
-              <td colspan="2">TVA 18% (Art. 355 CGI Sénégal)</td>
-              <td class="text-right font-mono" id="mTableTva">0 FCFA</td>
-            </tr>
-            <tr class="receipt-total-row">
-              <td colspan="2">
-                <strong id="mTableTotalLabel">TOTAL NET ENCAISSÉ ET RÉGLÉ</strong>
-              </td>
-              <td class="text-right font-mono-bold" id="mTableTotal">250 000 FCFA</td>
+            <tr style="border-top: 2px solid #111827; font-weight: 800; font-size: 15px;">
+              <td style="padding: 14px 0 10px 0; color: #111827;" id="mTableTotalLabel">TOTAL PAYÉ</td>
+              <td style="padding: 14px 0 10px 0; text-align: right; color: #111827;" id="mTableTotal">250 000 FCFA</td>
             </tr>
           </tbody>
         </table>
 
-        <!-- Montant en lettres et mentions légales -->
-        <div class="receipt-words-box">
-          <p>Le bailleur reconnaît avoir reçu la somme de :
-            <strong id="mAmountWords">Deux cent cinquante mille Francs CFA</strong>
-          </p>
-        </div>
-
-        <div class="receipt-legal-note" id="mDocumentLegalNote">
-          <p>La présente quittance annule tout reçu antérieur pour la période susvisée. Elle ne préjuge pas des loyers
-            postérieurs. Document généré avec certification numérique KeurGui conforme aux normes OHADA et au Code des
-            Obligations Civiles et Commerciales du Sénégal.</p>
-        </div>
-
-        <!-- Signatures & Date -->
-        <div class="receipt-footer-signatures">
-          <div class="sig-col">
-            <p>Fait à Dakar, le <span id="mIssueDate">17 Octobre 2026</span></p>
-            <div class="qr-placeholder">
-              <div class="qr-box">
-                <span style="font-size: 22px;">🇸🇳</span>
-                <small>Certifié KeurGui</small>
-              </div>
-              <small class="text-muted">Réf : <span id="mReceiptRef">KG-SN-8742</span></small>
-            </div>
+        <!-- 4. Confirmation de règlement (1 seule ligne claire sous le tableau) -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 16px; padding-top: 16px; border-top: 1px dashed #e5e7eb;">
+          <div style="font-size: 13.5px; color: #374151;" id="mPaymentConfirmationText">
+            Règlement reçu le 05/10/2026 via Wave.
           </div>
-          <div class="sig-col text-right">
-            <p>Signature et Cachet :</p>
-            <div class="signature-stamp-area">
-              <div class="digital-stamp">
-                <span>KEURGUI VALIDÉ</span>
-                <strong>GOMIS J.P.</strong>
-                <small>Dakar • Sénégal</small>
-              </div>
-            </div>
+          <div id="mPaymentBadge" style="background: #dcfce7; color: #15803d; border: 1px solid #86efac; border-radius: 6px; padding: 4px 10px; font-size: 12px; font-weight: 700; white-space: nowrap;">
+            ✓ PAYÉ
           </div>
         </div>
 
+        <!-- 5. Pied de page minimaliste (1 seule phrase en font-size: 12px; color: #6b7280; text-align: center; margin-top: 32px;) -->
+        <div style="font-size: 12px; color: #6b7280; text-align: center; margin-top: 32px;" id="mFooterText">
+          Quittance officielle délivrée pour valoir ce que de droit.
+        </div>
+
+        <!-- Balises cachées de compatibilité descendante -->
+        <span id="mReceiptRef" style="display: none;"></span>
+        <span id="mPaymentMethodBadge" style="display: none;"></span>
+        <span id="mTablePropertyDetails" style="display: none;"></span>
+        <span id="mTablePeriod" style="display: none;"></span>
+        <span id="mTableChargesPeriod" style="display: none;"></span>
+        <span id="mIssueDate" style="display: none;"></span>
+        <span id="mTableRowSubtotalHt" style="display: none;"></span>
+        <span id="mTableSubtotalHt" style="display: none;"></span>
+        <span id="mAmountWords" style="display: none;"></span>
+        <span id="mDocumentLegalNote" style="display: none;"></span>
       </div>
     </div>
   </div>
@@ -751,151 +645,73 @@
         </div>
       </div>
 
-      <!-- FEUILLE DE FACTURE OFFICIELLE (ZONE DU FICHIER PDF A4) -->
-      <div class="receipt-sheet agency-invoice-sheet" id="printableAgencyInvoice">
+      <!-- FEUILLE DE FACTURE OFFICIELLE (ZONE DU FICHIER PDF A4 FIXE 794PX) -->
+      <div class="receipt-sheet" id="printableAgencyInvoice" style="width: 794px; min-width: 794px; max-width: 794px; margin: 0 auto; background: #ffffff; padding: 40px; box-sizing: border-box; font-family: sans-serif; color: #111827;">
 
-        <!-- En-tête officiel Agence Immobilière -->
-        <div class="receipt-header">
-          <div class="receipt-brand">
-            <div style="display:flex; align-items:center; gap:10px; margin-bottom:4px;">
-              <img src="logo-icon.png" alt="KeurGui" style="width: 30px; height: 30px; border-radius: 6px;">
-              <h2 style="font-size: 18px;">KEURGUI IMMOBILIER SARL</h2>
-            </div>
-            <p style="font-size: 10px; color: #475569; font-weight: 700; text-transform: uppercase;">
-              GESTION IMMOBILIÈRE • TRANSACTIONS • SYNDIC DE COPROPRIÉTÉ
-            </p>
-            <p style="font-size: 10px; color: #64748b; margin-top: 2px;">
-              Agrément Ministériel N° 2024/DKR/AG-089 • NINEA : 00894521 2V2 • RC : SN-DKR-2024-B-11420<br>
-              Siège social : VDN Lot 42, Sacré-Cœur 3, Dakar • Tél : +221 78 818 21 04
-            </p>
+        <!-- 1. En-tête (sur 1 ligne, display: flex; justify-content: space-between; border-bottom: 2px solid #e5e7eb; padding-bottom: 16px;) -->
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #e5e7eb; padding-bottom: 16px;">
+          <div>
+            <div style="font-size: 20px; font-weight: 800; color: #111827; letter-spacing: -0.5px;">KEURGUI IMMOBILIER</div>
+            <div style="font-size: 13px; color: #4b5563; font-weight: 600; margin-top: 4px; text-transform: uppercase;">FACTURE D'HONORAIRES</div>
           </div>
-          <div class="receipt-stamp-box">
-            <div class="receipt-badge-paid" style="border-color:#065f46; color:#065f46; background:#ecfdf5;">
-              <span>HONORAIRES DÉDUITS</span>
-              <small id="agencyInvoicePaymentDate">Octobre 2026</small>
-            </div>
+          <div style="text-align: right; font-size: 13px; color: #4b5563;">
+            <div>Réf : <strong style="color: #111827;" id="mAgencyInvoiceNumber">FACT-AG-2026-10</strong></div>
+            <div style="margin-top: 4px;">Période : <strong style="color: #111827;" id="agencyInvoicePeriod">Octobre 2026</strong></div>
           </div>
         </div>
 
-        <div class="receipt-divider" style="margin: 16px 0;"></div>
-
-        <!-- Titre du document -->
-        <div class="receipt-document-title">
-          <h1 style="color: #064e3b;">FACTURE D'HONORAIRES DE GESTION LOCATIVE</h1>
-          <p>Compte-rendu financier & Décompte de reversement — <strong id="agencyInvoicePeriod">Mois d'Octobre
-              2026</strong></p>
-        </div>
-
-        <!-- Coordonnées Agence Mandataire & Mandant Bailleur -->
-        <div class="receipt-parties-grid">
-          <div class="party-box">
-            <span class="party-label">ÉMETTEUR (AGENCE GESTIONNAIRE) :</span>
-            <h4>KeurGui Immobilier SARL</h4>
-            <p>VDN Lot 42, Sacré-Cœur 3, Dakar</p>
-            <p>Tél : +221 78 818 21 04 / +221 77 000 00 00</p>
-            <p>NINEA : 00894521 2V2 — Régime Réel TVA 18%</p>
+        <!-- 2. Informations Mandant Bailleur & Prestation (encadré simple background: #f9fafb; padding: 16px; border-radius: 8px; margin: 20px 0;) -->
+        <div style="background: #f9fafb; padding: 16px; border-radius: 8px; margin: 20px 0; border: 1px solid #f3f4f6;">
+          <div style="font-size: 14px; color: #374151; margin-bottom: 8px;">
+            <span style="font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Bailleur Mandant : </span>
+            <strong style="color: #111827;" id="agencyInvoiceOwnerDisplay">M. Babacar Ndiaye</strong>
           </div>
-          <div class="party-box" style="border-left: 3px solid #059669;">
-            <span class="party-label">MANDANT (BAILLEUR PROPRIÉTAIRE) :</span>
-            <h4 id="agencyInvoiceOwnerDisplay">M. Babacar Ndiaye</h4>
-            <p id="agencyInvoicePortfolioDesc">Portefeuille sous mandat de gestion locative</p>
-            <p>Règlement du solde net par : <strong>Virement bancaire / Wave Pro</strong></p>
+          <div style="font-size: 14px; color: #374151;">
+            <span style="font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Prestation : </span>
+            <span id="agencyInvoicePortfolioDesc" style="color: #111827;">Honoraires de gestion locative mandatée</span>
           </div>
         </div>
 
-        <!-- Détail financier complet avec HT, TVA 18% et TTC -->
-        <table class="receipt-table">
-          <thead>
-            <tr>
-              <th>Désignation des prestations & encaissements</th>
-              <th>Base de calcul</th>
-              <th class="text-right">Montant (FCFA)</th>
-            </tr>
-          </thead>
+        <!-- 3. Tableau récapitulatif ultra-simple (3 lignes maximum) -->
+        <table style="width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 14px;">
           <tbody>
             <tr>
-              <td>
-                <strong>Total des loyers bruts encaissés</strong><br>
-                <small class="text-muted" id="agencyInvoiceUnitsDetail">Portefeuille géré ce mois</small>
-              </td>
-              <td>100% encaissé</td>
-              <td class="text-right font-mono" id="agencyTableCollected">0 FCFA</td>
+              <td style="padding: 10px 0; color: #374151;">Honoraires de gestion locative (10% HT)</td>
+              <td style="padding: 10px 0; text-align: right; font-weight: 600; color: #111827;" id="agencyTableCommissionHt">0 FCFA</td>
             </tr>
-            <tr style="background: #fafafa;">
-              <td>
-                <strong>Honoraires de gestion locative conventionnels (HT)</strong><br>
-                <small class="text-muted">Taux contractuel de gestion et suivi des recouvrements</small>
-              </td>
-              <td>10% sur encaissements</td>
-              <td class="text-right font-mono" id="agencyTableCommissionHt" style="color: #064e3b; font-weight:700;">0
-                FCFA</td>
+            <tr>
+              <td style="padding: 10px 0; color: #374151; border-top: 1px solid #f3f4f6;">TVA légale (18%)</td>
+              <td style="padding: 10px 0; text-align: right; font-weight: 600; color: #111827; border-top: 1px solid #f3f4f6;" id="agencyTableTva">0 FCFA</td>
             </tr>
-            <tr style="background: #f0fdf4; color: #166534; font-weight: 700;">
-              <td>
-                <strong>TVA légale sur honoraires (18%)</strong><br>
-                <small class="text-muted" style="color:#15803d;">Code Général des Impôts (CGI Sénégal - Art.
-                  355)</small>
-              </td>
-              <td>18% sur HT</td>
-              <td class="text-right font-mono" id="agencyTableTva">0 FCFA</td>
-            </tr>
-            <tr class="receipt-total-row">
-              <td colspan="2">
-                <strong>TOTAL HONORAIRES AGENCE TTC (DÉDUITS)</strong>
-              </td>
-              <td class="text-right font-mono-bold" id="agencyTableTotalTtc" style="color: #064e3b;">0 FCFA</td>
+            <tr style="border-top: 2px solid #111827; font-weight: 800; font-size: 15px;">
+              <td style="padding: 14px 0 10px 0; color: #111827;">TOTAL HONORAIRES TTC</td>
+              <td style="padding: 14px 0 10px 0; text-align: right; color: #111827;" id="agencyTableTotalTtc">0 FCFA</td>
             </tr>
           </tbody>
         </table>
 
-        <!-- ENCADRÉ MISE EN AVANT : NET REVERSÉ AU BAILLEUR -->
-        <div class="net-payout-box">
-          <div>
-            <div class="net-payout-label">💰 NET REVERSÉ AU BAILLEUR (PROPRIÉTAIRE)</div>
-            <div class="net-payout-sub">Loyers encaissés déduction faite de nos honoraires d'agence TTC</div>
+        <!-- 4. Confirmation de règlement et Net reversé (1 seule ligne claire sous le tableau) -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 16px; padding-top: 16px; border-top: 1px dashed #e5e7eb;">
+          <div style="font-size: 13.5px; color: #374151;">
+            Honoraires déduits • Net reversé au bailleur : <strong style="color: #111827;" id="agencyNetPayout">0 FCFA</strong>
           </div>
-          <div class="net-payout-amount" id="agencyNetPayout">0 FCFA</div>
-        </div>
-
-        <!-- Montant en lettres et mentions fiscales légales -->
-        <div class="receipt-words-box">
-          <p>Arrêté la présente facture d'honoraires à la somme de :
-            <strong id="agencyAmountWords">Zéro Franc CFA TTC</strong>
-          </p>
-        </div>
-
-        <div class="receipt-legal-note">
-          <p>Facture assujettie à la Taxe sur la Valeur Ajoutée (TVA) au taux de 18% conformément aux dispositions de
-            l'article 355 et suivants du Code Général des Impôts (CGI) de la République du Sénégal. Honoraires et
-            commissions d'agence fermes et non remboursables conformément au mandat de gestion locative. Les honoraires
-            ont été directement imputés sur les encaissements du mois et le solde net a été crédité en faveur du
-            mandant.</p>
-        </div>
-
-        <!-- Signatures, Date & Cachet Officiel Agence -->
-        <div class="receipt-footer-signatures">
-          <div class="sig-col">
-            <p>Fait à Dakar, le <span id="agencyInvoiceDate">19 Octobre 2026</span></p>
-            <div class="qr-placeholder">
-              <div class="qr-box" style="background:#ecfdf5; border-color:#059669;">
-                <span style="font-size: 22px;">🇸🇳</span>
-                <small style="color:#065f46; font-weight:800;">Agence Agréée</small>
-              </div>
-              <small class="text-muted">Réf : <span id="agencyInvoiceRef">FACT-AG-2026-10</span></small>
-            </div>
-          </div>
-          <div class="sig-col text-right">
-            <p>Signature et Cachet de l'Agence :</p>
-            <div class="signature-stamp-area">
-              <div class="digital-stamp" style="border-color:#059669; color:#064e3b;">
-                <span style="color:#059669;">KEURGUI IMMOBILIER</span>
-                <strong>DIRECTION FINANCIÈRE</strong>
-                <small>VDN Dakar • Agrément N° 2024</small>
-              </div>
-            </div>
+          <div style="background: #dcfce7; color: #15803d; border: 1px solid #86efac; border-radius: 6px; padding: 4px 10px; font-size: 12px; font-weight: 700; white-space: nowrap;">
+            ✓ RÉGLÉ
           </div>
         </div>
 
+        <!-- 5. Pied de page minimaliste (1 seule phrase en font-size: 12px; color: #6b7280; text-align: center; margin-top: 32px;) -->
+        <div style="font-size: 12px; color: #6b7280; text-align: center; margin-top: 32px;">
+          Facture officielle d'honoraires délivrée pour valoir ce que de droit.
+        </div>
+
+        <!-- Balises cachées de compatibilité descendante -->
+        <span id="agencyTableCollected" style="display: none;"></span>
+        <span id="agencyInvoiceUnitsDetail" style="display: none;"></span>
+        <span id="agencyAmountWords" style="display: none;"></span>
+        <span id="agencyInvoiceRef" style="display: none;"></span>
+        <span id="agencyInvoicePaymentDate" style="display: none;"></span>
+        <span id="agencyInvoiceDate" style="display: none;"></span>
       </div>
     </div>
   </div>
@@ -937,117 +753,73 @@
         </div>
       </div>
 
-      <!-- FEUILLE DE REÇU DE CAUTION (ZONE DU FICHIER PDF A4) -->
-      <div class="receipt-sheet" id="printableDepositReceipt">
+      <!-- FEUILLE DE REÇU DE CAUTION (ZONE DU FICHIER PDF A4 FIXE 794PX) -->
+      <div class="receipt-sheet" id="printableDepositReceipt" style="width: 794px; min-width: 794px; max-width: 794px; margin: 0 auto; background: #ffffff; padding: 40px; box-sizing: border-box; font-family: sans-serif; color: #111827;">
 
-        <!-- En-tête officiel -->
-        <div class="receipt-header">
-          <div class="receipt-brand">
-            <div style="display:flex; align-items:center; gap:10px; margin-bottom:4px;">
-              <img src="logo-icon.png" alt="KeurGui" style="width: 28px; height: 28px; border-radius: 6px;">
-              <h2>KEURGUI IMMOBILIER</h2>
-            </div>
-            <p>RÉPUBLIQUE DU SÉNÉGAL — GESTION LOCATIVE CONFORME</p>
+        <!-- 1. En-tête (sur 1 ligne, display: flex; justify-content: space-between; border-bottom: 2px solid #e5e7eb; padding-bottom: 16px;) -->
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #e5e7eb; padding-bottom: 16px;">
+          <div>
+            <div style="font-size: 20px; font-weight: 800; color: #111827; letter-spacing: -0.5px;" id="mDepositOwnerName">KEURGUI</div>
+            <div style="font-size: 13px; color: #4b5563; font-weight: 600; margin-top: 4px; text-transform: uppercase;" id="mDepositDocumentMainTitle">REÇU DE CAUTION</div>
           </div>
-          <div class="receipt-stamp-box">
-            <div class="receipt-badge-paid" style="background: #ecfdf5; border-color: #059669; color: #065f46;">
-              <span id="mDepositBadgeMain">CAUTION EN RÉSERVE</span>
-              <small id="mDepositPaymentMethodBadge">Par Wave</small>
-            </div>
+          <div style="text-align: right; font-size: 13px; color: #4b5563;">
+            <div>Réf : <strong style="color: #111827;" id="mDepositReceiptNumber">DEP-2026-0042</strong></div>
+            <div style="margin-top: 4px;" id="mDepositEquivMonths">Dépôt de garantie</div>
           </div>
         </div>
 
-        <div class="receipt-divider"></div>
-
-        <!-- Titre du document -->
-        <div class="receipt-document-title">
-          <h1 id="mDepositDocumentMainTitle" style="color: #064e3b;">REÇU OFFICIEL DE DÉPÔT DE GARANTIE</h1>
-          <p>Caution Locative d'Entrée • <strong id="mDepositEquivMonths">Équivalent à 2 mois de loyer</strong></p>
-        </div>
-
-        <!-- Coordonnées Bailleur & Locataire -->
-        <div class="receipt-parties-grid">
-          <div class="party-box">
-            <span class="party-label">BAILLEUR / GESTIONNAIRE :</span>
-            <h4 id="mDepositOwnerName">Jean Philippe Gomis</h4>
-            <p id="mDepositOwnerAddress">Dakar, Sénégal</p>
-            <p>Contact : +221 78 818 21 04</p>
+        <!-- 2. Informations Locataire & Bien (encadré simple background: #f9fafb; padding: 16px; border-radius: 8px; margin: 20px 0;) -->
+        <div style="background: #f9fafb; padding: 16px; border-radius: 8px; margin: 20px 0; border: 1px solid #f3f4f6;">
+          <div style="font-size: 14px; color: #374151; margin-bottom: 8px;">
+            <span style="font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Locataire : </span>
+            <strong style="color: #111827;" id="mDepositTenantName">Moussa Diop</strong> • <span id="mDepositTenantPhone">+221 77 654 32 10</span>
           </div>
-          <div class="party-box">
-            <span class="party-label">LOCATAIRE PRENEUR :</span>
-            <h4 id="mDepositTenantName">Moussa Diop</h4>
-            <p id="mDepositPropertyAddress">Appartement 3B, Résidence Teranga — Mermoz</p>
-            <p>Téléphone : <span id="mDepositTenantPhone">+221 77 654 32 10</span></p>
+          <div style="font-size: 14px; color: #374151;">
+            <span style="font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase;">Bien loué : </span>
+            <span id="mDepositPropertyAddress" style="color: #111827;">Appartement 3B — Résidence Teranga (Mermoz)</span>
           </div>
         </div>
 
-        <!-- Détail financier de la caution -->
-        <table class="receipt-table">
-          <thead>
-            <tr>
-              <th style="width: 44%;">Désignation de la garantie</th>
-              <th style="width: 32%;">Bien loué / Destination</th>
-              <th style="width: 24%;" class="text-right">Montant (FCFA)</th>
-            </tr>
-          </thead>
+        <!-- 3. Tableau récapitulatif ultra-simple (3 lignes maximum) -->
+        <table style="width: 100%; border-collapse: collapse; margin-top: 8px; font-size: 14px;">
           <tbody>
             <tr>
-              <td>
-                <strong>Dépôt de garantie contractuel (Caution)</strong><br>
-                <small class="text-muted" id="mDepositSubDetails">Garantie des obligations locatives d'entrée</small>
-              </td>
-              <td>
-                <span id="mDepositUnitDetails">Appartement 3 pièces standing</span><br>
-                <small class="text-muted">Loyer mensuel contractuel : <strong id="mDepositMonthlyRent">230 000 FCFA</strong></small>
-              </td>
-              <td class="text-right font-mono" id="mDepositTableAmount" style="font-size:15px; font-weight:800; color:#064e3b;">460 000 FCFA</td>
+              <td style="padding: 10px 0; color: #374151;">Dépôt de garantie contractuel (Caution)</td>
+              <td style="padding: 10px 0; text-align: right; font-weight: 600; color: #111827;" id="mDepositTableAmount">460 000 FCFA</td>
             </tr>
-            <tr class="receipt-total-row">
-              <td colspan="2">
-                <strong>TOTAL DÉPÔT DE GARANTIE ENCAISSÉ</strong>
-              </td>
-              <td class="text-right font-mono-bold" id="mDepositTableTotal" style="color: #064e3b;">460 000 FCFA</td>
+            <tr style="border-top: 2px solid #111827; font-weight: 800; font-size: 15px;">
+              <td style="padding: 14px 0 10px 0; color: #111827;">TOTAL REÇU EN CAUTION</td>
+              <td style="padding: 14px 0 10px 0; text-align: right; color: #111827;" id="mDepositTableTotal">460 000 FCFA</td>
             </tr>
           </tbody>
         </table>
 
-        <!-- Montant en lettres et mentions légales -->
-        <div class="receipt-words-box" style="background:#f0fdf4; border-left:4px solid #10b981;">
-          <p>Le bailleur certifie avoir reçu en dépôt de garantie la somme de :<br>
-            <strong id="mDepositAmountWords" style="color:#064e3b; font-size:13.5px;">Quatre cent soixante mille Francs CFA</strong>
-          </p>
-        </div>
-
-        <!-- Cadre légal conforme au Sénégal -->
-        <div class="receipt-legal-note">
-          <p>La présente somme est conservée à titre de dépôt de garantie par le bailleur conformément aux usages et aux règles régissant les baux d'habitation et le Code des Obligations Civiles et Commerciales (COCC) de la République du Sénégal. Elle est destinée à garantir l'exécution des obligations du locataire (réparations locatives, dégradations éventuelles, arriérés de loyers, charges ou factures Sen'Eau/Senelec restant dues). Cette somme ne dispense en aucun cas du paiement des loyers mensuels. Elle sera restituée au locataire dans un délai maximum de 30 jours à compter de la remise définitive des clés et de l'état des lieux contradictoire de sortie, déduction faite des éventuelles sommes justifiées légalement dues au bailleur.</p>
-        </div>
-
-        <!-- Signatures, Date & Cachet -->
-        <div class="receipt-footer-signatures">
-          <div class="sig-col">
-            <p>Fait à Dakar, le <span id="mDepositIssueDate">01 Octobre 2026</span></p>
-            <div class="qr-placeholder">
-              <div class="qr-box" style="background:#ecfdf5; border-color:#059669;">
-                <span style="font-size: 22px;">🛡️</span>
-                <small style="color:#065f46; font-weight:800;">Dépôt Sécurisé</small>
-              </div>
-              <small class="text-muted">Réf : <span id="mDepositReceiptRef">DEP-2026-0042</span></small>
-            </div>
-            <p style="font-size: 11px; color:#64748b; margin-top:8px;">Pour accord et remise : <strong id="mDepositTenantSig">Moussa Diop</strong></p>
+        <!-- 4. Confirmation de règlement (1 seule ligne claire sous le tableau) -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 16px; padding-top: 16px; border-top: 1px dashed #e5e7eb;">
+          <div style="font-size: 13.5px; color: #374151;" id="mDepositConfirmationText">
+            Dépôt de garantie reçu le 01/10/2026 via Wave.
           </div>
-          <div class="sig-col text-right">
-            <p>Signature et Cachet du Bailleur / Agence :</p>
-            <div class="signature-stamp-area">
-              <div class="digital-stamp" style="border-color:#059669; color:#064e3b;">
-                <span style="color:#059669;">KEURGUI IMMOBILIER</span>
-                <strong id="mDepositSignerName">GOMIS J.P.</strong>
-                <small>Dakar • Sénégal</small>
-              </div>
-            </div>
+          <div id="mDepositBadgeMain" style="background: #dcfce7; color: #15803d; border: 1px solid #86efac; border-radius: 6px; padding: 4px 10px; font-size: 12px; font-weight: 700; white-space: nowrap;">
+            ✓ CAUTION EN RÉSERVE
           </div>
         </div>
 
+        <!-- 5. Pied de page minimaliste (1 seule phrase en font-size: 12px; color: #6b7280; text-align: center; margin-top: 32px;) -->
+        <div style="font-size: 12px; color: #6b7280; text-align: center; margin-top: 32px;">
+          Reçu officiel de caution délivré pour valoir ce que de droit.
+        </div>
+
+        <!-- Balises cachées de compatibilité descendante -->
+        <span id="mDepositReceiptRef" style="display: none;"></span>
+        <span id="mDepositPaymentMethodBadge" style="display: none;"></span>
+        <span id="mDepositOwnerAddress" style="display: none;"></span>
+        <span id="mDepositTenantSig" style="display: none;"></span>
+        <span id="mDepositSignerName" style="display: none;"></span>
+        <span id="mDepositSubDetails" style="display: none;"></span>
+        <span id="mDepositUnitDetails" style="display: none;"></span>
+        <span id="mDepositMonthlyRent" style="display: none;"></span>
+        <span id="mDepositAmountWords" style="display: none;"></span>
+        <span id="mDepositIssueDate" style="display: none;"></span>
       </div>
     </div>
   </div>
