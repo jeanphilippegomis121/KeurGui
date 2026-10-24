@@ -342,3 +342,31 @@
   - 100% du texte visible et net : `CAUTION EN RÉSERVE / PAR WAVE` et `KEURGUI IMMOBILIER / GOMIS J.P. / Dakar • Sénégal`.
   - Strictement 1 seule page A4 sans débordement.
 - Déploiement git push sur `main` validé.
+
+---
+
+## 📱 Séance du 24 Octobre 2026 — Corrections UX Mobile : Padding Sécurité Modales & Barre de Filtres Fluide
+
+### 1. 🔍 Problèmes résolus :
+1. **Modales coupées sur mobile (Encaisser un loyer & Ajouter un bien) :**
+   - Les boutons d'action en bas des formulaires (« Confirmer le paiement & Générer la Quittance », « Enregistrer le logement ») étaient masqués ou partiellement coupés par la barre de navigation inférieure mobile.
+   - Les modales n'avaient pas de marge de sécurité interne en bas et un `z-index` inférieur à la bottom bar (`1000` vs `9999`).
+2. **Barre de filtres horizontale (Mes Biens & Immeubles) :**
+   - Sur mobile, le 4e filtre (`🔴 En retard`) était coupé sur le bord droit ("🔴 En ret...").
+
+### 2. 🛠️ Corrections techniques appliquées dans `style.css` :
+1. **Sécurité et scroll des modales mobiles :**
+   - `z-index: 100000 !important` appliqué sur `.modal-overlay`, plaçant sans équivoque toutes les modales et leur fond flouté au-dessus de la barre de navigation mobile (`z-index: 9999`).
+   - Conteneurs des modales (`.modal-card`, `.modal-history-card`, `.modal-receipt-wrapper`, `.modal-quick-box`, `.feedback-modal-card`) configurés en bottom-sheet scrollable : `max-height: 80vh !important`, `overflow-y: auto !important`, `-webkit-overflow-scrolling: touch !important`.
+   - Espacement interne généreux en bas (`padding: 22px 16px 96px 16px !important` / équivalent `pb-32`) et `.modal-actions` avec marges verticales dédiées, garantissant que les boutons d'action sont 100% dégagés et facilement cliquables au-dessus de la barre de navigation.
+2. **Barre de filtres horizontale fluide sans troncature :**
+   - `.filter-tabs` doté d'un scroll tactile fluide : `display: flex !important`, `overflow-x: auto !important`, `overflow-y: hidden !important`, `white-space: nowrap !important`, `-webkit-overflow-scrolling: touch !important`, `scrollbar-width: none !important`.
+   - Masquage de la barre de défilement : `.filter-tabs::-webkit-scrollbar { display: none !important; }`.
+   - `.tab-btn` optimisé : `flex-shrink: 0 !important`, `white-space: nowrap !important`, `padding: 6px 8px !important`, `font-size: 11px !important`, `font-weight: 700 !important`, `gap: 3px !important`.
+   - Résultat : les 4 boutons (`Tous (8)`, `🟢 Payés (7)`, `🟡 En attente (1)`, `🔴 En retard (1)`) s'affichent entièrement sans coupure sur les écrans mobiles tout en restant horizontalement scrollables au touch.
+
+### 3. 🧪 Validation :
+- Script d'inspection Chromium headless (`verify_mobile_ux.ps1`) et captures d'écran mobiles (`shot_filters.png`, `shot_pay_modal.png`, `shot_add_modal.png`).
+- Dégagement des boutons de confirmation validé avec plus de 90px de marge au bas du conteneur.
+- Déploiement git push sur `main` validé.
+
