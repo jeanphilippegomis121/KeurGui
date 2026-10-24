@@ -25,7 +25,7 @@
   <!-- Bibliothèque de génération PDF directe (téléchargement instantané du fichier .pdf) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
-  <link rel="stylesheet" href="style.css?v=2.7">
+  <link rel="stylesheet" href="style.css?v=3.0">
 </head>
 
 <body>
@@ -54,221 +54,432 @@
     </div>
   </div>
 
-  <!-- Navigation principale -->
-  <header class="app-header">
-    <div class="header-container">
-      <div class="logo-area">
-        <a href="index.html" style="display: flex; align-items: center; text-decoration: none;">
-          <img src="logo-banner.png" alt="KeurGui" style="height: 38px; width: auto; border-radius: 8px;">
-        </a>
-        <div class="logo-sub-wrapper"
-          style="border-left: 2px solid var(--gray-200); padding-left: 12px; margin-left: 6px;">
-          <p class="logo-sub" style="font-size: 11px; color: var(--gray-600); font-weight: 600; line-height: 1.25;">Vos
-            loyers au pays,<br>en toute sérénité 🇸🇳</p>
+  <!-- STRUCTURE GLOBALE SAAS : SIDEBAR DESKTOP + BOTTOM BAR MOBILE -->
+  <div class="app-layout">
+
+    <!-- 1. BARRE LATÉRALE BUREAU / ORDINATEUR (DESKTOP SIDEBAR) -->
+    <aside class="app-sidebar" id="appSidebar">
+      <div class="sidebar-top">
+        <div class="sidebar-brand">
+          <a href="index.html" class="sidebar-logo-link">
+            <img src="logo-banner.png" alt="KeurGui" class="sidebar-logo-img">
+          </a>
+          <p class="sidebar-slogan">Vos loyers au pays, en toute sérénité 🇸🇳</p>
         </div>
+
+        <!-- Navigation principale -->
+        <nav class="sidebar-nav">
+          <button class="nav-item active" id="sideNav-dashboard" onclick="switchView('dashboard')">
+            <span class="nav-icon">📊</span>
+            <span class="nav-text">Tableau de bord</span>
+          </button>
+          <button class="nav-item" id="sideNav-properties" onclick="switchView('properties')">
+            <span class="nav-icon">🏢</span>
+            <span class="nav-text">Mes Biens</span>
+            <span class="nav-badge" id="sideBadgeProps">6</span>
+          </button>
+          <button class="nav-item" id="sideNav-tenants" onclick="switchView('tenants')">
+            <span class="nav-icon">👥</span>
+            <span class="nav-text">Locataires</span>
+            <span class="nav-badge" id="sideBadgeTenants">6</span>
+          </button>
+          <button class="nav-item" id="sideNav-receipts" onclick="switchView('receipts')">
+            <span class="nav-icon">🧾</span>
+            <span class="nav-text">Quittances & Reçus</span>
+            <span class="nav-badge" id="sideBadgeReceipts">0</span>
+          </button>
+        </nav>
       </div>
 
-      <!-- Sélecteur Mode Propriétaire / Mode Agence -->
-      <div class="mode-toggle-card">
-        <span class="mode-label active-role" id="label-bailleur">Bailleur Particulier</span>
-        <label class="switch">
-          <input type="checkbox" id="agencyModeToggle" onchange="toggleAgencyMode()">
-          <span class="slider round"></span>
-        </label>
-        <span class="mode-label" id="label-agence">Mode Agence</span>
-      </div>
-
-      <!-- Profil Utilisateur & Outils -->
-      <div class="user-profile">
-        <a href="index.html" class="btn-link-landing"
-          style="font-size: 12px; font-weight: 700; color: #059669; text-decoration: none; padding: 6px 12px; background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 999px; display: flex; align-items: center; gap: 4px;">
-          <span>🌐</span> Site Vitrine VIP
-        </a>
-        <div class="user-avatar" id="headerAvatar">JP</div>
-        <div class="user-meta">
-          <span class="user-name" id="headerUserName">Jean Philippe Gomis</span>
-          <span class="user-badge" id="userRoleBadge">Propriétaire</span>
+      <!-- Bas de la barre latérale : Mode Agence & Profil -->
+      <div class="sidebar-bottom">
+        <!-- Sélecteur Mode Propriétaire / Mode Agence -->
+        <div class="mode-toggle-card sidebar-mode-toggle">
+          <span class="mode-label active-role" id="label-bailleur">Bailleur</span>
+          <label class="switch">
+            <input type="checkbox" id="agencyModeToggle" onchange="toggleAgencyMode()">
+            <span class="slider round"></span>
+          </label>
+          <span class="mode-label" id="label-agence">Mode Agence</span>
         </div>
-        <button class="btn-icon-subtle" title="Réinitialiser les données de démo" onclick="resetDemoData()">🔄</button>
-      </div>
-    </div>
-  </header>
 
-  <!-- Bannière d'Accueil Personnalisée Subtile & Chaleureuse -->
-  <div id="welcomeBanner" class="welcome-banner" style="display: none;">
-    <div class="container welcome-banner-content">
-      <div class="welcome-text">
-        <span class="welcome-wave">👋</span>
-        <div>
-          <strong>Dalal ak jàmm <span id="welcomeUserName"></span> !</strong>
-          <p>Bienvenue sur votre démo interactive KeurGui. Explorez le tableau de bord, testez une quittance officielle
-            en 1 clic ou nettoyez les exemples pour ajouter vos vrais biens.</p>
-        </div>
-      </div>
-      <button class="btn-welcome-dismiss" onclick="dismissWelcomeBanner()">C'est parti ! 🚀</button>
-    </div>
-  </div>
-
-  <!-- Bannière d'accueil Démo Interactive Ultra-Visible -->
-  <div class="notification-bar demo-banner-highlight">
-    <div class="container notif-content">
-      <div class="demo-banner-left">
-        <span class="demo-chip-live">⚡ DÉMO INTERACTIVE</span>
-        <span class="demo-text-desc">Vous testez actuellement des exemples fictifs à Dakar.</span>
-      </div>
-      <div class="demo-banner-actions">
-        <button class="btn-clean-start-prominent" onclick="clearToMyProperties()">
-          <span>✨</span>
-          <strong>Nettoyer pour mettre mes vrais biens</strong>
-          <span class="btn-arrow-subtle">→</span>
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Contenu Principal -->
-  <main class="container main-content">
-
-    <!-- EN-TÊTE DU TABLEAU DE BORD AVEC SÉLECTEUR DE PÉRIODE SUBTIL & ÉLÉGANT -->
-    <div class="dashboard-executive-header">
-      <div class="dash-title-block">
-        <h1 class="dash-main-title">Tableau de bord</h1>
-        <p class="dash-subtitle">Suivi des encaissements • <span id="activePeriodLabel"
-            class="period-text-highlight">Octobre 2026</span></p>
-      </div>
-
-      <!-- Sélecteur de période épuré (visible mais subtil) -->
-      <div class="period-pill-subtle">
-        <button class="btn-period-arrow-subtle" onclick="changePeriod(-1)" title="Mois précédent"
-          aria-label="Mois précédent">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <polyline points="15 18 9 12 15 6"></polyline>
-          </svg>
-        </button>
-        <div class="period-dropdowns-group">
-          <span class="period-icon-cal">📅</span>
-          <select id="periodMonthSelect" onchange="onPeriodPickerChange()" class="select-period-subtle"
-            title="Choisir le mois">
-            <option value="1">Janvier</option>
-            <option value="2">Février</option>
-            <option value="3">Mars</option>
-            <option value="4">Avril</option>
-            <option value="5">Mai</option>
-            <option value="6">Juin</option>
-            <option value="7">Juillet</option>
-            <option value="8">Août</option>
-            <option value="9">Septembre</option>
-            <option value="10" selected>Octobre</option>
-            <option value="11">Novembre</option>
-            <option value="12">Décembre</option>
-          </select>
-          <select id="periodYearSelect" onchange="onPeriodPickerChange()"
-            class="select-period-subtle select-year-subtle" title="Choisir l'année">
-            <option value="2025">2025</option>
-            <option value="2026" selected>2026</option>
-            <option value="2027">2027</option>
-            <option value="2028">2028</option>
-            <option value="2029">2029</option>
-            <option value="2030">2030</option>
-          </select>
-        </div>
-        <button class="btn-period-arrow-subtle" onclick="changePeriod(1)" title="Mois suivant"
-          aria-label="Mois suivant">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-            <polyline points="9 18 15 12 9 6"></polyline>
-          </svg>
-        </button>
-        <button class="btn-period-today-subtle" onclick="goToCurrentPeriod()" title="Revenir au mois en cours">Mois en
-          cours</button>
-      </div>
-    </div>
-
-    <!-- Statistiques Clés -->
-    <section class="stats-grid">
-      <div class="stat-card stat-success">
-        <div class="stat-icon">💰</div>
-        <div class="stat-info">
-          <span class="stat-title">Total Encaissé (Mois)</span>
-          <h2 class="stat-value" id="totalCollected">1 850 000 FCFA</h2>
-          <span class="stat-tag success">↑ 5 loyers payés</span>
-        </div>
-      </div>
-
-      <div class="stat-card stat-warning">
-        <div class="stat-icon">⏳</div>
-        <div class="stat-info">
-          <span class="stat-title">Reste à Encaisser</span>
-          <h2 class="stat-value" id="totalPending">250 000 FCFA</h2>
-          <span class="stat-tag warning">1 locataire en attente</span>
-        </div>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-icon">📊</div>
-        <div class="stat-info">
-          <span class="stat-title">Taux de Recouvrement</span>
-          <h2 class="stat-value" id="collectionRate">88%</h2>
-          <div class="progress-bar-bg">
-            <div class="progress-bar-fill" id="collectionFill" style="width: 88%;"></div>
+        <!-- Profil Utilisateur & Outils -->
+        <div class="sidebar-profile-card">
+          <div class="sidebar-user-row">
+            <div class="user-avatar" id="headerAvatar">JP</div>
+            <div class="user-meta">
+              <span class="user-name" id="headerUserName">Jean Philippe Gomis</span>
+              <span class="user-badge" id="userRoleBadge">Propriétaire</span>
+            </div>
+          </div>
+          <div class="sidebar-profile-actions">
+            <a href="index.html" class="btn-link-landing-sidebar" title="Visiter le site vitrine">
+              <span>🌐</span> Site Vitrine VIP
+            </a>
+            <button class="btn-icon-subtle" title="Réinitialiser les données de démo" onclick="resetDemoData()">🔄</button>
           </div>
         </div>
       </div>
+    </aside>
 
-      <!-- Statistique Caution & Dépôt de Garantie Sécurisé -->
-      <div class="stat-card stat-deposit" id="statDepositCard">
-        <div class="stat-icon" style="background: rgba(16, 185, 129, 0.12); color: #059669;">🛡️</div>
-        <div class="stat-info">
-          <span class="stat-title">Cautions en Réserve</span>
-          <h2 class="stat-value" id="totalDeposits">0 FCFA</h2>
-          <span class="stat-tag success" id="depositsCountTag">🛡️ 0 caution en réserve</span>
+    <!-- 2. CONTENEUR DU CONTENU PRINCIPAL (MAIN LAYOUT) -->
+    <div class="app-main-layout">
+
+      <!-- TOP BAR MOBILE (Uniquement sur smartphone / tablette < 992px) -->
+      <header class="mobile-top-bar">
+        <div class="mobile-top-left">
+          <a href="index.html" style="display:flex; align-items:center; text-decoration:none;">
+            <img src="logo-icon.png" alt="KeurGui" class="mobile-logo-icon">
+          </a>
+          <span class="mobile-view-title" id="mobileActiveViewTitle">Tableau de bord</span>
+        </div>
+        <div class="mobile-top-right">
+          <span class="user-badge" id="mobileRoleBadge" style="font-size:10px; padding:3px 8px;">Propriétaire</span>
+          <div class="user-avatar user-avatar-sm" id="mobileHeaderAvatar" onclick="switchView('dashboard')">JP</div>
+        </div>
+      </header>
+
+      <!-- Bannière d'Accueil Personnalisée Subtile & Chaleureuse -->
+      <div id="welcomeBanner" class="welcome-banner" style="display: none;">
+        <div class="container welcome-banner-content">
+          <div class="welcome-text">
+            <span class="welcome-wave">👋</span>
+            <div>
+              <strong>Dalal ak jàmm <span id="welcomeUserName"></span> !</strong>
+              <p>Bienvenue sur votre démo interactive KeurGui. Explorez le tableau de bord, testez une quittance officielle
+                en 1 clic ou nettoyez les exemples pour ajouter vos vrais biens.</p>
+            </div>
+          </div>
+          <button class="btn-welcome-dismiss" onclick="dismissWelcomeBanner()">C'est parti ! 🚀</button>
         </div>
       </div>
 
-      <!-- Statistique spéciale Agence (affichée en Mode Agence) -->
-      <div class="stat-card stat-agency" id="agencyCommissionCard" style="display: none;">
-        <div class="stat-icon">💼</div>
-        <div class="stat-info">
-          <span class="stat-title">Commissions Agence (10%)</span>
-          <h2 class="stat-value" id="agencyCommission">185 000 FCFA</h2>
-          <span class="stat-tag info" id="agencyPayoutTag">Reversé aux bailleurs : 1 665 000 FCFA</span>
-          <div style="margin-top: 10px;">
-            <button class="btn btn-invoice-agency" onclick="openAgencyInvoiceModal()">
-              <span>📑</span> Facture d'Honoraires (TVA 18%) →
+      <!-- Bannière d'accueil Démo Interactive Ultra-Visible -->
+      <div class="notification-bar demo-banner-highlight">
+        <div class="container notif-content">
+          <div class="demo-banner-left">
+            <span class="demo-chip-live">⚡ DÉMO INTERACTIVE</span>
+            <span class="demo-text-desc">Vous testez actuellement des exemples fictifs à Dakar.</span>
+          </div>
+          <div class="demo-banner-actions">
+            <button class="btn-clean-start-prominent" onclick="clearToMyProperties()">
+              <span>✨</span>
+              <strong>Nettoyer pour mettre mes vrais biens</strong>
+              <span class="btn-arrow-subtle">→</span>
             </button>
           </div>
         </div>
       </div>
-    </section>
 
-    <!-- Barre d'actions & Filtres -->
-    <section class="action-bar">
-      <div class="filter-tabs">
-        <button class="tab-btn active" id="tab-all" onclick="setFilter('all')">Tous les biens (<span
-            id="countAll">6</span>)</button>
-        <button class="tab-btn" id="tab-paid" onclick="setFilter('paid')">Payés (<span id="countPaid">5</span>)</button>
-        <button class="tab-btn" id="tab-late" onclick="setFilter('late')">En attente / Retard (<span
-            id="countLate">1</span>)</button>
-      </div>
+      <!-- ESPACE DE TRAVAIL DES DIFFÉRENTES VUES DÉDIÉES -->
+      <main class="container main-content app-views-wrapper">
 
-      <div class="action-buttons">
-        <button class="btn btn-history-action" onclick="openReceiptsHistoryModal()"
-          title="Consulter l'historique complet des quittances délivrées">
-          <span>📑</span> Historique Quittances (<span id="historyCountBadge">0</span>)
+        <!-- ============================================== -->
+        <!-- VUE 1 : TABLEAU DE BORD (PILOTAGE & KPIS)      -->
+        <!-- ============================================== -->
+        <section id="view-dashboard" class="app-view active">
+          <!-- EN-TÊTE DU TABLEAU DE BORD AVEC SÉLECTEUR DE PÉRIODE SUBTIL & ÉLÉGANT -->
+          <div class="dashboard-executive-header">
+            <div class="dash-title-block">
+              <h1 class="dash-main-title">Tableau de bord</h1>
+              <p class="dash-subtitle">Suivi des encaissements • <span id="activePeriodLabel"
+                  class="period-text-highlight">Octobre 2026</span></p>
+            </div>
+
+            <!-- Sélecteur de période épuré -->
+            <div class="period-pill-subtle">
+              <button class="btn-period-arrow-subtle" onclick="changePeriod(-1)" title="Mois précédent"
+                aria-label="Mois précédent">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+              </button>
+              <div class="period-dropdowns-group">
+                <span class="period-icon-cal">📅</span>
+                <select id="periodMonthSelect" onchange="onPeriodPickerChange()" class="select-period-subtle"
+                  title="Choisir le mois">
+                  <option value="1">Janvier</option>
+                  <option value="2">Février</option>
+                  <option value="3">Mars</option>
+                  <option value="4">Avril</option>
+                  <option value="5">Mai</option>
+                  <option value="6">Juin</option>
+                  <option value="7">Juillet</option>
+                  <option value="8">Août</option>
+                  <option value="9">Septembre</option>
+                  <option value="10" selected>Octobre</option>
+                  <option value="11">Novembre</option>
+                  <option value="12">Décembre</option>
+                </select>
+                <select id="periodYearSelect" onchange="onPeriodPickerChange()"
+                  class="select-period-subtle select-year-subtle" title="Choisir l'année">
+                  <option value="2025">2025</option>
+                  <option value="2026" selected>2026</option>
+                  <option value="2027">2027</option>
+                  <option value="2028">2028</option>
+                  <option value="2029">2029</option>
+                  <option value="2030">2030</option>
+                </select>
+              </div>
+              <button class="btn-period-arrow-subtle" onclick="changePeriod(1)" title="Mois suivant"
+                aria-label="Mois suivant">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+              </button>
+              <button class="btn-period-today-subtle" onclick="goToCurrentPeriod()" title="Revenir au mois en cours">Mois en
+                cours</button>
+            </div>
+          </div>
+
+          <!-- Statistiques Clés -->
+          <section class="stats-grid">
+            <div class="stat-card stat-success">
+              <div class="stat-icon">💰</div>
+              <div class="stat-info">
+                <span class="stat-title">Total Encaissé (Mois)</span>
+                <h2 class="stat-value" id="totalCollected">1 850 000 FCFA</h2>
+                <span class="stat-tag success">↑ 5 loyers payés</span>
+              </div>
+            </div>
+
+            <div class="stat-card stat-warning">
+              <div class="stat-icon">⏳</div>
+              <div class="stat-info">
+                <span class="stat-title">Reste à Encaisser</span>
+                <h2 class="stat-value" id="totalPending">250 000 FCFA</h2>
+                <span class="stat-tag warning">1 locataire en attente</span>
+              </div>
+            </div>
+
+            <div class="stat-card">
+              <div class="stat-icon">📊</div>
+              <div class="stat-info">
+                <span class="stat-title">Taux de Recouvrement</span>
+                <h2 class="stat-value" id="collectionRate">88%</h2>
+                <div class="progress-bar-bg">
+                  <div class="progress-bar-fill" id="collectionFill" style="width: 88%;"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Statistique Caution & Dépôt de Garantie Sécurisé -->
+            <div class="stat-card stat-deposit" id="statDepositCard">
+              <div class="stat-icon" style="background: rgba(16, 185, 129, 0.12); color: #059669;">🛡️</div>
+              <div class="stat-info">
+                <span class="stat-title">Cautions en Réserve</span>
+                <h2 class="stat-value" id="totalDeposits">0 FCFA</h2>
+                <span class="stat-tag success" id="depositsCountTag">🛡️ 0 caution en réserve</span>
+              </div>
+            </div>
+
+            <!-- Statistique spéciale Agence (affichée en Mode Agence) -->
+            <div class="stat-card stat-agency" id="agencyCommissionCard" style="display: none;">
+              <div class="stat-icon">💼</div>
+              <div class="stat-info">
+                <span class="stat-title">Commissions Agence (10%)</span>
+                <h2 class="stat-value" id="agencyCommission">185 000 FCFA</h2>
+                <span class="stat-tag info" id="agencyPayoutTag">Reversé aux bailleurs : 1 665 000 FCFA</span>
+                <div style="margin-top: 10px;">
+                  <button class="btn btn-invoice-agency" onclick="openAgencyInvoiceModal()">
+                    <span>📑</span> Facture d'Honoraires (TVA 18%) →
+                  </button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- SECTION WIDGETS DÉCISIONNELS & ACTIONS DU MOIS -->
+          <div class="dash-alerts-section" id="dashAlertsSection">
+            <!-- Rempli dynamiquement en JS (Alertes retards avec bouton WhatsApp ou célébration verte) -->
+          </div>
+
+          <!-- RACCOURCIS RAPIDES & DERNIÈRES QUITTANCES -->
+          <div class="dash-quick-links-grid">
+            <div class="dash-quick-box">
+              <div class="dash-box-header">
+                <span class="dash-box-title">⚡ Actions Fréquentes</span>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:10px;">
+                <button class="btn btn-primary" style="justify-content:flex-start;" onclick="openAddPropertyModal()">
+                  <span>+</span> Ajouter un nouveau bien / immeuble
+                </button>
+                <button class="btn btn-secondary" style="justify-content:flex-start;" onclick="switchView('properties')">
+                  <span>🏢</span> Voir la liste de tous mes biens →
+                </button>
+                <button class="btn btn-secondary" style="justify-content:flex-start;" onclick="switchView('receipts')">
+                  <span>🧾</span> Accéder au registre des quittances →
+                </button>
+              </div>
+            </div>
+
+            <div class="dash-quick-box">
+              <div class="dash-box-header">
+                <span class="dash-box-title">📑 Dernières Quittances Émises</span>
+                <button class="dash-box-link" onclick="switchView('receipts')">Tout voir →</button>
+              </div>
+              <div id="dashRecentReceiptsContainer">
+                <!-- Rempli dynamiquement en JS -->
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- VUE 2 : MES BIENS & IMMEUBLES                  -->
+        <!-- ============================================== -->
+        <section id="view-properties" class="app-view">
+          <div class="dashboard-executive-header" style="margin-bottom:16px;">
+            <div class="dash-title-block">
+              <h1 class="dash-main-title">Mes Biens & Immeubles</h1>
+              <p class="dash-subtitle">Gestion de votre patrimoine locatif à Dakar et au Sénégal</p>
+            </div>
+            <button class="btn btn-primary" onclick="openAddPropertyModal()">
+              <span>+</span> Ajouter un bien / immeuble
+            </button>
+          </div>
+
+          <!-- Barre d'actions & Filtres (Vert, Jaune, Rouge 🇸🇳) -->
+          <section class="action-bar">
+            <div class="filter-tabs">
+              <button class="tab-btn active" id="tab-all" onclick="setFilter('all')">Tous (<span id="countAll">6</span>)</button>
+              <button class="tab-btn tab-green" id="tab-paid" onclick="setFilter('paid')">🟢 Payés (<span id="countPaid">5</span>)</button>
+              <button class="tab-btn tab-yellow" id="tab-pending" onclick="setFilter('pending')">🟡 En attente (<span id="countPending">1</span>)</button>
+              <button class="tab-btn tab-red" id="tab-late" onclick="setFilter('late')">🔴 En retard (<span id="countLate">0</span>)</button>
+            </div>
+
+            <div class="action-buttons">
+              <input type="text" id="searchInput" placeholder="Rechercher (Mermoz, Diallo, Teranga...)" class="search-input"
+                onkeyup="searchProperties()">
+            </div>
+          </section>
+
+          <!-- Zone principale : Regroupement par Immeuble / Résidence -->
+          <section class="buildings-container" id="buildingsContainer">
+            <!-- Rempli dynamiquement et regroupé par Javascript -->
+          </section>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- VUE 3 : ANNUAIRE DES LOCATAIRES                -->
+        <!-- ============================================== -->
+        <section id="view-tenants" class="app-view">
+          <div class="tenants-view-header">
+            <div>
+              <h1 class="dash-main-title">Annuaire des Locataires</h1>
+              <p class="dash-subtitle">Coordonnées directes, contacts WhatsApp et suivi des cautions</p>
+            </div>
+            <div style="display:flex; gap:10px; align-items:center;">
+              <input type="text" id="tenantSearchInput" placeholder="Rechercher un locataire..." class="search-input"
+                style="max-width:240px;" oninput="renderTenantsList()">
+            </div>
+          </div>
+
+          <div class="tenants-grid" id="tenantsContainer">
+            <!-- Rempli dynamiquement en JS -->
+          </div>
+        </section>
+
+        <!-- ============================================== -->
+        <!-- VUE 4 : QUITTANCES & REÇUS (ARCHIVES)          -->
+        <!-- ============================================== -->
+        <section id="view-receipts" class="app-view">
+          <div class="dashboard-executive-header" style="margin-bottom:16px;">
+            <div>
+              <h1 class="dash-main-title">Quittances & Reçus Certifiés</h1>
+              <p class="dash-subtitle">Registre historique officiel • Export PDF 1 page A4 & Partage WhatsApp direct</p>
+            </div>
+          </div>
+
+          <!-- Filtres de l'historique dans la page -->
+          <div class="history-controls-bar" style="margin-bottom:16px;">
+            <div class="history-search-wrapper">
+              <span class="search-icon">🔍</span>
+              <input type="text" id="inPageReceiptSearchInput"
+                placeholder="Rechercher par locataire, référence, immeuble..."
+                class="history-search-input" oninput="renderInPageReceipts()">
+            </div>
+            <div class="history-filters-group">
+              <select id="inPageReceiptYearFilter" class="history-select-subtle" onchange="renderInPageReceipts()">
+                <option value="all">Toutes les années</option>
+                <option value="2026" selected>2026</option>
+                <option value="2025">2025</option>
+                <option value="2024">2024</option>
+              </select>
+              <select id="inPageReceiptBuildingFilter" class="history-select-subtle" onchange="renderInPageReceipts()">
+                <option value="all">Tous les biens / immeubles</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="history-summary-strip" style="margin-bottom:14px;">
+            <span id="inPageReceiptSummaryText">Affichage de <strong>0</strong> document(s)</span>
+            <span class="history-format-hint">📄 100% Conformes A4 • Téléchargement instantané</span>
+          </div>
+
+          <!-- Liste des quittances et reçus dans la page -->
+          <div class="history-list-container" id="inPageReceiptsContainer">
+            <!-- Rempli dynamiquement en JS -->
+          </div>
+        </section>
+
+      </main>
+    </div>
+
+    <!-- 3. BARRE DE NAVIGATION MOBILE BAS D'ÉCRAN (BOTTOM BAR) -->
+    <nav class="mobile-bottom-nav">
+      <button class="bottom-nav-item active" id="bottomNav-dashboard" onclick="switchView('dashboard')">
+        <span class="bnav-icon">📊</span>
+        <span class="bnav-label">Accueil</span>
+      </button>
+      <button class="bottom-nav-item" id="bottomNav-properties" onclick="switchView('properties')">
+        <span class="bnav-icon">🏢</span>
+        <span class="bnav-label">Biens</span>
+      </button>
+      <button class="bottom-nav-item" id="bottomNav-tenants" onclick="switchView('tenants')">
+        <span class="bnav-icon">👥</span>
+        <span class="bnav-label">Locataires</span>
+      </button>
+      <button class="bottom-nav-item" id="bottomNav-receipts" onclick="switchView('receipts')">
+        <span class="bnav-icon">🧾</span>
+        <span class="bnav-label">Reçus</span>
+      </button>
+    </nav>
+
+    <!-- 4. BOUTON MAGIQUE FLOTTANT MOBILE (FAB + MENU POPUP) -->
+    <div class="mobile-fab-container">
+      <button class="btn-mobile-fab" id="btnMobileFab" onclick="toggleFabActionMenu()" title="Actions rapides" aria-label="Menu actions rapides">
+        <span id="fabIcon">+</span>
+      </button>
+      <div class="fab-sheet-backdrop" id="fabBackdrop" onclick="closeFabActionMenu()"></div>
+      <div class="fab-action-sheet" id="fabActionSheet">
+        <div class="fab-sheet-title">Actions rapides ⚡</div>
+        <button class="fab-sheet-item" onclick="closeFabActionMenu(); openAddPropertyModal();">
+          <span class="fab-item-icon">🏢</span>
+          <div class="fab-item-text">
+            <strong>Ajouter un bien ou immeuble</strong>
+            <small>Nouveau logement, villa, studio ou lots</small>
+          </div>
         </button>
-        <input type="text" id="searchInput" placeholder="Rechercher (Mermoz, Diallo, Teranga...)" class="search-input"
-          onkeyup="searchProperties()">
-        <button class="btn btn-primary" onclick="openAddPropertyModal()">
-          <span>+</span> Ajouter un bien / immeuble
+        <button class="fab-sheet-item" onclick="closeFabActionMenu(); switchView('properties');">
+          <span class="fab-item-icon">💰</span>
+          <div class="fab-item-text">
+            <strong>Encaisser un loyer</strong>
+            <small>Enregistrer Wave, Orange Money ou Espèces</small>
+          </div>
+        </button>
+        <button class="fab-sheet-item" onclick="closeFabActionMenu(); switchView('receipts');">
+          <span class="fab-item-icon">🧾</span>
+          <div class="fab-item-text">
+            <strong>Consulter les quittances</strong>
+            <small>Historique certifié & partage WhatsApp</small>
+          </div>
         </button>
       </div>
-    </section>
+    </div>
 
-    <!-- Zone principale : Affichage structuré et épuré par Immeuble / Résidence -->
-    <section class="buildings-container" id="buildingsContainer">
-      <!-- Rempli dynamiquement et regroupé par Javascript -->
-    </section>
+  </div> <!-- FIN APP-LAYOUT -->
 
-  </main>
 
   <!-- ============================================== -->
   <!-- MODAL : REGISTRE & HISTORIQUE DES QUITTANCES -->
@@ -847,14 +1058,20 @@
         <label class="pay-option">
           <input type="radio" name="payMethod" value="Wave" checked>
           <div class="pay-option-content">
-            <span class="pay-logo wave-logo">🌊 Wave</span>
+            <span class="pay-logo wave-logo">
+              <svg class="brand-logo-svg" width="22" height="22" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="7" fill="#1BA5E0"/><path d="M16 5.5C11.85 5.5 8.5 8.85 8.5 13C8.5 16.2 10.45 18.95 13.2 20.15L12.3 25.5C12.2 26 12.6 26.5 13.1 26.5H18.9C19.4 26.5 19.8 26 19.7 25.5L18.8 20.15C21.55 18.95 23.5 16.2 23.5 13C23.5 8.85 20.15 5.5 16 5.5Z" fill="#0C2340"/><ellipse cx="16" cy="14.5" rx="3.5" ry="5.5" fill="#FFFFFF"/><polygon points="16,12.5 14,14 18,14" fill="#FF9E00"/><ellipse cx="13.5" cy="26" rx="2" ry="1" fill="#FF9E00"/><ellipse cx="18.5" cy="26" rx="2" ry="1" fill="#FF9E00"/></svg>
+              Wave (Sénégal)
+            </span>
             <small>Transfert direct sans frais</small>
           </div>
         </label>
         <label class="pay-option">
           <input type="radio" name="payMethod" value="Orange Money">
           <div class="pay-option-content">
-            <span class="pay-logo om-logo">🟠 Orange Money</span>
+            <span class="pay-logo om-logo">
+              <svg class="brand-logo-svg" width="22" height="22" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="7" fill="#000000"/><rect x="16" width="16" height="32" fill="#FF7900"/><circle cx="16" cy="16" r="10" fill="#000000"/><text x="16" y="20" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-weight="900" font-size="11" fill="#FF7900" text-anchor="middle">om</text></svg>
+              Orange Money
+            </span>
             <small>Transfert Orange Money</small>
           </div>
         </label>
@@ -1276,7 +1493,7 @@
     </div>
   </div>
 
-  <script src="app.js?v=2.7"></script>
+  <script src="app.js?v=3.0"></script>
 </body>
 
 </html>

@@ -399,10 +399,90 @@ function escapeHtml(str) {
     .replace(/'/g, '&#039;');
 }
 
+// ===================================================
+// LOGOS OFFICIELS VECTORIELS (WAVE & ORANGE MONEY SVG)
+// ===================================================
+const WAVE_SVG_ICON = `<svg class="brand-logo-svg wave-svg" width="18" height="18" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="7" fill="#1BA5E0"/><path d="M16 5.5C11.85 5.5 8.5 8.85 8.5 13C8.5 16.2 10.45 18.95 13.2 20.15L12.3 25.5C12.2 26 12.6 26.5 13.1 26.5H18.9C19.4 26.5 19.8 26 19.7 25.5L18.8 20.15C21.55 18.95 23.5 16.2 23.5 13C23.5 8.85 20.15 5.5 16 5.5Z" fill="#0C2340"/><ellipse cx="16" cy="14.5" rx="3.5" ry="5.5" fill="#FFFFFF"/><polygon points="16,12.5 14,14 18,14" fill="#FF9E00"/><ellipse cx="13.5" cy="26" rx="2" ry="1" fill="#FF9E00"/><ellipse cx="18.5" cy="26" rx="2" ry="1" fill="#FF9E00"/></svg>`;
+
+const OM_SVG_ICON = `<svg class="brand-logo-svg om-svg" width="18" height="18" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="7" fill="#000000"/><rect x="16" width="16" height="32" fill="#FF7900"/><circle cx="16" cy="16" r="10" fill="#000000"/><text x="16" y="20" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-weight="900" font-size="11" fill="#FF7900" text-anchor="middle">om</text></svg>`;
+
 let isAgencyMode = false;
 let activeFilter = 'all';
 let currentActiveProperty = null;
 let propertyToPay = null;
+let activeView = 'dashboard';
+
+const VIEW_TITLES = {
+  'dashboard': 'Tableau de bord',
+  'properties': 'Mes Biens & Immeubles',
+  'tenants': 'Locataires',
+  'receipts': 'Quittances & Reçus'
+};
+
+// ===================================================
+// GESTION DU SYSTÈME MULTI-VUES (SAAS)
+// ===================================================
+function switchView(viewName) {
+  if (!VIEW_TITLES[viewName]) viewName = 'dashboard';
+  activeView = viewName;
+
+  // 1. Masquer toutes les vues, activer la cible
+  document.querySelectorAll('.app-view').forEach(v => v.classList.remove('active'));
+  const targetView = document.getElementById(`view-${viewName}`);
+  if (targetView) targetView.classList.add('active');
+
+  // 2. Mettre à jour la navigation Desktop (Sidebar)
+  document.querySelectorAll('.app-sidebar .nav-item').forEach(btn => btn.classList.remove('active'));
+  const sideNavBtn = document.getElementById(`sideNav-${viewName}`);
+  if (sideNavBtn) sideNavBtn.classList.add('active');
+
+  // 3. Mettre à jour la Bottom Nav Mobile
+  document.querySelectorAll('.mobile-bottom-nav .bottom-nav-item').forEach(btn => btn.classList.remove('active'));
+  const bottomNavBtn = document.getElementById(`bottomNav-${viewName}`);
+  if (bottomNavBtn) bottomNavBtn.classList.add('active');
+
+  // 4. Mettre à jour le titre sur la barre mobile
+  const mobileTitle = document.getElementById('mobileActiveViewTitle');
+  if (mobileTitle) mobileTitle.textContent = VIEW_TITLES[viewName];
+
+  // 5. Initialiser les données de la vue choisie
+  if (viewName === 'tenants') {
+    renderTenantsList();
+  } else if (viewName === 'receipts') {
+    renderInPageReceipts();
+  } else if (viewName === 'dashboard') {
+    renderDashboardWidgets();
+  }
+
+  // Scroll doux vers le haut
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Menu popup du bouton magique mobile (FAB)
+function toggleFabActionMenu() {
+  const sheet = document.getElementById('fabActionSheet');
+  const backdrop = document.getElementById('fabBackdrop');
+  const fab = document.getElementById('btnMobileFab');
+  if (!sheet) return;
+
+  const isOpen = sheet.classList.contains('active');
+  if (isOpen) {
+    closeFabActionMenu();
+  } else {
+    sheet.classList.add('active');
+    if (backdrop) backdrop.classList.add('active');
+    if (fab) fab.classList.add('open');
+  }
+}
+
+function closeFabActionMenu() {
+  const sheet = document.getElementById('fabActionSheet');
+  const backdrop = document.getElementById('fabBackdrop');
+  const fab = document.getElementById('btnMobileFab');
+  if (sheet) sheet.classList.remove('active');
+  if (backdrop) backdrop.classList.remove('active');
+  if (fab) fab.classList.remove('open');
+}
 
 // Initialisation
 function initApp() {
@@ -410,6 +490,9 @@ function initApp() {
   renderBuildingUnitsSetup();
   checkWelcomeGreeting();
   initReceiptsHistory();
+  renderDashboardWidgets();
+  renderTenantsList();
+  renderInPageReceipts();
 }
 
 if (document.readyState === 'loading') {
@@ -427,6 +510,7 @@ document.addEventListener('keydown', (e) => {
     closeAddPropertyModal();
     closeFeedbackModal();
     closeReceiptsHistoryModal();
+    closeFabActionMenu();
   }
 });
 
@@ -667,10 +751,27 @@ function updateStats() {
       : `✓ Tous les loyers réglés pour ${currentPeriodName}`;
   }
 
-  // Compteurs d'onglets
-  document.getElementById('countAll').textContent = properties.length;
-  document.getElementById('countPaid').textContent = paidCount;
-  document.getElementById('countLate').textContent = lateCount;
+  // Compteurs d'onglets (Vert, Jaune, Rouge 🇸🇳)
+  const elCountAll = document.getElementById('countAll');
+  const elCountPaid = document.getElementById('countPaid');
+  const elCountPending = document.getElementById('countPending');
+  const elCountLate = document.getElementById('countLate');
+
+  if (elCountAll) elCountAll.textContent = properties.length;
+  if (elCountPaid) elCountPaid.textContent = paidCount;
+  if (elCountPending) elCountPending.textContent = lateCount; // En attente / Vacants (Jaune)
+  if (elCountLate) elCountLate.textContent = lateCount > 0 ? lateCount : 0; // En retard (Rouge)
+
+  // Badges Sidebar
+  const sideProps = document.getElementById('sideBadgeProps');
+  const sideTenants = document.getElementById('sideBadgeTenants');
+  const sideReceipts = document.getElementById('sideBadgeReceipts');
+  if (sideProps) sideProps.textContent = properties.length;
+  if (sideTenants) sideTenants.textContent = properties.filter(p => p.tenant).length;
+  if (sideReceipts) sideReceipts.textContent = getReceiptsHistory().length;
+
+  // Rafraîchir les widgets du tableau de bord
+  renderDashboardWidgets();
 }
 
 // ===================================================
@@ -722,6 +823,7 @@ function renderProperties() {
   let filtered = properties.filter(p => {
     const pData = getPropertyPeriodData(p, pKey);
     if (activeFilter === 'paid' && pData.status !== 'paid') return false;
+    if (activeFilter === 'pending' && pData.status === 'paid') return false;
     if (activeFilter === 'late' && pData.status !== 'late') return false;
 
     if (search) {
@@ -776,7 +878,7 @@ function renderProperties() {
     });
 
     const isFullPaid = bldPaidCount === units.length;
-    const chipClass = isFullPaid ? 'bld-chip success' : 'bld-chip warning';
+    const chipClass = isFullPaid ? 'bld-chip status-flag-green' : 'bld-chip status-flag-yellow';
     const chipText = isFullPaid ? '✓ Tous payés' : `⏳ ${units.length - bldPaidCount} en attente`;
 
     const icon = bldName.includes('Villa') ? '🏡' : '🏢';
@@ -804,19 +906,21 @@ function renderProperties() {
             const total = u.rent + u.charges;
             const uData = getPropertyPeriodData(u, pKey);
 
-            // Statut de paiement dynamique par période
+            // Statut de paiement dynamique par période (Vert, Jaune, Rouge 🇸🇳)
             let statusBadge = '';
             if (uData.status === 'paid') {
               const paidDateText = uData.paidDate || 'Payé';
               if (uData.paymentMethod === 'Wave') {
-                statusBadge = `<span class="unit-badge-status status-paid-wave">🌊 Wave • ${escapeHtml(paidDateText)}</span>`;
+                statusBadge = `<span class="unit-badge-status status-paid-wave status-flag-green">${WAVE_SVG_ICON} Wave • ${escapeHtml(paidDateText)}</span>`;
               } else if (uData.paymentMethod === 'Orange Money') {
-                statusBadge = `<span class="unit-badge-status status-paid-om">🟠 OM • ${escapeHtml(paidDateText)}</span>`;
+                statusBadge = `<span class="unit-badge-status status-paid-om status-flag-green">${OM_SVG_ICON} OM • ${escapeHtml(paidDateText)}</span>`;
               } else {
-                statusBadge = `<span class="unit-badge-status status-paid-cash">💵 Espèces • ${escapeHtml(paidDateText)}</span>`;
+                statusBadge = `<span class="unit-badge-status status-paid-cash status-flag-green">💵 Espèces • ${escapeHtml(paidDateText)}</span>`;
               }
+            } else if (!u.tenant || u.tenant.trim() === '') {
+              statusBadge = `<span class="unit-badge-status status-flag-yellow">🟡 Vacant</span>`;
             } else {
-              statusBadge = `<span class="unit-badge-status status-late">⏳ En attente de loyer</span>`;
+              statusBadge = `<span class="unit-badge-status status-flag-yellow">🟡 En attente de loyer</span>`;
             }
 
             const ownerBadge = isAgencyMode ? `<span class="agency-tag-owner">Bailleur : ${escapeHtml(u.owner)}</span>` : '';
@@ -885,6 +989,282 @@ function renderProperties() {
               </div>
             `;
           }).join('')}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ===================================================
+// VUE 1 : WIDGETS DÉCISIONNELS DU TABLEAU DE BORD
+// ===================================================
+function renderDashboardWidgets() {
+  const alertsContainer = document.getElementById('dashAlertsSection');
+  const recentContainer = document.getElementById('dashRecentReceiptsContainer');
+  const pKey = getPeriodKey();
+  const periodText = getPeriodFrench();
+
+  // 1. Alertes du mois (Retards vs 100% Réglé)
+  if (alertsContainer) {
+    const lateProps = properties.filter(p => {
+      const pData = getPropertyPeriodData(p, pKey);
+      return pData.status === 'late' && p.tenant && p.tenant.trim() !== '';
+    });
+
+    if (lateProps.length > 0) {
+      alertsContainer.innerHTML = `
+        <div class="dash-alert-card alert-danger">
+          <div class="dash-alert-left">
+            <span class="dash-alert-icon">⚠️</span>
+            <div>
+              <div class="dash-alert-title">${lateProps.length} loyer${lateProps.length > 1 ? 's' : ''} en attente ou retard en ${periodText}</div>
+              <div class="dash-alert-desc">Les locataires suivants n'ont pas encore réglé : <strong>${lateProps.map(p => escapeHtml(p.tenant)).join(', ')}</strong>.</div>
+            </div>
+          </div>
+          <button class="btn btn-secondary-sm" style="background:#fee2e2; color:#991b1b; border-color:#fca5a5;" onclick="switchView('properties'); setFilter('late');">
+            <span>🔔</span> Voir les ${lateProps.length} relance${lateProps.length > 1 ? 's' : ''} →
+          </button>
+        </div>
+      `;
+    } else {
+      alertsContainer.innerHTML = `
+        <div class="dash-alert-card alert-success">
+          <div class="dash-alert-left">
+            <span class="dash-alert-icon">🎉</span>
+            <div>
+              <div class="dash-alert-title">Excellente nouvelle ! Tous les loyers sont réglés pour ${periodText} 🇸🇳</div>
+              <div class="dash-alert-desc">Votre taux de recouvrement est optimal. Toutes les quittances ont été délivrées.</div>
+            </div>
+          </div>
+          <button class="btn btn-secondary-sm" style="background:#ecfdf5; color:#059669; border-color:#a7f3d0;" onclick="switchView('receipts');">
+            <span>📑</span> Voir le registre →
+          </button>
+        </div>
+      `;
+    }
+  }
+
+  // 2. Dernières quittances émises
+  if (recentContainer) {
+    const history = getReceiptsHistory().slice(0, 3);
+    if (history.length === 0) {
+      recentContainer.innerHTML = `
+        <p style="font-size:12px; color:#64748b; padding:12px 0;">Aucune quittance émise pour l'instant.</p>
+      `;
+    } else {
+      recentContainer.innerHTML = history.map(r => `
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #f1f5f9; font-size:12px;">
+          <div>
+            <strong style="color:#0f172a; display:block;">${escapeHtml(r.tenant)}</strong>
+            <span style="color:#64748b;">${escapeHtml(r.receiptNo)} • ${escapeHtml(r.periodFrench)}</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <strong style="color:#059669;">${formatFCFA(r.total)}</strong>
+            <button class="btn-icon-subtle" onclick="downloadPdfFromHistory('${escapeHtml(r.receiptNo)}')" title="Télécharger PDF">📥</button>
+          </div>
+        </div>
+      `).join('');
+    }
+  }
+}
+
+// ===================================================
+// VUE 3 : ANNUAIRE DES LOCATAIRES
+// ===================================================
+function renderTenantsList() {
+  const container = document.getElementById('tenantsContainer');
+  if (!container) return;
+  const searchInput = document.getElementById('tenantSearchInput');
+  const query = searchInput ? normalizeStr(searchInput.value.trim()) : '';
+  const pKey = getPeriodKey();
+
+  let tenantProps = properties.filter(p => p.tenant && p.tenant.trim() !== '');
+
+  if (query) {
+    tenantProps = tenantProps.filter(p => 
+      normalizeStr(p.tenant).includes(query) ||
+      normalizeStr(p.phone).includes(query) ||
+      normalizeStr(p.building).includes(query) ||
+      normalizeStr(p.unitName).includes(query) ||
+      normalizeStr(p.neighborhood).includes(query)
+    );
+  }
+
+  if (tenantProps.length === 0) {
+    container.innerHTML = `
+      <div style="grid-column: 1 / -1; background: white; padding: 48px 20px; text-align: center; border-radius: 16px; border: 1px dashed #cbd5e1;">
+        <span style="font-size: 36px;">👥</span>
+        <h3 style="margin-top: 12px; color: #1e293b; font-weight: 800;">Aucun locataire trouvé</h3>
+        <p style="color: #64748b; font-size: 13px;">Ajoutez des biens avec locataires ou modifiez votre recherche.</p>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = tenantProps.map(p => {
+    const pData = getPropertyPeriodData(p, pKey);
+    const initials = p.tenant.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+    const cleanPhone = sanitizeWhatsAppPhone(p.phone);
+    const hasPhone = p.phone && p.phone !== 'Non renseigné';
+    
+    // Statut Vert, Jaune, Rouge 🇸🇳
+    let statusClass = 'status-flag-green';
+    let statusLabel = '🟢 Loyer Payé';
+    if (pData.status !== 'paid') {
+      statusClass = 'status-flag-yellow';
+      statusLabel = '🟡 En attente';
+    }
+
+    const depositAmount = p.deposit || (p.rent * 2);
+
+    return `
+      <div class="tenant-card-pro">
+        <div class="tenant-top-row">
+          <div class="tenant-pro-avatar">${escapeHtml(initials)}</div>
+          <div class="tenant-pro-info">
+            <h3 class="tenant-pro-name">${escapeHtml(p.tenant)}</h3>
+            <p class="tenant-pro-unit">🚪 ${escapeHtml(p.unitName)} • ${escapeHtml(p.building)} (${escapeHtml(p.neighborhood)})</p>
+          </div>
+          <span class="unit-badge-status ${statusClass}" style="font-size: 11px; padding: 4px 8px;">${statusLabel}</span>
+        </div>
+
+        <div class="tenant-details-grid">
+          <div>
+            <span style="color: #64748b; display: block; font-size: 11px;">Loyer mensuel</span>
+            <strong style="color: #0f172a; font-size: 13px;">${formatFCFA(p.rent)}</strong>
+          </div>
+          <div>
+            <span style="color: #64748b; display: block; font-size: 11px;">Caution en réserve</span>
+            <strong style="color: #059669; font-size: 13px;">${formatFCFA(depositAmount)}</strong>
+          </div>
+          <div>
+            <span style="color: #64748b; display: block; font-size: 11px;">Bail</span>
+            <span style="color: #0f172a; font-weight:700;">${p.isCommercial ? 'Commercial' : 'Habitation'}</span>
+          </div>
+        </div>
+
+        <div class="tenant-action-buttons">
+          ${hasPhone ? `
+            <a href="https://wa.me/${cleanPhone}" target="_blank" rel="noopener" class="btn-tenant-wa">
+              <span>💬</span> WhatsApp
+            </a>
+            <a href="tel:${cleanPhone}" class="btn-icon-subtle" title="Appeler le locataire" style="border: 1px solid #cbd5e1; border-radius: 10px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; text-decoration: none;">
+              📞
+            </a>
+          ` : `
+            <span style="font-size: 12px; color: #94a3b8; font-style: italic; align-self: center;">Aucun numéro enregistré</span>
+          `}
+          <button class="btn-tenant-caution" onclick="openDepositModal(${p.id})" title="Voir le reçu de caution certifié A4">
+            <span>🛡️</span> Reçu Caution
+          </button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ===================================================
+// VUE 4 : QUITTANCES & REÇUS DANS LA PAGE (ARCHIVES)
+// ===================================================
+function renderInPageReceipts() {
+  const container = document.getElementById('inPageReceiptsContainer');
+  const summary = document.getElementById('inPageReceiptSummaryText');
+  const searchInput = document.getElementById('inPageReceiptSearchInput');
+  const yearFilter = document.getElementById('inPageReceiptYearFilter');
+  const bldFilter = document.getElementById('inPageReceiptBuildingFilter');
+  if (!container) return;
+
+  const query = searchInput ? normalizeStr(searchInput.value.trim()) : '';
+  const year = yearFilter ? yearFilter.value : 'all';
+  const building = bldFilter ? bldFilter.value : 'all';
+
+  // Remplir le filtre d'immeubles s'il est vide
+  if (bldFilter && bldFilter.options.length <= 1) {
+    const buildings = [...new Set(properties.map(p => p.building).filter(Boolean))];
+    buildings.forEach(b => {
+      const opt = document.createElement('option');
+      opt.value = b;
+      opt.textContent = b;
+      bldFilter.appendChild(opt);
+    });
+  }
+
+  let history = getReceiptsHistory();
+
+  if (query) {
+    history = history.filter(r => 
+      (r.tenant && normalizeStr(r.tenant).includes(query)) ||
+      (r.receiptNo && normalizeStr(r.receiptNo).includes(query)) ||
+      (r.building && normalizeStr(r.building).includes(query)) ||
+      (r.unitName && normalizeStr(r.unitName).includes(query)) ||
+      (r.neighborhood && normalizeStr(r.neighborhood).includes(query)) ||
+      (r.periodFrench && normalizeStr(r.periodFrench).includes(query))
+    );
+  }
+
+  if (year !== 'all') {
+    history = history.filter(r => r.periodKey && r.periodKey.startsWith(year));
+  }
+
+  if (building !== 'all') {
+    history = history.filter(r => r.building === building);
+  }
+
+  if (summary) {
+    summary.innerHTML = `Affichage de <strong>${history.length}</strong> document(s) certifié(s)`;
+  }
+
+  if (history.length === 0) {
+    container.innerHTML = `
+      <div class="history-empty-state">
+        <div class="empty-icon">🔍</div>
+        <h4 style="font-weight:700; color:var(--dark);">Aucun document trouvé</h4>
+        <p style="font-size:12px; margin-top:4px;">Essayez d'ajuster vos filtres ou effectuez un encaissement pour générer une nouvelle quittance.</p>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = history.map(r => {
+    let methodBadge = `💵 Espèces • le ${escapeHtml(r.paidDate || '05')}`;
+    if (r.paymentMethod === 'Wave') {
+      methodBadge = `${WAVE_SVG_ICON} Wave • le ${escapeHtml(r.paidDate || '05')}`;
+    } else if (r.paymentMethod === 'Orange Money') {
+      methodBadge = `${OM_SVG_ICON} OM • le ${escapeHtml(r.paidDate || '05')}`;
+    }
+
+    return `
+      <div class="history-item-row">
+        <div class="history-item-main">
+          <div class="history-item-header">
+            <span class="history-badge-ref">${escapeHtml(r.receiptNo)}</span>
+            <span class="history-badge-period">📅 ${escapeHtml(r.periodFrench)}</span>
+            <span class="history-badge-method">${methodBadge}</span>
+          </div>
+          <div class="history-item-tenant">
+            <strong>${escapeHtml(r.tenant)}</strong>
+            <span class="history-tenant-phone">${escapeHtml(r.tenantPhone || '')}</span>
+          </div>
+          <div class="history-item-property">
+            📍 ${escapeHtml(r.unitName)} — ${escapeHtml(r.building)} (${escapeHtml(r.neighborhood)})
+          </div>
+        </div>
+
+        <div class="history-item-amount-side">
+          <div class="history-item-price">${formatFCFA(r.total)}</div>
+          <div class="history-item-type">${r.isCommercial ? 'Facture Commerciale' : 'Quittance Particulier'}</div>
+        </div>
+
+        <div class="history-item-actions">
+          <button class="btn-history-view" onclick="openReceiptFromHistory('${escapeHtml(r.receiptNo)}')" title="Visualiser la quittance certifiée">
+            <span>👁️</span> Voir
+          </button>
+          <button class="btn-history-pdf" onclick="downloadPdfFromHistory('${escapeHtml(r.receiptNo)}')" title="Télécharger le PDF 1 page">
+            <span>📥</span> PDF
+          </button>
+          <button class="btn-history-wa" onclick="sendWhatsAppFromHistory('${escapeHtml(r.receiptNo)}')" title="Envoyer au locataire par WhatsApp">
+            <span>💬</span> WhatsApp
+          </button>
         </div>
       </div>
     `;

@@ -3542,6 +3542,767 @@ input:checked + .slider:before {
   }
 }
 
+/* ===================================================
+   KEURGUI SAAS — ARCHITECTURE MODERNE MULTI-VUES
+   Navigation Latérale Desktop + Barre Mobile Bas d'Écran
+   =================================================== */
+
+/* Structure Globale de l'App */
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+  background-color: #f8fafc;
+  width: 100%;
+}
+
+/* 1. BARRE LATÉRALE DESKTOP (SIDEBAR) */
+.app-sidebar {
+  width: 270px;
+  min-width: 270px;
+  background: #ffffff;
+  border-right: 1px solid var(--gray-200);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  z-index: 95;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.02);
+  padding: 24px 18px;
+}
+
+.sidebar-top {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.sidebar-brand {
+  padding-bottom: 18px;
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.sidebar-logo-link {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.sidebar-logo-img {
+  height: 38px;
+  width: auto;
+  border-radius: 8px;
+}
+
+.sidebar-slogan {
+  font-size: 11px;
+  color: var(--gray-600);
+  font-weight: 700;
+  margin-top: 8px;
+  letter-spacing: 0.2px;
+}
+
+/* Menu de Navigation */
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--gray-600);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  width: 100%;
+}
+
+.nav-item .nav-icon {
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+}
+
+.nav-item .nav-text {
+  flex: 1;
+}
+
+.nav-item .nav-badge {
+  background: var(--gray-200);
+  color: var(--gray-800);
+  font-size: 11px;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 999px;
+  transition: all 0.2s;
+}
+
+.nav-item:hover {
+  background: var(--gray-100);
+  color: var(--dark);
+  transform: translateX(3px);
+}
+
+.nav-item.active {
+  background: #ecfdf5;
+  color: #059669;
+  border-color: #a7f3d0;
+  box-shadow: 0 2px 6px rgba(5, 150, 105, 0.08);
+}
+
+.nav-item.active .nav-badge {
+  background: #059669;
+  color: #ffffff;
+}
+
+/* Sidebar Footer (Mode Agence / Profil) */
+.sidebar-bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--gray-200);
+}
+
+.sidebar-mode-toggle {
+  width: 100%;
+  justify-content: space-between;
+}
+
+.sidebar-profile-card {
+  background: #f8fafc;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sidebar-user-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sidebar-profile-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.btn-link-landing-sidebar {
+  font-size: 11px;
+  font-weight: 700;
+  color: #059669;
+  text-decoration: none;
+  padding: 5px 10px;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: all 0.2s;
+}
+
+.btn-link-landing-sidebar:hover {
+  background: #d1fae5;
+}
+
+/* 2. CONTENEUR PRINCIPAL DE L'APPLICATION */
+.app-main-layout {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 40px;
+}
+
+/* Top bar mobile (Cachée sur bureau) */
+.mobile-top-bar {
+  display: none;
+}
+
+/* Barre de navigation mobile bas d'écran (Cachée sur bureau) */
+.mobile-bottom-nav {
+  display: none;
+}
+
+.mobile-fab-container {
+  display: none;
+}
+
+/* Système d'onglets de vues (Vues uniques) */
+.app-views-wrapper {
+  padding-top: 20px;
+}
+
+.app-view {
+  display: none;
+}
+
+.app-view.active {
+  display: block;
+  animation: fadeInAppView 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fadeInAppView {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===================================================
+   3. PALETTE DRAPEAU DU SÉNÉGAL (VERT, JAUNE, ROUGE 🇸🇳)
+   =================================================== */
+/* Vert : Payé / Conforme */
+.status-flag-green, .badge-green {
+  background: #ecfdf5 !important;
+  color: #065f46 !important;
+  border: 1px solid #a7f3d0 !important;
+}
+
+/* Jaune / Or Chaud : En attente / Vacant */
+.status-flag-yellow, .badge-yellow {
+  background: #fefce8 !important;
+  color: #854d0e !important;
+  border: 1px solid #fde047 !important;
+}
+
+/* Rouge : En retard / Urgent */
+.status-flag-red, .badge-red {
+  background: #fef2f2 !important;
+  color: #991b1b !important;
+  border: 1px solid #fecaca !important;
+}
+
+/* Onglets de filtrage avec couleurs du drapeau */
+.tab-btn.tab-green.active {
+  background: #059669;
+  border-color: #059669;
+  color: #ffffff;
+}
+
+.tab-btn.tab-yellow.active {
+  background: #d97706;
+  border-color: #d97706;
+  color: #ffffff;
+}
+
+.tab-btn.tab-red.active {
+  background: #dc2626;
+  border-color: #dc2626;
+  color: #ffffff;
+}
+
+/* Badge SVG pour Wave et Orange Money */
+.brand-logo-svg {
+  vertical-align: middle;
+  flex-shrink: 0;
+  border-radius: 4px;
+}
+
+.unit-badge-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ===================================================
+   4. DASHBOARD SPÉCIFIQUE : WIDGETS DÉCISIONNELS
+   =================================================== */
+.dash-alerts-section {
+  margin-bottom: 24px;
+}
+
+.dash-alert-card {
+  background: #ffffff;
+  border-radius: var(--radius-lg);
+  padding: 18px 22px;
+  border: 1px solid var(--gray-200);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.dash-alert-card.alert-danger {
+  border-left: 5px solid #ef4444;
+  background: #fffafa;
+}
+
+.dash-alert-card.alert-success {
+  border-left: 5px solid #10b981;
+  background: #f0fdf4;
+}
+
+.dash-alert-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.dash-alert-icon {
+  font-size: 28px;
+}
+
+.dash-alert-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--dark);
+  margin-bottom: 3px;
+}
+
+.dash-alert-desc {
+  font-size: 13px;
+  color: var(--gray-600);
+}
+
+.dash-quick-links-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.dash-quick-box {
+  background: #ffffff;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  box-shadow: var(--shadow-sm);
+}
+
+.dash-box-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.dash-box-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--dark);
+}
+
+.dash-box-link {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--primary);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.dash-box-link:hover {
+  text-decoration: underline;
+}
+
+/* ===================================================
+   5. PAGE ANNUAIRE DES LOCATAIRES (VIEW 3)
+   =================================================== */
+.tenants-view-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.tenants-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
+}
+
+.tenant-card-pro {
+  background: #ffffff;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-lg);
+  padding: 18px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 14px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.tenant-card-pro:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: #a7f3d0;
+}
+
+.tenant-top-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.tenant-pro-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #ecfdf5;
+  color: #059669;
+  font-weight: 800;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #a7f3d0;
+  flex-shrink: 0;
+}
+
+.tenant-pro-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.tenant-pro-name {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--dark);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tenant-pro-unit {
+  font-size: 12px;
+  color: var(--gray-600);
+  margin-top: 2px;
+}
+
+.tenant-details-grid {
+  background: #f8fafc;
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+}
+
+.tenant-action-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-tenant-wa {
+  flex: 1;
+  background: #25D366;
+  color: #ffffff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: var(--radius-md);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  text-decoration: none;
+  transition: all 0.15s;
+}
+
+.btn-tenant-wa:hover {
+  background: #1eb855;
+}
+
+.btn-tenant-caution {
+  background: #ecfdf5;
+  color: #059669;
+  border: 1px solid #a7f3d0;
+  padding: 8px 12px;
+  border-radius: var(--radius-md);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  transition: all 0.15s;
+}
+
+.btn-tenant-caution:hover {
+  background: #d1fae5;
+}
+
+/* ===================================================
+   6. RESPONSIVE MOBILE (< 992px) — EXPÉRIENCE 20/10
+   =================================================== */
+@media (max-width: 991px) {
+  /* Masquer la Sidebar Desktop */
+  .app-sidebar {
+    display: none !important;
+  }
+
+  /* Ajuster le conteneur principal */
+  .app-main-layout {
+    width: 100% !important;
+    padding-bottom: 95px !important; /* Laisse la place pour la bottom bar */
+  }
+
+  /* Afficher le Top Bar Mobile */
+  .mobile-top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 58px;
+    padding: 0 16px;
+    background: #ffffff;
+    border-bottom: 1px solid var(--gray-200);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  }
+
+  .mobile-top-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .mobile-logo-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+  }
+
+  .mobile-view-title {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--dark);
+    letter-spacing: -0.3px;
+  }
+
+  .mobile-top-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .user-avatar-sm {
+    width: 32px;
+    height: 32px;
+    font-size: 12px;
+  }
+
+  /* Barre de Navigation Mobile en Bas (Bottom Bar) */
+  .mobile-bottom-nav {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 64px;
+    background: #ffffff;
+    border-top: 1px solid var(--gray-200);
+    justify-content: space-around;
+    align-items: center;
+    z-index: 100;
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.05);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .bottom-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    background: none;
+    border: none;
+    color: var(--gray-400);
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: 8px;
+    transition: all 0.15s ease;
+    flex: 1;
+    touch-action: manipulation;
+  }
+
+  .bottom-nav-item .bnav-icon {
+    font-size: 20px;
+    line-height: 1;
+  }
+
+  .bottom-nav-item.active {
+    color: #059669;
+    font-weight: 800;
+  }
+
+  .bottom-nav-item.active .bnav-icon {
+    transform: scale(1.12);
+  }
+
+  /* Bouton Magique Mobile Flottant (FAB) */
+  .mobile-fab-container {
+    display: block;
+  }
+
+  .btn-mobile-fab {
+    position: fixed;
+    bottom: 76px;
+    right: 18px;
+    width: 54px;
+    height: 54px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    color: #ffffff;
+    border: none;
+    font-size: 30px;
+    font-weight: 300;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 10px 25px rgba(5, 150, 105, 0.45);
+    z-index: 105;
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s;
+    touch-action: manipulation;
+  }
+
+  .btn-mobile-fab:active {
+    transform: scale(0.92);
+  }
+
+  .btn-mobile-fab.open {
+    transform: rotate(45deg);
+    background: #0f172a;
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.3);
+  }
+
+  /* Action Sheet Popup pour le bouton magique */
+  .fab-sheet-backdrop {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(15, 23, 42, 0.45);
+    backdrop-filter: blur(3px);
+    z-index: 102;
+  }
+
+  .fab-sheet-backdrop.active {
+    display: block;
+  }
+
+  .fab-action-sheet {
+    display: none;
+    position: fixed;
+    bottom: 140px;
+    right: 18px;
+    width: calc(100% - 36px);
+    max-width: 340px;
+    background: #ffffff;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--gray-200);
+    padding: 16px;
+    z-index: 104;
+    animation: slideUpFab 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .fab-action-sheet.active {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  @keyframes slideUpFab {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .fab-sheet-title {
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--gray-400);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 2px;
+  }
+
+  .fab-sheet-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    border-radius: var(--radius-md);
+    background: #f8fafc;
+    border: 1px solid var(--gray-200);
+    cursor: pointer;
+    text-align: left;
+    font-family: inherit;
+    transition: all 0.15s;
+    width: 100%;
+  }
+
+  .fab-sheet-item:active {
+    background: #ecfdf5;
+    border-color: #a7f3d0;
+  }
+
+  .fab-item-icon {
+    font-size: 24px;
+  }
+
+  .fab-item-text strong {
+    display: block;
+    font-size: 14px;
+    color: var(--dark);
+  }
+
+  .fab-item-text small {
+    display: block;
+    font-size: 11px;
+    color: var(--gray-600);
+    margin-top: 2px;
+  }
+}
+
+
 
 
 
