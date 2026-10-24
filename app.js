@@ -400,11 +400,11 @@ function escapeHtml(str) {
 }
 
 // ===================================================
-// LOGOS OFFICIELS VECTORIELS (WAVE & ORANGE MONEY SVG)
+// LOGOS OFFICIELS (WAVE & ORANGE MONEY - IMAGES RÉELLES)
 // ===================================================
-const WAVE_SVG_ICON = `<svg class="brand-logo-svg wave-svg" width="18" height="18" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="7" fill="#1BA5E0"/><path d="M16 5.5C11.85 5.5 8.5 8.85 8.5 13C8.5 16.2 10.45 18.95 13.2 20.15L12.3 25.5C12.2 26 12.6 26.5 13.1 26.5H18.9C19.4 26.5 19.8 26 19.7 25.5L18.8 20.15C21.55 18.95 23.5 16.2 23.5 13C23.5 8.85 20.15 5.5 16 5.5Z" fill="#0C2340"/><ellipse cx="16" cy="14.5" rx="3.5" ry="5.5" fill="#FFFFFF"/><polygon points="16,12.5 14,14 18,14" fill="#FF9E00"/><ellipse cx="13.5" cy="26" rx="2" ry="1" fill="#FF9E00"/><ellipse cx="18.5" cy="26" rx="2" ry="1" fill="#FF9E00"/></svg>`;
+const WAVE_SVG_ICON = `<img src="logo-wave.png" alt="Wave" class="brand-logo-img wave-logo-img" width="18" height="18" style="width:18px; height:18px; object-fit:contain; border-radius:3px; vertical-align:middle; display:inline-block; margin-right:4px;">`;
 
-const OM_SVG_ICON = `<svg class="brand-logo-svg om-svg" width="18" height="18" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="7" fill="#000000"/><rect x="16" width="16" height="32" fill="#FF7900"/><circle cx="16" cy="16" r="10" fill="#000000"/><text x="16" y="20" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-weight="900" font-size="11" fill="#FF7900" text-anchor="middle">om</text></svg>`;
+const OM_SVG_ICON = `<img src="logo-om.png" alt="Orange Money" class="brand-logo-img om-logo-img" width="18" height="18" style="width:18px; height:18px; object-fit:contain; border-radius:3px; vertical-align:middle; display:inline-block; margin-right:4px;">`;
 
 let isAgencyMode = false;
 let activeFilter = 'all';

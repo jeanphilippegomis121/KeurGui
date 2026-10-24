@@ -134,6 +134,9 @@
           <span class="mobile-view-title" id="mobileActiveViewTitle">Tableau de bord</span>
         </div>
         <div class="mobile-top-right">
+          <button class="btn-mobile-feedback-top" onclick="openFeedbackModal()" title="Donner votre avis" style="background:#ecfdf5; border:1px solid #a7f3d0; color:#059669; padding:4px 8px; border-radius:999px; font-size:11px; font-weight:700; display:flex; align-items:center; gap:4px; cursor:pointer;">
+            <span>💬</span> Avis
+          </button>
           <span class="user-badge" id="mobileRoleBadge" style="font-size:10px; padding:3px 8px;">Propriétaire</span>
           <div class="user-avatar user-avatar-sm" id="mobileHeaderAvatar" onclick="switchView('dashboard')">JP</div>
         </div>
@@ -473,6 +476,13 @@
           <div class="fab-item-text">
             <strong>Consulter les quittances</strong>
             <small>Historique certifié & partage WhatsApp</small>
+          </div>
+        </button>
+        <button class="fab-sheet-item" onclick="closeFabActionMenu(); openFeedbackModal();">
+          <span class="fab-item-icon">💬</span>
+          <div class="fab-item-text">
+            <strong>Votre avis &amp; Suggestions</strong>
+            <small>Écrire directement à Jean Philippe Gomis</small>
           </div>
         </button>
       </div>
@@ -1059,7 +1069,7 @@
           <input type="radio" name="payMethod" value="Wave" checked>
           <div class="pay-option-content">
             <span class="pay-logo wave-logo">
-              <svg class="brand-logo-svg" width="22" height="22" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="7" fill="#1BA5E0"/><path d="M16 5.5C11.85 5.5 8.5 8.85 8.5 13C8.5 16.2 10.45 18.95 13.2 20.15L12.3 25.5C12.2 26 12.6 26.5 13.1 26.5H18.9C19.4 26.5 19.8 26 19.7 25.5L18.8 20.15C21.55 18.95 23.5 16.2 23.5 13C23.5 8.85 20.15 5.5 16 5.5Z" fill="#0C2340"/><ellipse cx="16" cy="14.5" rx="3.5" ry="5.5" fill="#FFFFFF"/><polygon points="16,12.5 14,14 18,14" fill="#FF9E00"/><ellipse cx="13.5" cy="26" rx="2" ry="1" fill="#FF9E00"/><ellipse cx="18.5" cy="26" rx="2" ry="1" fill="#FF9E00"/></svg>
+              <img src="logo-wave.png" alt="Wave" class="brand-logo-img wave-logo-img" width="22" height="22" style="width:22px; height:22px; object-fit:contain; border-radius:4px; vertical-align:middle; margin-right:6px;">
               Wave (Sénégal)
             </span>
             <small>Transfert direct sans frais</small>
@@ -1069,7 +1079,7 @@
           <input type="radio" name="payMethod" value="Orange Money">
           <div class="pay-option-content">
             <span class="pay-logo om-logo">
-              <svg class="brand-logo-svg" width="22" height="22" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="7" fill="#000000"/><rect x="16" width="16" height="32" fill="#FF7900"/><circle cx="16" cy="16" r="10" fill="#000000"/><text x="16" y="20" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-weight="900" font-size="11" fill="#FF7900" text-anchor="middle">om</text></svg>
+              <img src="logo-om.png" alt="Orange Money" class="brand-logo-img om-logo-img" width="22" height="22" style="width:22px; height:22px; object-fit:contain; border-radius:3px; vertical-align:middle; margin-right:6px;">
               Orange Money
             </span>
             <small>Transfert Orange Money</small>
