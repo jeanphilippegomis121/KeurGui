@@ -772,17 +772,17 @@ function updateStats() {
 
   const depositsTag = document.getElementById('depositsCountTag');
   if (depositsTag) {
-    depositsTag.textContent = `🛡️ ${depositsHeldCount} caution${depositsHeldCount > 1 ? 's' : ''} en réserve`;
+    depositsTag.textContent = `🛡️ ${depositsHeldCount} caution${depositsHeldCount > 1 ? 's' : ''}`;
   }
 
   const collectedTag = document.getElementById('collectedLoyerCountTag');
   if (collectedTag) {
-    collectedTag.textContent = `↑ ${paidCount} loyer${paidCount > 1 ? 's' : ''} payé${paidCount > 1 ? 's' : ''}`;
+    collectedTag.textContent = `↑ ${paidCount} payé${paidCount > 1 ? 's' : ''}`;
   }
 
   const pendingTag = document.getElementById('pendingLoyerCountTag');
   if (pendingTag) {
-    pendingTag.textContent = `${lateCount} locataire${lateCount > 1 ? 's' : ''} en attente`;
+    pendingTag.textContent = lateCount > 0 ? `⚠️ ${lateCount} en attente` : `✓ Tous réglés`;
   }
 
   document.getElementById('collectionFill').style.width = rate + '%';
@@ -805,19 +805,19 @@ function updateStats() {
     }
   }
 
-  // Tags dynamiques explicites et contextualisés sur le mois actif
+  // Tags dynamiques épurés et percutants (format First-Mobile compact)
   const collectedCardTag = document.querySelector('.stat-card.stat-success .stat-tag');
   if (collectedCardTag) {
     collectedCardTag.textContent = paidCount > 0 
-      ? `↑ ${paidCount} loyer${paidCount > 1 ? 's' : ''} encaissé${paidCount > 1 ? 's' : ''} (${currentPeriodName})` 
-      : `Aucun encaissement en ${currentPeriodName}`;
+      ? `↑ ${paidCount} loyer${paidCount > 1 ? 's' : ''} encaissé${paidCount > 1 ? 's' : ''}` 
+      : `0 encaissement`;
   }
 
   const pendingCardTag = document.querySelector('.stat-card.stat-warning .stat-tag');
   if (pendingCardTag) {
     pendingCardTag.textContent = lateCount > 0 
-      ? `⚠️ ${lateCount} loyer${lateCount > 1 ? 's' : ''} en attente (${currentPeriodName})` 
-      : `✓ Tous les loyers réglés pour ${currentPeriodName}`;
+      ? `⚠️ ${lateCount} en attente` 
+      : `✓ Tous réglés`;
   }
 
   // Compteurs d'onglets (Vert, Jaune, Rouge 🇸🇳)
