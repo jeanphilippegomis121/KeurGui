@@ -527,8 +527,8 @@
         </div>
       </div>
 
-      <!-- FEUILLE DE QUITTANCE OFFICIELLE (ZONE DU FICHIER PDF A4 FIXE 794PX) -->
-      <div class="receipt-sheet" id="printableReceipt" style="width: 794px; min-width: 794px; max-width: 794px; margin: 0 auto; background: #ffffff; padding: 40px; box-sizing: border-box; font-family: sans-serif; color: #111827;">
+      <!-- FEUILLE DE QUITTANCE OFFICIELLE -->
+      <div class="receipt-sheet" id="printableReceipt" style="margin: 0 auto; background: #ffffff; box-sizing: border-box; font-family: sans-serif; color: #111827;">
 
         <!-- 1. En-tête (sur 1 ligne, display: flex; justify-content: space-between; border-bottom: 2px solid #e5e7eb; padding-bottom: 16px;) -->
         <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #e5e7eb; padding-bottom: 16px;">
@@ -577,19 +577,35 @@
           </tbody>
         </table>
 
-        <!-- 4. Confirmation de règlement (1 seule ligne claire sous le tableau) -->
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 16px; padding-top: 16px; border-top: 1px dashed #e5e7eb;">
-          <div style="font-size: 13.5px; color: #374151;" id="mPaymentConfirmationText">
-            Règlement reçu le 05/10/2026 via Wave.
+        <!-- 4. Conversion automatique du montant total payé en toutes lettres en français -->
+        <div style="margin-top: 14px; padding: 10px 14px; background: #f9fafb; border-radius: 6px; border-left: 3px solid #10b981; font-size: 13px; color: #374151; font-style: italic; line-height: 1.4;">
+          Arrêtée la présente quittance à la somme de : <strong id="mAmountWords" style="color: #111827; font-style: normal; font-weight: 700;">Deux cent cinquante mille Francs CFA</strong>
+        </div>
+
+        <!-- 5. Encadré / Cachet visuel vert officiel bien lisible : ACQUITTÉ / LOYER PAYÉ -->
+        <div class="receipt-official-stamp" style="margin-top: 18px; padding: 14px 18px; border: 2px solid #059669; background: #f0fdf4; border-radius: 8px; display: flex; align-items: center; justify-content: space-between; gap: 14px; box-sizing: border-box; flex-wrap: wrap;">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div style="width: 38px; height: 38px; border: 2px solid #059669; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #059669; font-size: 18px; font-weight: 900; flex-shrink: 0; background: #ffffff;">✓</div>
+            <div>
+              <div style="font-size: 13.5px; font-weight: 900; color: #047857; letter-spacing: 0.5px; text-transform: uppercase;">ACQUITTÉ / LOYER PAYÉ</div>
+              <div style="font-size: 13px; color: #065f46; font-weight: 600; margin-top: 2px;" id="mPaymentConfirmationText">
+                Règlement reçu le 05/10/2026 via Wave.
+              </div>
+            </div>
           </div>
-          <div id="mPaymentBadge" style="background: #dcfce7; color: #15803d; border: 1px solid #86efac; border-radius: 6px; padding: 4px 10px; font-size: 12px; font-weight: 700; white-space: nowrap;">
+          <div id="mPaymentBadge" style="background: #059669; color: #ffffff; border-radius: 6px; padding: 6px 14px; font-size: 12px; font-weight: 800; white-space: nowrap; letter-spacing: 0.5px; text-transform: uppercase;">
             ✓ PAYÉ
           </div>
         </div>
 
-        <!-- 5. Pied de page minimaliste (1 seule phrase en font-size: 12px; color: #6b7280; text-align: center; margin-top: 32px;) -->
-        <div style="font-size: 12px; color: #6b7280; text-align: center; margin-top: 32px;" id="mFooterText">
+        <!-- 6. Pied de page minimaliste -->
+        <div style="font-size: 12px; color: #6b7280; text-align: center; margin-top: 24px;" id="mFooterText">
           Quittance officielle délivrée pour valoir ce que de droit.
+        </div>
+
+        <!-- Mention officielle KeurGui en bas de page A4 -->
+        <div style="margin-top: 12px; padding-top: 10px; border-top: 1px solid #e5e7eb; font-size: 11px; color: #6b7280; text-align: center; line-height: 1.4;" id="mCertifiedFooter">
+          Document officiel certifié généré via KeurGui — Gérez vos biens immobiliers au Sénégal sur keurgui.sn
         </div>
 
         <!-- Balises cachées de compatibilité descendante -->
@@ -601,7 +617,6 @@
         <span id="mIssueDate" style="display: none;"></span>
         <span id="mTableRowSubtotalHt" style="display: none;"></span>
         <span id="mTableSubtotalHt" style="display: none;"></span>
-        <span id="mAmountWords" style="display: none;"></span>
         <span id="mDocumentLegalNote" style="display: none;"></span>
       </div>
     </div>
@@ -654,8 +669,8 @@
         </div>
       </div>
 
-      <!-- FEUILLE DE FACTURE OFFICIELLE (ZONE DU FICHIER PDF A4 FIXE 794PX) -->
-      <div class="receipt-sheet" id="printableAgencyInvoice" style="width: 794px; min-width: 794px; max-width: 794px; margin: 0 auto; background: #ffffff; padding: 40px; box-sizing: border-box; font-family: sans-serif; color: #111827;">
+      <!-- FEUILLE DE FACTURE OFFICIELLE -->
+      <div class="receipt-sheet" id="printableAgencyInvoice" style="margin: 0 auto; background: #ffffff; box-sizing: border-box; font-family: sans-serif; color: #111827;">
 
         <!-- 1. En-tête (sur 1 ligne, display: flex; justify-content: space-between; border-bottom: 2px solid #e5e7eb; padding-bottom: 16px;) -->
         <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #e5e7eb; padding-bottom: 16px;">
@@ -762,8 +777,8 @@
         </div>
       </div>
 
-      <!-- FEUILLE DE REÇU DE CAUTION (ZONE DU FICHIER PDF A4 FIXE 794PX) -->
-      <div class="receipt-sheet" id="printableDepositReceipt" style="width: 794px; min-width: 794px; max-width: 794px; margin: 0 auto; background: #ffffff; padding: 40px; box-sizing: border-box; font-family: sans-serif; color: #111827;">
+      <!-- FEUILLE DE REÇU DE CAUTION -->
+      <div class="receipt-sheet" id="printableDepositReceipt" style="margin: 0 auto; background: #ffffff; box-sizing: border-box; font-family: sans-serif; color: #111827;">
 
         <!-- 1. En-tête (sur 1 ligne, display: flex; justify-content: space-between; border-bottom: 2px solid #e5e7eb; padding-bottom: 16px;) -->
         <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #e5e7eb; padding-bottom: 16px;">

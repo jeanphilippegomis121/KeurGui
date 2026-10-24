@@ -2339,27 +2339,35 @@ a {
   gap: 4px;
 }
 
-/* Sur mobile : bouton compact élégant pour ne pas encombrer l'écran */
-@media (max-width: 640px) {
+/* Sur mobile (< 768px) : bouton flottant WhatsApp rond compact 52px x 52px */
+@media (max-width: 768px) {
   .floating-whatsapp-btn {
     bottom: 20px;
     right: 20px;
-    padding: 8px 14px 8px 10px;
-    gap: 8px;
+    width: 52px;
+    min-width: 52px;
+    height: 52px;
+    padding: 0;
+    border-radius: 50%;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 8px 24px rgba(37, 211, 102, 0.45), 0 4px 12px rgba(0, 0, 0, 0.3);
+    z-index: 9999;
+  }
+  .wa-btn-text-content {
+    display: none !important;
   }
   .wa-btn-icon-box {
-    width: 34px;
-    height: 34px;
+    width: 36px;
+    height: 36px;
+    background: #ffffff;
+    box-shadow: none;
+    margin: 0;
   }
   .wa-btn-icon-box svg {
-    width: 20px;
-    height: 20px;
-  }
-  .wa-btn-label {
-    font-size: 12px;
-  }
-  .wa-btn-status {
-    display: none;
+    width: 22px;
+    height: 22px;
+    fill: #25d366;
   }
 }
 

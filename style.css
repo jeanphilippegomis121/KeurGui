@@ -1431,7 +1431,8 @@ input:checked + .slider:before {
   max-width: 800px;
   width: 100%;
   margin: auto;
-  overflow-x: auto;
+  box-sizing: border-box;
+  overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
 }
 
@@ -1535,17 +1536,16 @@ input:checked + .slider:before {
   background: var(--gray-200);
 }
 
-/* FEUILLE BLANCHE A4 FIXE 794PX ULTRA-SIMPLE (GARANTIE STRICTE 1 SEULE PAGE SANS COUPURE) */
+/* FEUILLE BLANCHE DE QUITTANCE OFFICIELLE */
 .receipt-sheet {
-  width: 794px !important;
-  min-width: 794px !important;
-  max-width: 794px !important;
-  margin: 0 auto !important;
-  background: #ffffff !important;
-  padding: 40px !important;
-  box-sizing: border-box !important;
-  font-family: sans-serif !important;
-  color: #111827 !important;
+  width: 794px;
+  max-width: 100%;
+  margin: 0 auto;
+  background: #ffffff;
+  padding: 40px;
+  box-sizing: border-box;
+  font-family: sans-serif;
+  color: #111827;
   border-radius: 0 0 var(--radius-lg) var(--radius-lg);
   box-shadow: var(--shadow-lg);
 }
@@ -2251,7 +2251,47 @@ input:checked + .slider:before {
     box-sizing: border-box !important;
   }
 
-  /* .receipt-sheet reste strictement fixe à 794px pour garantir la conformité A4 */
+  /* Modale et conteneur d'aperçu de la quittance 100% responsive sur mobile sans aucun défilement horizontal */
+  .modal-receipt-wrapper {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
+    margin: 0 !important;
+  }
+
+  .receipt-sheet {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
+    padding: 20px 14px !important;
+  }
+
+  .receipt-actions-bar {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    padding: 12px 14px !important;
+  }
+
+  .receipt-cta-group {
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+
+  .receipt-cta-group .btn {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  .receipt-official-stamp {
+    flex-wrap: wrap !important;
+    gap: 12px !important;
+  }
 
   .form-row,
   .add-mode-tabs,
@@ -4811,7 +4851,17 @@ input:checked + .slider:before {
     -webkit-overflow-scrolling: touch !important;
     padding: 22px 16px 96px 16px !important; /* Espacement interne de sécurité généreux en bas */
     box-sizing: border-box !important;
+    overflow-x: hidden !important;
     box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.28) !important;
+  }
+
+  .receipt-sheet {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
+    padding: 20px 14px !important;
   }
 
   .modal-actions {

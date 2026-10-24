@@ -573,14 +573,14 @@ function numberToWordsFR(n) {
   const teens = ['dix', 'onze', 'douze', 'treize', 'quatorze', 'quinze', 'seize', 'dix-sept', 'dix-huit', 'dix-neuf'];
   const tens = ['', 'dix', 'vingt', 'trente', 'quarante', 'cinquante', 'soixante', 'soixante-dix', 'quatre-vingt', 'quatre-vingt-dix'];
 
-  function convertBelow1000(num) {
+  function convertBelow1000(num, beforeMille = false) {
     let s = '';
     const h = Math.floor(num / 100);
     const r = num % 100;
 
     if (h > 0) {
       if (h === 1) s += 'cent ';
-      else s += ones[h] + (r === 0 ? ' cents ' : ' cent ');
+      else s += ones[h] + ((r === 0 && !beforeMille) ? ' cents ' : ' cent ');
     }
 
     if (r > 0) {
@@ -594,7 +594,7 @@ function numberToWordsFR(n) {
         if (t === 7) {
           s += (u === 1 ? 'soixante-et-onze ' : 'soixante-' + teens[u] + ' ');
         } else if (t === 8) {
-          s += (u === 0 ? 'quatre-vingts ' : 'quatre-vingt-' + ones[u] + ' ');
+          s += ((u === 0 && !beforeMille) ? 'quatre-vingts ' : 'quatre-vingt-' + ones[u] + ' ');
         } else if (t === 9) {
           s += 'quatre-vingt-' + teens[u] + ' ';
         } else {
@@ -616,14 +616,14 @@ function numberToWordsFR(n) {
     result += (millions === 1 ? 'un million ' : convertBelow1000(millions) + ' millions ');
   }
   if (thousands > 0) {
-    result += (thousands === 1 ? 'mille ' : convertBelow1000(thousands) + ' mille ');
+    result += (thousands === 1 ? 'mille ' : convertBelow1000(thousands, true) + ' mille ');
   }
   if (rem > 0) {
     result += convertBelow1000(rem);
   }
 
   result = result.trim();
-  return result.charAt(0).toUpperCase() + result.slice(1) + ' Francs CFA';
+  return result.charAt(0).toUpperCase() + result.slice(1) + ' francs CFA';
 }
 
 // Nettoyage intelligent des numéros pour WhatsApp (+221 automatique au Sénégal)
@@ -1625,6 +1625,11 @@ function exportElementToA4Pdf(sourceElement, filename, btn, originalText, callba
           pdf.setFillColor(255, 255, 255);
           pdf.rect(0, 0, pageWidth, pageHeight, 'F');
           pdf.addImage(imgData, 'JPEG', posX, posY, renderW, renderH);
+
+          // Mention officielle KeurGui obligatoire tout en bas de la page A4 du PDF (centrée, discrète et nette)
+          pdf.setFontSize(8.5);
+          pdf.setTextColor(107, 114, 128);
+          pdf.text("Document officiel certifié généré via KeurGui — Gérez vos biens immobiliers au Sénégal sur keurgui.sn", pageWidth / 2, pageHeight - 8, { align: "center" });
 
           const blob = pdf.output('blob');
 
