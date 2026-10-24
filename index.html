@@ -748,6 +748,13 @@
       // 1. Sauvegarde locale
       localStorage.setItem('keurgui_lead_registered', 'true');
       localStorage.setItem('keurgui_lead_name', name);
+      const userProfile = {
+        name: name,
+        phone: phone,
+        email: email || '',
+        role: role
+      };
+      localStorage.setItem('keurgui_user_profile', JSON.stringify(userProfile));
       try {
         const vipLeads = JSON.parse(localStorage.getItem('keurgui_vip_leads') || '[]');
         vipLeads.push(leadData);
@@ -799,6 +806,13 @@
       // 1. Sauvegarde locale
       localStorage.setItem('keurgui_lead_registered', 'true');
       localStorage.setItem('keurgui_lead_name', name);
+      const userProfile = {
+        name: name,
+        phone: phone,
+        email: email || '',
+        role: role
+      };
+      localStorage.setItem('keurgui_user_profile', JSON.stringify(userProfile));
       try {
         const vipLeads = JSON.parse(localStorage.getItem('keurgui_vip_leads') || '[]');
         vipLeads.push(leadData);

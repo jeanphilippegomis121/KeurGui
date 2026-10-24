@@ -356,6 +356,7 @@ function resetDemoData() {
   localStorage.removeItem('keurgui_properties_data');
   localStorage.removeItem('keurgui_receipts_history');
   localStorage.removeItem('keurgui_cleaned');
+  localStorage.removeItem('keurgui_demo_cleaned');
   sessionStorage.removeItem('keurgui_home_demo_dismissed');
   properties = JSON.parse(JSON.stringify(DEFAULT_PROPERTIES));
   saveProperties();
@@ -370,18 +371,200 @@ function resetDemoData() {
   showToast("Données de démonstration rechargées avec succès !", "success");
 }
 
-// Nettoyage direct SANS boîte de confirmation bloquante du navigateur
-function clearToMyProperties() {
+// ===================================================
+// GESTION DYNAMIQUE DU PROFIL BAILLEUR (VOLET B)
+// ===================================================
+function getBailleurProfile() {
+  try {
+    const raw = localStorage.getItem('keurgui_user_profile');
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed && parsed.name && parsed.name.trim()) {
+        const name = parsed.name.trim();
+        const phone = parsed.phone ? parsed.phone.trim() : '';
+        const email = parsed.email ? parsed.email.trim() : '';
+        const role = parsed.role ? parsed.role.trim() : 'Propriétaire';
+
+        // Calcul dynamique des initiales
+        const parts = name.split(/\s+/).filter(Boolean);
+        let initials = 'JP';
+        if (parts.length >= 2) {
+          initials = (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+        } else if (parts.length === 1 && parts[0].length >= 2) {
+          initials = parts[0].substring(0, 2).toUpperCase();
+        } else if (parts.length === 1) {
+          initials = parts[0].substring(0, 1).toUpperCase();
+        }
+
+        return {
+          name: name,
+          phone: phone,
+          email: email,
+          role: role,
+          initials: initials
+        };
+      }
+    }
+  } catch (e) {
+    console.warn("Erreur getBailleurProfile:", e);
+  }
+
+  // Fallback de sécurité strict
+  return {
+    name: "Jean-Philippe Gomis",
+    phone: "",
+    email: "",
+    role: "Propriétaire",
+    initials: "JP"
+  };
+}
+
+function hasSavedBailleurProfile() {
+  try {
+    const raw = localStorage.getItem('keurgui_user_profile');
+    if (raw) {
+      const p = JSON.parse(raw);
+      if (p && p.name && p.name.trim() && p.phone && p.phone.trim()) {
+        return true;
+      }
+    }
+  } catch (e) {}
+  return false;
+}
+
+function renderBailleurProfile() {
+  const profile = getBailleurProfile();
+
+  // Desktop Header / Sidebar
+  const headerNameEl = document.getElementById('headerUserName');
+  if (headerNameEl) headerNameEl.textContent = profile.name;
+
+  const headerAvatarEl = document.getElementById('headerAvatar');
+  if (headerAvatarEl) headerAvatarEl.textContent = profile.initials;
+
+  const userRoleEl = document.getElementById('userRoleBadge');
+  if (userRoleEl && profile.role) {
+    userRoleEl.textContent = profile.role.includes('Agence') ? 'Agence' : 'Propriétaire';
+  }
+
+  // Mobile Top Bar
+  const mobileAvatarEl = document.getElementById('mobileHeaderAvatar');
+  if (mobileAvatarEl) mobileAvatarEl.textContent = profile.initials;
+
+  const mobileRoleEl = document.getElementById('mobileRoleBadge');
+  if (mobileRoleEl && profile.role) {
+    mobileRoleEl.textContent = profile.role.includes('Agence') ? 'Agence' : 'Propriétaire';
+  }
+}
+
+// Exécute la purge des données de démo et active l'Espace Bailleur Actif
+function executeDemoCleaning() {
   properties = [];
   saveProperties();
   saveReceiptsHistory([]);
+  localStorage.setItem('keurgui_demo_cleaned', 'true');
+  localStorage.setItem('keurgui_cleaned', 'true');
+
   updatePeriodDisplay();
+  renderProperties();
+  updateStats();
+  renderDashboardWidgets();
+  renderTenantsList();
+  renderInPageReceipts();
+  updateDemoBannersVisibility(activeView);
 
-  // Masquer le bandeau démo car l'utilisateur passe en mode réel
-  const demoBanner = document.querySelector('.demo-banner-highlight');
-  if (demoBanner) demoBanner.classList.add('hidden');
+  showToast("✨ Espace Bailleur activé ! Les exemples ont été effacés.", "success");
 
-  showToast("✨ Prêt pour vos vrais biens ! Les exemples ont été effacés.", "success");
+  // Ouvre automatiquement et immédiatement la modale [+] Ajouter à votre patrimoine
+  setTimeout(() => {
+    openAddPropertyModal();
+  }, 350);
+}
+
+// Logique intelligente du bouton "Nettoyer pour mettre mes vrais biens ->"
+function clearToMyProperties() {
+  // CAS 1 : profil existant dans le localStorage avec nom et téléphone
+  if (hasSavedBailleurProfile()) {
+    executeDemoCleaning();
+    return;
+  }
+
+  // CAS 2 : keurgui_user_profile n'existe pas dans le localStorage
+  openCleanProfileModal();
+}
+
+function openCleanProfileModal() {
+  const modal = document.getElementById('cleanProfileModal');
+  if (modal) {
+    modal.classList.add('active');
+    modal.style.display = 'flex';
+    setTimeout(() => {
+      const nameInput = document.getElementById('cleanProfileName');
+      if (nameInput) nameInput.focus();
+    }, 100);
+  }
+}
+
+function closeCleanProfileModal() {
+  const modal = document.getElementById('cleanProfileModal');
+  if (modal) {
+    modal.classList.remove('active');
+    modal.style.display = 'none';
+  }
+}
+
+async function handleCleanProfileSubmit(e) {
+  e.preventDefault();
+  const submitBtn = document.getElementById('btnCleanProfileSubmit');
+  if (submitBtn) {
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span>Activation en cours...</span> ⏳';
+  }
+
+  const name = document.getElementById('cleanProfileName').value.trim();
+  const phone = document.getElementById('cleanProfilePhone').value.trim();
+  const dateStr = new Date().toLocaleString('fr-FR', { timeZone: 'Africa/Dakar' });
+
+  const leadData = {
+    date: dateStr,
+    name: name,
+    phone: phone,
+    email: 'Non renseigné',
+    role: 'Propriétaire (Nettoyage Démo)'
+  };
+
+  // 1. Sauvegarde dans le localStorage
+  const userProfile = {
+    name: name,
+    phone: phone,
+    email: '',
+    role: 'Propriétaire'
+  };
+  localStorage.setItem('keurgui_user_profile', JSON.stringify(userProfile));
+  localStorage.setItem('keurgui_lead_registered', 'true');
+  localStorage.setItem('keurgui_lead_name', name);
+
+  // 2. Envoi silencieux vers le webhook Google Sheets existant
+  const webhookUrl = "https://script.google.com/macros/s/AKfycbyq-4fs2XGdsdMSPWRjvwyuut-V8PgZ-_38_titTXmfz6G4jxCDZy6yuCwpWnmYm_IN/exec";
+  try {
+    fetch(webhookUrl, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(leadData)
+    });
+  } catch (err) {
+    console.warn("Erreur Google Sheets webhook:", err);
+  }
+
+  // 3. Mise à jour dynamique de l'en-tête et avatar
+  renderBailleurProfile();
+
+  // 4. Fermeture de la mini-modale
+  closeCleanProfileModal();
+
+  // 5. Exécution immédiate de la suite du Cas 1
+  executeDemoCleaning();
 }
 
 // Système de Toast moderne (remplace les alertes brutes)
@@ -486,20 +669,69 @@ function switchView(viewName) {
 function updateDemoBannersVisibility(viewName = activeView) {
   const homeDemo = document.getElementById('homeMergedDemoCard');
   const otherDemo = document.getElementById('otherViewsDemoStrip');
-  const isDemoCleaned = localStorage.getItem('keurgui_cleaned') === 'true';
+  const isDemoCleaned = (localStorage.getItem('keurgui_demo_cleaned') === 'true') || (localStorage.getItem('keurgui_cleaned') === 'true');
   const isHomeDismissed = sessionStorage.getItem('keurgui_home_demo_dismissed') === 'true';
 
-  if (!isDemoCleaned) {
+  if (isDemoCleaned) {
     if (viewName === 'dashboard') {
-      if (homeDemo) homeDemo.style.display = isHomeDismissed ? 'none' : 'block';
+      if (homeDemo) {
+        homeDemo.style.display = isHomeDismissed ? 'none' : 'block';
+        homeDemo.innerHTML = `
+          <div class="container">
+            <div class="demo-card-inner" style="background: linear-gradient(135deg, #064e3b 0%, #065f46 100%); border: 1.5px solid #10b981; box-shadow: 0 4px 16px rgba(6, 78, 59, 0.25); color: #ffffff;">
+              <div class="demo-card-left">
+                <span class="demo-chip-live" style="background: #10b981; color: #ffffff; font-weight: 800;">🛡️ ESPACE BAILLEUR ACTIF</span>
+                <div class="demo-card-text">
+                  <strong style="color: #ffffff; font-size: 14px;">Espace Bailleur Actif • Gestion Privée Sécurisée</strong>
+                  <span class="demo-sub" style="color: #d1fae5; font-size: 12px;">Vos données sont 100% confidentielles. Vos quittances officielles sont certifiées conformes.</span>
+                </div>
+              </div>
+              <div class="demo-card-actions">
+                <button class="btn btn-primary" onclick="openAddPropertyModal()" style="background: #ffffff; color: #065f46; font-weight: 800; border: none; padding: 9px 18px; border-radius: 8px; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">
+                  <span>➕</span> Ajouter un bien
+                </button>
+                <button class="btn-dismiss-demo-card" onclick="dismissHomeDemoCard()" title="Fermer cette bannière" style="color: rgba(255,255,255,0.7);">✕</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+      if (otherDemo) otherDemo.style.display = 'none';
+    } else {
+      if (homeDemo) homeDemo.style.display = 'none';
+      if (otherDemo) otherDemo.style.display = 'none';
+    }
+  } else {
+    if (viewName === 'dashboard') {
+      if (homeDemo) {
+        homeDemo.style.display = isHomeDismissed ? 'none' : 'block';
+        homeDemo.innerHTML = `
+          <div class="container">
+            <div class="demo-card-inner">
+              <div class="demo-card-left">
+                <span class="demo-chip-live">⚡ DÉMO INTERACTIVE</span>
+                <div class="demo-card-text">
+                  <strong>Dalal ak jàmm sur KeurGui !</strong>
+                  <span class="demo-sub">Vous testez des exemples fictifs à Dakar.</span>
+                </div>
+              </div>
+              <div class="demo-card-actions">
+                <button class="btn-clean-start-prominent" onclick="clearToMyProperties()">
+                  <span>✨</span>
+                  <strong>Nettoyer pour mettre mes vrais biens</strong>
+                  <span class="btn-arrow-subtle">→</span>
+                </button>
+                <button class="btn-dismiss-demo-card" onclick="dismissHomeDemoCard()" title="Fermer cette bannière">✕</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }
       if (otherDemo) otherDemo.style.display = 'none';
     } else {
       if (homeDemo) homeDemo.style.display = 'none';
       if (otherDemo) otherDemo.style.display = 'block';
     }
-  } else {
-    if (homeDemo) homeDemo.style.display = 'none';
-    if (otherDemo) otherDemo.style.display = 'none';
   }
 }
 
@@ -513,6 +745,7 @@ function dismissHomeDemoCard() {
 
 // Initialisation
 function initApp() {
+  renderBailleurProfile();
   updatePeriodDisplay();
   renderProperties();
   updateStats();
@@ -1395,8 +1628,25 @@ function openReceiptModal(id, targetPeriodKey = null) {
   const legalNote = document.getElementById('mDocumentLegalNote');
 
   const receiptNo = pData.receiptNo || p.receiptNo || `KG-${y}-${String(p.id).padStart(4, '0')}`;
-  document.getElementById('mReceiptNumber').textContent = receiptNo;
-  document.getElementById('mReceiptRef').textContent = receiptNo;
+  pData.receiptNo = receiptNo;
+
+  // Harmonisation stricte de la référence (une seule et unique variable)
+  const modalTitleRefEl = document.getElementById('mModalReceiptTitleRef');
+  if (modalTitleRefEl) modalTitleRefEl.textContent = receiptNo;
+  const receiptBodyRefEl = document.getElementById('mReceiptBodyRef');
+  if (receiptBodyRefEl) receiptBodyRefEl.textContent = receiptNo;
+  const oldReceiptNoEl = document.getElementById('mReceiptNumber');
+  if (oldReceiptNoEl) oldReceiptNoEl.textContent = receiptNo;
+  const oldReceiptRefEl = document.getElementById('mReceiptRef');
+  if (oldReceiptRefEl) oldReceiptRefEl.textContent = receiptNo;
+
+  // Injection dynamique de la ligne Bailleur / Gestionnaire
+  const bailleur = getBailleurProfile();
+  const bailleurInfoEl = document.getElementById('mReceiptBailleurInfo');
+  if (bailleurInfoEl) {
+    const bailleurText = bailleur.phone ? `${bailleur.name} (${bailleur.phone})` : (bailleur.name || 'Jean-Philippe Gomis');
+    bailleurInfoEl.textContent = bailleurText;
+  }
   document.getElementById('mPaymentMethodBadge').textContent = 'Par ' + (pData.paymentMethod || p.paymentMethod || 'Wave');
   document.getElementById('mTenantName').textContent = p.tenant;
   document.getElementById('mTenantPhone').textContent = p.phone;
@@ -1482,10 +1732,20 @@ function openReceiptModal(id, targetPeriodKey = null) {
     }
   }
 
+  // Bloc Signature & Cachet Officiel du Bailleur
+  const sigNameEl = document.getElementById('mSignatureBailleurName');
+  if (sigNameEl) {
+    sigNameEl.textContent = bailleur.name || 'Jean-Philippe Gomis';
+  }
+  const sigDateEl = document.getElementById('mSignatureDateText');
+  if (sigDateEl) {
+    sigDateEl.textContent = `Règlement du : ${payDate}`;
+  }
+
   if (isAgencyMode && p.owner) {
     document.getElementById('mOwnerName').textContent = p.owner;
   } else {
-    document.getElementById('mOwnerName').textContent = 'KEURGUI';
+    document.getElementById('mOwnerName').textContent = bailleur.name ? bailleur.name.toUpperCase() : 'KEURGUI';
   }
 
   const modal = document.getElementById('receiptModalOverlay');
@@ -1549,12 +1809,33 @@ function exportElementToA4Pdf(sourceElement, filename, btn, originalText, callba
       max-width: 794px !important;
       margin: 0 auto !important;
       background: #ffffff !important;
-      padding: 40px !important;
+      padding: 34px 40px !important;
       box-sizing: border-box !important;
       font-family: sans-serif !important;
       color: #111827 !important;
       border: none !important;
       box-shadow: none !important;
+    }
+    .receipt-signature-block {
+      display: flex !important;
+      flex-direction: column !important;
+      align-items: flex-end !important;
+      text-align: right !important;
+      margin-top: 14px !important;
+      margin-bottom: 6px !important;
+      box-sizing: border-box !important;
+    }
+    .receipt-stamp-badge {
+      border: 2px solid #059669 !important;
+      background: rgba(236, 253, 245, 0.85) !important;
+      color: #065f46 !important;
+      border-radius: 6px !important;
+      padding: 5px 12px !important;
+      margin-top: 6px !important;
+      display: inline-block !important;
+      text-align: right !important;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+      box-sizing: border-box !important;
     }
     .no-print {
       display: none !important;
@@ -2568,6 +2849,7 @@ function handleGenerateBuilding(e) {
 function closeModalOnOverlay(e) {
   if (e.target.classList.contains('modal-overlay')) {
     e.target.classList.remove('active');
+    e.target.style.display = 'none';
   }
 }
 
@@ -2774,18 +3056,23 @@ function printDepositReceiptPaper() {
 function checkWelcomeGreeting() {
   const urlParams = new URLSearchParams(window.location.search);
   const welcomeParam = urlParams.get('welcome');
-  const nameParam = urlParams.get('name') || localStorage.getItem('keurgui_lead_name');
+  const nameParam = urlParams.get('name');
   
   if (nameParam) {
-    const avatarEl = document.getElementById('headerAvatar');
-    const nameEl = document.getElementById('headerUserName');
-    if (avatarEl && nameParam.length > 0) {
-      avatarEl.textContent = nameParam.substring(0, 2).toUpperCase();
-    }
-    if (nameEl) {
-      nameEl.textContent = nameParam;
-    }
+    try {
+      const existing = localStorage.getItem('keurgui_user_profile');
+      if (!existing) {
+        const newProf = {
+          name: nameParam.trim(),
+          phone: '',
+          email: '',
+          role: 'Propriétaire'
+        };
+        localStorage.setItem('keurgui_user_profile', JSON.stringify(newProf));
+      }
+    } catch (e) {}
   }
+  renderBailleurProfile();
 
   const dismissed = sessionStorage.getItem('keurgui_welcome_dismissed');
   if (!dismissed && (welcomeParam === '1' || nameParam)) {

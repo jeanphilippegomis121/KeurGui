@@ -1589,6 +1589,29 @@ input:checked + .slider:before {
   padding-top: 12px;
 }
 
+.receipt-signature-block {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  text-align: right;
+  margin-top: 14px;
+  margin-bottom: 6px;
+  box-sizing: border-box;
+}
+
+.receipt-stamp-badge {
+  border: 2px solid #059669;
+  background: rgba(236, 253, 245, 0.85);
+  color: #065f46;
+  border-radius: 6px;
+  padding: 5px 12px;
+  margin-top: 6px;
+  display: inline-block;
+  text-align: right;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  box-sizing: border-box;
+}
+
 .receipt-header {
   display: flex;
   justify-content: space-between;
