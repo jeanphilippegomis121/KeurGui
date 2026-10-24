@@ -191,38 +191,45 @@ function loadProperties() {
     const saved = localStorage.getItem('keurgui_properties_data');
     if (saved) {
       let parsed = JSON.parse(saved);
-      // Migration automatique : S'assurer que le dépôt de garantie / caution existe pour chaque bien
-      let hasMigration = false;
-      parsed.forEach(p => {
-        if (p.deposit === undefined) {
-          p.depositMonths = p.isCommercial ? 3 : 2;
-          p.deposit = p.rent * p.depositMonths;
-          p.depositPaymentMethod = p.paymentMethod || 'Wave';
-          p.depositPaidDate = p.paidDate || '01/10/2026';
-          p.depositStatus = 'held';
-          p.depositReceiptNo = `DEP-2026-${String(p.id).padStart(4, '0')}`;
-          hasMigration = true;
-        }
-      });
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        // Migration automatique : S'assurer que le dépôt de garantie / caution existe pour chaque bien
+        let hasMigration = false;
+        parsed.forEach(p => {
+          if (p.deposit === undefined || p.deposit === null) {
+            p.depositMonths = p.isCommercial ? 3 : 2;
+            p.deposit = p.rent * p.depositMonths;
+            p.depositPaymentMethod = p.paymentMethod || 'Wave';
+            p.depositPaidDate = p.paidDate || '01/10/2026';
+            p.depositStatus = 'held';
+            p.depositReceiptNo = `DEP-2026-${String(p.id).padStart(4, '0')}`;
+            hasMigration = true;
+          }
+        });
 
-      // S'assurer que l'exemple de bail commercial TVA 18% est présent
-      if (!parsed.some(p => p.isCommercial)) {
-        const comm = DEFAULT_PROPERTIES.find(p => p.isCommercial);
-        if (comm) {
-          parsed.push(comm);
-          hasMigration = true;
+        // S'assurer que l'exemple de bail commercial TVA 18% est présent
+        if (!parsed.some(p => p.isCommercial)) {
+          const comm = DEFAULT_PROPERTIES.find(p => p.isCommercial);
+          if (comm) {
+            parsed.push(comm);
+            hasMigration = true;
+          }
         }
-      }
 
-      if (hasMigration) {
-        localStorage.setItem('keurgui_properties_data', JSON.stringify(parsed));
+        if (hasMigration) {
+          localStorage.setItem('keurgui_properties_data', JSON.stringify(parsed));
+        }
+        return parsed;
       }
-      return parsed;
     }
   } catch (e) {
     console.error('Erreur chargement LocalStorage', e);
   }
-  return JSON.parse(JSON.stringify(DEFAULT_PROPERTIES));
+  // Si le stockage local est vide ou corrompu, recharger immédiatement les données de démonstration par défaut
+  const fresh = JSON.parse(JSON.stringify(DEFAULT_PROPERTIES));
+  try {
+    localStorage.setItem('keurgui_properties_data', JSON.stringify(fresh));
+  } catch (e) {}
+  return fresh;
 }
 
 function saveProperties() {
@@ -348,15 +355,18 @@ function goToCurrentPeriod() {
 function resetDemoData() {
   localStorage.removeItem('keurgui_properties_data');
   localStorage.removeItem('keurgui_receipts_history');
+  localStorage.removeItem('keurgui_cleaned');
+  sessionStorage.removeItem('keurgui_home_demo_dismissed');
   properties = JSON.parse(JSON.stringify(DEFAULT_PROPERTIES));
   saveProperties();
   updatePeriodDisplay();
   initReceiptsHistory();
-
-  // Réafficher le bandeau démo
-  const demoBanner = document.querySelector('.demo-banner-highlight');
-  if (demoBanner) demoBanner.classList.remove('hidden');
-
+  renderProperties();
+  updateStats();
+  renderDashboardWidgets();
+  renderTenantsList();
+  renderInPageReceipts();
+  updateDemoBannersVisibility(activeView);
   showToast("Données de démonstration rechargées avec succès !", "success");
 }
 
@@ -446,19 +456,31 @@ function switchView(viewName) {
   if (mobileTitle) mobileTitle.textContent = VIEW_TITLES[viewName];
 
   // 5. Initialiser les données de la vue choisie
-  if (viewName === 'tenants') {
-    renderTenantsList();
-  } else if (viewName === 'receipts') {
-    renderInPageReceipts();
-  } else if (viewName === 'dashboard') {
-    renderDashboardWidgets();
+  try {
+    if (viewName === 'tenants') {
+      renderTenantsList();
+    } else if (viewName === 'receipts') {
+      renderInPageReceipts();
+    } else if (viewName === 'dashboard') {
+      renderDashboardWidgets();
+      updateStats();
+    } else if (viewName === 'properties') {
+      renderProperties();
+      updateStats();
+    }
+  } catch (err) {
+    console.error(`Erreur rendu vue ${viewName}:`, err);
   }
 
   // 6. Gestion des bannières démo (Accueil : carte compacte ; Autres vues : fine bande 1-ligne)
-  updateDemoBannersVisibility(viewName);
+  try {
+    updateDemoBannersVisibility(viewName);
+  } catch (err) {}
 
   // Scroll doux vers le haut
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  try {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } catch (err) {}
 }
 
 function updateDemoBannersVisibility(viewName = activeView) {
@@ -492,6 +514,8 @@ function dismissHomeDemoCard() {
 // Initialisation
 function initApp() {
   updatePeriodDisplay();
+  renderProperties();
+  updateStats();
   renderBuildingUnitsSetup();
   checkWelcomeGreeting();
   initReceiptsHistory();
@@ -615,9 +639,14 @@ function sanitizeWhatsAppPhone(phone) {
 // ===================================================
 // GESTION DU MODE BAILLEUR / AGENCE
 // ===================================================
-function toggleAgencyMode() {
+function toggleAgencyMode(fromCheckbox = false) {
   const toggle = document.getElementById('agencyModeToggle');
-  isAgencyMode = toggle.checked;
+  if (fromCheckbox && toggle) {
+    isAgencyMode = toggle.checked;
+  } else {
+    isAgencyMode = !isAgencyMode;
+    if (toggle) toggle.checked = isAgencyMode;
+  }
 
   const labelBailleur = document.getElementById('label-bailleur');
   const labelAgence = document.getElementById('label-agence');
@@ -625,21 +654,45 @@ function toggleAgencyMode() {
   const commissionCard = document.getElementById('agencyCommissionCard');
   const agencyOwnerField = document.getElementById('agencyOwnerField');
   const bldAgencyOwnerField = document.getElementById('bldAgencyOwnerField');
+  const mobileBtn = document.getElementById('btnMobileAgencyToggle');
+  const mobileText = document.getElementById('mobileAgencyText');
+  const mobileIcon = document.getElementById('mobileAgencyIcon');
+  const mobileRoleBadge = document.getElementById('mobileRoleBadge');
 
   if (isAgencyMode) {
-    labelBailleur.classList.remove('active-role');
-    labelAgence.classList.add('active-role');
-    userBadge.textContent = 'Agence Immobilière';
-    commissionCard.style.display = 'flex';
+    if (labelBailleur) labelBailleur.classList.remove('active-role');
+    if (labelAgence) labelAgence.classList.add('active-role');
+    if (userBadge) userBadge.textContent = 'Agence Immobilière';
+    if (mobileRoleBadge) {
+      mobileRoleBadge.textContent = 'Agence';
+      mobileRoleBadge.style.background = '#dcfce7';
+      mobileRoleBadge.style.color = '#15803d';
+    }
+    if (commissionCard) commissionCard.style.display = 'flex';
     if (agencyOwnerField) agencyOwnerField.style.display = 'block';
     if (bldAgencyOwnerField) bldAgencyOwnerField.style.display = 'block';
+    if (mobileBtn) {
+      mobileBtn.classList.add('agency-active');
+      if (mobileText) mobileText.textContent = 'Agence';
+      if (mobileIcon) mobileIcon.textContent = '🏢';
+    }
   } else {
-    labelBailleur.classList.add('active-role');
-    labelAgence.classList.remove('active-role');
-    userBadge.textContent = 'Propriétaire';
-    commissionCard.style.display = 'none';
+    if (labelBailleur) labelBailleur.classList.add('active-role');
+    if (labelAgence) labelAgence.classList.remove('active-role');
+    if (userBadge) userBadge.textContent = 'Propriétaire';
+    if (mobileRoleBadge) {
+      mobileRoleBadge.textContent = 'Propriétaire';
+      mobileRoleBadge.style.background = '';
+      mobileRoleBadge.style.color = '';
+    }
+    if (commissionCard) commissionCard.style.display = 'none';
     if (agencyOwnerField) agencyOwnerField.style.display = 'none';
     if (bldAgencyOwnerField) bldAgencyOwnerField.style.display = 'none';
+    if (mobileBtn) {
+      mobileBtn.classList.remove('agency-active');
+      if (mobileText) mobileText.textContent = 'Bailleur';
+      if (mobileIcon) mobileIcon.textContent = '🏠';
+    }
   }
 
   renderProperties();
@@ -753,16 +806,16 @@ function updateStats() {
   }
 
   // Tags dynamiques explicites et contextualisés sur le mois actif
-  const collectedTag = document.querySelector('.stat-card.stat-success .stat-tag');
-  if (collectedTag) {
-    collectedTag.textContent = paidCount > 0 
+  const collectedCardTag = document.querySelector('.stat-card.stat-success .stat-tag');
+  if (collectedCardTag) {
+    collectedCardTag.textContent = paidCount > 0 
       ? `↑ ${paidCount} loyer${paidCount > 1 ? 's' : ''} encaissé${paidCount > 1 ? 's' : ''} (${currentPeriodName})` 
       : `Aucun encaissement en ${currentPeriodName}`;
   }
 
-  const pendingTag = document.querySelector('.stat-card.stat-warning .stat-tag');
-  if (pendingTag) {
-    pendingTag.textContent = lateCount > 0 
+  const pendingCardTag = document.querySelector('.stat-card.stat-warning .stat-tag');
+  if (pendingCardTag) {
+    pendingCardTag.textContent = lateCount > 0 
       ? `⚠️ ${lateCount} loyer${lateCount > 1 ? 's' : ''} en attente (${currentPeriodName})` 
       : `✓ Tous les loyers réglés pour ${currentPeriodName}`;
   }

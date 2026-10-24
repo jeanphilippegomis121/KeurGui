@@ -97,7 +97,7 @@
         <div class="mode-toggle-card sidebar-mode-toggle">
           <span class="mode-label active-role" id="label-bailleur">Bailleur</span>
           <label class="switch">
-            <input type="checkbox" id="agencyModeToggle" onchange="toggleAgencyMode()">
+            <input type="checkbox" id="agencyModeToggle" onchange="toggleAgencyMode(true)">
             <span class="slider round"></span>
           </label>
           <span class="mode-label" id="label-agence">Mode Agence</span>
@@ -134,6 +134,10 @@
           <span class="mobile-view-title" id="mobileActiveViewTitle">Tableau de bord</span>
         </div>
         <div class="mobile-top-right">
+          <button class="btn-mobile-agency-toggle" id="btnMobileAgencyToggle" onclick="toggleAgencyMode()" title="Basculer Mode Bailleur / Agence">
+            <span id="mobileAgencyIcon">🏠</span>
+            <span id="mobileAgencyText">Bailleur</span>
+          </button>
           <button class="btn-mobile-feedback-top" onclick="openFeedbackModal()" title="Donner votre avis" style="background:#ecfdf5; border:1px solid #a7f3d0; color:#059669; padding:4px 8px; border-radius:999px; font-size:11px; font-weight:700; display:flex; align-items:center; gap:4px; cursor:pointer;">
             <span>💬</span> Avis
           </button>
@@ -413,7 +417,7 @@
       </main>
     </div>
 
-    <!-- 3. BARRE DE NAVIGATION MOBILE BAS D'ÉCRAN (BOTTOM BAR) -->
+    <!-- 3. BARRE DE NAVIGATION MOBILE BAS D'ÉCRAN (BOTTOM BAR - 5 ÉLÉMENTS BIEN RÉPARTIS) -->
     <nav class="mobile-bottom-nav">
       <button class="bottom-nav-item active" id="bottomNav-dashboard" onclick="switchView('dashboard')">
         <span class="bnav-icon">📊</span>
@@ -423,12 +427,17 @@
         <span class="bnav-icon">🏢</span>
         <span class="bnav-label">Biens</span>
       </button>
+      <button class="bottom-nav-add-btn" id="bottomNav-add" onclick="openAddPropertyModal()" title="Ajouter un bien" aria-label="Ajouter un bien">
+        <div class="bottom-nav-add-circle">
+          <span class="bnav-add-icon">➕</span>
+        </div>
+      </button>
       <button class="bottom-nav-item" id="bottomNav-tenants" onclick="switchView('tenants')">
         <span class="bnav-icon">👥</span>
         <span class="bnav-label">Locataires</span>
       </button>
       <button class="bottom-nav-item" id="bottomNav-receipts" onclick="switchView('receipts')">
-        <span class="bnav-icon">🧾</span>
+        <span class="bnav-icon">📄</span>
         <span class="bnav-label">Reçus</span>
       </button>
     </nav>
